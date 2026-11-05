@@ -1244,7 +1244,38 @@ window.caShowPolicy=function(){show('İstifadə və təhlükəsizlik məlumatlar
 document.addEventListener('keydown',e=>{if(e.key==='Escape')caCloseDialog()});
 })();
 </script>
-<div id="caServerNotice" style="position:fixed;bottom:10px;left:10px;z-index:9999;max-width:340px;padding:8px 12px;background:#12233b;color:#fff;border:1px solid #536a85;border-radius:12px;font:12px Arial;box-shadow:0 5px 22px #0005">Onlayn elanlar üçün Supabase SQL qurulumu və internet bağlantısı tələb olunur. Ödənişli paketlər ödəniş təsdiqinə qədər aktivləşmir.</div></body></html>
+<div id="caServerNotice" style="position:fixed;bottom:10px;left:10px;z-index:9999;max-width:340px;padding:8px 12px;background:#12233b;color:#fff;border:1px solid #536a85;border-radius:12px;font:12px Arial;box-shadow:0 5px 22px #0005">Onlayn elanlar üçün Supabase SQL qurulumu və internet bağlantısı tələb olunur. Ödənişli paketlər ödəniş təsdiqinə qədər aktivləşmir.</div><style id="ca-admin-ui-style">
+#caAdminLaunch{display:none;position:fixed;bottom:18px;right:16px;z-index:9997;background:#b9f34b;color:#081b2d;border:0;border-radius:14px;padding:12px 18px;font-weight:800;box-shadow:0 8px 35px #0008}
+#caAdminPanel{display:none;position:fixed;inset:0;z-index:9998;overflow:auto;background:#071525;color:#f4f9ff;padding:20px 14px;font-family:system-ui,sans-serif}
+#caAdminPanel .ca-wrap{max-width:980px;margin:auto}#caAdminPanel button{cursor:pointer;border:1px solid #4b6479;border-radius:11px;padding:9px 12px;background:#18344b;color:white;font-weight:700}
+#caAdminPanel .ca-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}#caAdminPanel .ca-list{display:grid;gap:12px}
+#caAdminPanel .ca-item{padding:16px;background:#10263c;border:1px solid #2b4963;border-radius:16px}
+#caAdminPanel .ca-item strong{font-size:18px}#caAdminPanel .ca-item p{color:#b8c9d8;overflow-wrap:anywhere}
+#caAdminPanel .ca-yes{background:#367a36}#caAdminPanel .ca-no{background:#833d43}
+</style>
+<button id="caAdminLaunch" type="button" onclick="caAdminOpen()">🛡 Admin paneli</button>
+<section id="caAdminPanel" aria-label="Cənub Avto admin paneli"><div class="ca-wrap">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2>🛡 Cənub Avto — Admin</h2><button onclick="caAdminClose()">✕ Bağla</button></div>
+<p>Elanların təsdiqlənməsi və rədd edilməsi</p><div class="ca-actions"><button onclick="caAdminLoad()">Yenilə</button><button onclick="caAdminFilter('all')">Hamısı</button><button onclick="caAdminFilter('gozlemede')">Gözləmədə</button><button onclick="caAdminFilter('aktiv')">Təsdiqlənmiş</button><button onclick="caAdminFilter('reddedildi')">Rədd edilmiş</button></div>
+<p id="caAdminMsg"></p><div id="caAdminList" class="ca-list"></div></div></section>
+<script id="ca-admin-script">
+(function(){
+const ADMIN_UID='8f1f12d1-692c-4214-9cc9-46bd23953e82';let rows=[],filter='all';
+const el=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function token(){if(typeof caToken==='function')return await caToken();return caSession?.access_token||null;}
+async function rpc(name,body){const t=await token();if(!t)throw Error('Yenidən daxil olmalısan');return caRequest('/rest/v1/rpc/'+name,'POST',body,t);}
+async function verify(){if(!currentUser||currentUser.id!==ADMIN_UID){el('caAdminLaunch').style.display='none';return false;}try{await rpc('ca_admin_list',{});el('caAdminLaunch').style.display='block';return true}catch(e){el('caAdminLaunch').style.display='none';return false;}}
+window.caAdminOpen=async()=>{if(!await verify())return alert('Admin icazəsi təsdiqlənmədi. Əvvəlcə ADMIN_SQL faylını Supabase-də icra et.');el('caAdminPanel').style.display='block';await window.caAdminLoad();};
+window.caAdminClose=()=>{el('caAdminPanel').style.display='none';};
+window.caAdminFilter=v=>{filter=v;draw();};
+function draw(){const list=el('caAdminList');const selected=rows.filter(x=>filter==='all'||x.veziyyet===filter);list.innerHTML=selected.map(x=>`<article class="ca-item"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p><p>${esc(x.tesvir).slice(0,250)}</p><div class="ca-actions"><button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv">✓ Təsdiqlə</button><button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button><button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button></div></article>`).join('')||'<p>Bu bölmədə elan yoxdur.</p>';}
+window.caAdminLoad=async()=>{el('caAdminMsg').textContent='Elanlar yüklənir...';try{rows=await rpc('ca_admin_list',{});if(!Array.isArray(rows))throw Error('Gözlənilməyən cavab');el('caAdminMsg').textContent=rows.length+' elan tapıldı';draw();}catch(e){el('caAdminMsg').textContent='Xəta: '+e.message;}};
+el('caAdminList').addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b)return;const id=b.dataset.id,status=b.dataset.status;if(!confirm('Bu elanın vəziyyəti dəyişdirilsin?'))return;b.disabled=true;try{await rpc('ca_admin_status',{p_id:id,p_status:status});await window.caAdminLoad();}catch(err){alert('Dəyişmədi: '+err.message);}finally{b.disabled=false;}});
+setInterval(verify,12000);window.addEventListener('load',()=>setTimeout(verify,1200));
+})();
+</script>
+</body></html>
 <style id="cenub-bmw-series-layout-final-fix">
 /* Fix: BMW series cards were being vertically compressed inside the picker grid */
 #pickerList.bmw-series-layout-active,
