@@ -1244,7 +1244,7 @@ window.caShowPolicy=function(){show('İstifadə və təhlükəsizlik məlumatlar
 document.addEventListener('keydown',e=>{if(e.key==='Escape')caCloseDialog()});
 })();
 </script>
-<div id="caServerNotice" hidden style="display:none;"position:fixed;bottom:10px;left:10px;z-index:9999;max-width:340px;padding:8px 12px;background:#12233b;color:#fff;border:1px solid #536a85;border-radius:12px;font:12px Arial;box-shadow:0 5px 22px #0005">Onlayn elanlar üçün Supabase SQL qurulumu və internet bağlantısı tələb olunur. Ödənişli paketlər ödəniş təsdiqinə qədər aktivləşmir.</div><style id="ca-admin-ui-style">
+<div id="caServerNotice" hidden style="display:none;position:fixed;bottom:10px;left:10px;z-index:9999;max-width:340px;padding:8px 12px;background:#12233b;color:#fff;border:1px solid #536a85;border-radius:12px;font:12px Arial;box-shadow:0 5px 22px #0005">Onlayn elanlar üçün Supabase SQL qurulumu və internet bağlantısı tələb olunur. Ödənişli paketlər ödəniş təsdiqinə qədər aktivləşmir.</div><style id="ca-admin-ui-style">
 #caAdminLaunch{display:none;position:fixed;bottom:18px;right:16px;z-index:9997;background:#b9f34b;color:#081b2d;border:0;border-radius:14px;padding:12px 18px;font-weight:800;box-shadow:0 8px 35px #0008}
 #caAdminPanel{display:none;position:fixed;inset:0;z-index:9998;overflow:auto;background:#071525;color:#f4f9ff;padding:20px 14px;font-family:system-ui,sans-serif}
 #caAdminPanel .ca-wrap{max-width:980px;margin:auto}#caAdminPanel button{cursor:pointer;border:1px solid #4b6479;border-radius:11px;padding:9px 12px;background:#18344b;color:white;font-weight:700}
@@ -1268,8 +1268,8 @@ async function rpc(name,body){const t=await token();if(!t)throw Error('Yenidən 
 async function verify(){
  const btn=el('caAdminLaunch');
  if(!currentUser||currentUser.id!==ADMIN_UID){btn.style.display='none';return false;}
- btn.style.display='block'; // Show entry for correct account; verify server authorization on opening.
- try{const t=await token();if(!t)throw Error('Sessiya bitib');await rpc('ca_admin_list',{});btn.title='Admin təsdiqləndi';return true;}
+ btn.style.display='none'; // Only reveal admin entry after server authorization succeeds.
+ try{const t=await token();if(!t)throw Error('Sessiya bitib');await rpc('ca_admin_list',{});btn.style.display='block';btn.title='Admin təsdiqləndi';return true;}
  catch(e){btn.title='Admin yoxlaması: '+e.message;return false;}
 }
 window.caAdminOpen=async()=>{if(!await verify())return alert('Admin bağlantısı təsdiqlənmədi. Hesabın Supabase sessiyasını yoxla və yenidən daxil ol.');el('caAdminPanel').style.display='block';await window.caAdminLoad();};
