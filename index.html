@@ -485,15 +485,13 @@ body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5f
 #caAdminPanel .ca-item{border-radius:20px;background:#142a42;border-color:#3a5670}
 @media(max-width:600px){.car-card .details{padding:11px}.car-card h3{font-size:14px}.car-card .price{font-size:17px}.ca-today{margin:12px 12px 0}}
 
-/* Cənub Avto: marka/model always visible on listing cards */
-.car-card .details .ca-visible-car-name{display:block!important;visibility:visible!important;opacity:1!important;color:#132c45!important;font-size:clamp(14px,1.6vw,19px)!important;font-weight:900!important;line-height:1.4!important;min-height:24px!important;margin:0 0 10px!important;overflow-wrap:anywhere!important;white-space:normal!important}
-.car-card .details .ca-visible-car-year{color:#5d7187;font-size:.8em;font-weight:700}
-
-/* Fix card text contrast on the white listing card, for all packages */
-.car-card .details{display:block!important;visibility:visible!important;opacity:1!important;background:#fff!important;color:#132c45!important;padding:14px!important;min-height:135px!important}
-.car-card .details .price{display:block!important;color:#0c2742!important;visibility:visible!important;opacity:1!important}
-.car-card .details .meta,.car-card .details .seller{display:block!important;color:#51657b!important;visibility:visible!important;opacity:1!important}
-.car-card .details .ca-visible-car-name{color:#132c45!important}
+/* Elan kartları: hər paketdə mətnin görünməsi, tünd dizayna uyğun kontrast */
+.car-card .details{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;height:auto!important;min-height:145px!important;padding:16px!important;background:#142a42!important;color:#eaf5ff!important;overflow:visible!important}
+.car-card .details .ca-visible-car-name{display:block!important;visibility:visible!important;opacity:1!important;color:#ffffff!important;font-size:19px!important;font-weight:850!important;line-height:1.35!important;margin-bottom:9px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.car-card .details .ca-visible-car-year{font-size:14px;color:#a9bed3}
+.car-card .details .price{display:block!important;color:#55e1d0!important;font-weight:800!important;font-size:22px!important;visibility:visible!important}
+.car-card .details .meta{display:block!important;color:#b3c5d7!important;visibility:visible!important;opacity:1!important}
+.car-card .details .seller{display:block!important;color:#a9d9d4!important;visibility:visible!important;opacity:1!important}
 </style>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -1119,7 +1117,17 @@ listingModelEl.addEventListener('change',updateEngineSuggestions);
 
 function allCars(){return caRemoteCars.filter(c=>c.veziyyet==='aktiv' || c.status==='aktiv')}
 function packageName(pack){return ({VIP:'Önə çıxarılan',Premium:'Üstün',Standart:'Sərfəli seçim',Pulsuz:'Pulsuz'})[pack]||'Pulsuz';}
-function card(c){let id=allCars().indexOf(c),flag=c.pack==='VIP'||c.pack==='Premium'?`<span class="flag">${packageName(c.pack)}</span>`:'';let cover=c.photo||firstCarPhoto(c),key=listingKey(c),fav=favoriteKeys().includes(key),encoded=encodeURIComponent(key);return `<article class="car-card" role="button" tabindex="0" onclick="openCarDetail(${id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCarDetail(${id})}"><button type="button" class="favorite-btn ${fav?'is-favorite':''}" aria-label="${fav?'Seçilmişlərdən çıxar':'Seçilmişlərə əlavə et'}" onclick="toggleFavorite(decodeURIComponent('${encoded}'),event)">${fav?'♥':'♡'}</button><div class="photo">${flag}<span>${cover?`<img src="${cover}" alt="${esc(c.make)} ${esc(c.model)}" style="width:100%;height:100%;object-fit:cover">`:'<span class="photo-placeholder">Foto yoxdur</span>'}</span></div><div class="details"><div class="ca-visible-car-name">${esc([c.make,c.model].filter(Boolean).join(" ")||"Marka və model qeyd edilməyib")}${c.year?` <span class="ca-visible-car-year">· ${esc(c.year)}</span>`:""}</div><div class="price">${Number(c.price).toLocaleString('az-AZ')} ₼</div><div class="meta">${esc(c.year)} · ${esc(c.city)} · ${esc(c.mileage||'Yürüş qeyd edilməyib')}</div><div class="meta">${esc(c.fuel||'')} · ${esc(c.gear||'')}</div><div class="seller">${esc(packageName(c.pack))} elan · Ətraflı bax →</div></div></article>`}
+function card(c){
+ const id=allCars().indexOf(c);
+ const flag=c.pack==='VIP'||c.pack==='Premium'?`<span class="flag">${packageName(c.pack)}</span>`:'';
+ const cover=c.photo||firstCarPhoto(c),key=listingKey(c),fav=favoriteKeys().includes(key),encoded=encodeURIComponent(key);
+ const make=String(c.make||c.marka||c.brand||'').trim();
+ const model=String(c.model||c.modelName||'').trim();
+ const carName=[make,model].filter(Boolean).join(' ')||'Marka və model qeyd edilməyib';
+ const year=c.year||c.il||'';
+ const price=Number(c.price||0).toLocaleString('az-AZ');
+ return `<article class="car-card" role="button" tabindex="0" onclick="openCarDetail(${id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCarDetail(${id})}"><button type="button" class="favorite-btn ${fav?'is-favorite':''}" aria-label="${fav?'Seçilmişlərdən çıxar':'Seçilmişlərə əlavə et'}" onclick="toggleFavorite(decodeURIComponent('${encoded}'),event)">${fav?'♥':'♡'}</button><div class="photo">${flag}<span>${cover?`<img src="${cover}" alt="${esc(carName)}" style="width:100%;height:100%;object-fit:cover">`:'<span class="photo-placeholder">Foto yoxdur</span>'}</span></div><div class="details"><div class="ca-visible-car-name">${esc(carName)}${year?` <span class="ca-visible-car-year">· ${esc(year)}</span>`:''}</div><div class="price">${price} ₼</div><div class="meta">${esc(year)} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(c.mileage||'Yürüş qeyd edilməyib')}</div><div class="meta">${esc(c.fuel||'')} · ${esc(c.gear||'')}</div><div class="seller">${esc(packageName(c.pack))} elan · Ətraflı bax →</div></div></article>`;
+}
 function firstCarPhoto(c){let groups=c.photos||{};for(const key of ['front','rear','side','interior','engine','other'])if(Array.isArray(groups[key])&&groups[key].length)return groups[key][0];return null}
 const photoCategoryNames={front:'Ön görünüş',rear:'Arxa görünüş',side:'Yan görünüş',interior:'Salon',engine:'Mühərrik',other:'Digər şəkillər'};
 let activeDetailCar=null,detailPhotos=[],detailPhotoIndex=0,touchStartX=0;
