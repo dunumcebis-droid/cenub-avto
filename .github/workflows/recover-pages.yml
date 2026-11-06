@@ -1,0 +1,32 @@
+name: Recover stalled GitHub Pages deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+
+jobs:
+  cancel-stalled-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Inspect and cancel the identified stalled deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This deployment timed out and blocks subsequent Pages releases.
+          target="8dbb71b88567cb993a15df4c7cc5e5548a814678"
+          endpoint="repos/${GITHUB_REPOSITORY}/pages/deployments/${target}"
+          before="$(gh api "$endpoint" --jq .status)"
+          printf 'Pages status before recovery: %s\n' "$before"
+          if [[ "$before" == "succeed" ]]; then
+            echo "Deployment already succeeded; no cancellation needed."
+            exit 0
+          fi
+          gh api --method POST "$endpoint/cancel"
+          gh api "$endpoint" --jq '{status, error}'
+
