@@ -486,8 +486,14 @@ body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5f
 @media(max-width:600px){.car-card .details{padding:11px}.car-card h3{font-size:14px}.car-card .price{font-size:17px}.ca-today{margin:12px 12px 0}}
 
 /* Cənub Avto: marka/model always visible on listing cards */
-.car-card .details .ca-visible-car-name{display:block!important;visibility:visible!important;opacity:1!important;color:#f4f8ff!important;font-size:clamp(14px,1.6vw,19px)!important;font-weight:900!important;line-height:1.4!important;min-height:24px!important;margin:0 0 10px!important;overflow-wrap:anywhere!important;white-space:normal!important}
-.car-card .details .ca-visible-car-year{color:#a9bbce;font-size:.8em;font-weight:700}
+.car-card .details .ca-visible-car-name{display:block!important;visibility:visible!important;opacity:1!important;color:#132c45!important;font-size:clamp(14px,1.6vw,19px)!important;font-weight:900!important;line-height:1.4!important;min-height:24px!important;margin:0 0 10px!important;overflow-wrap:anywhere!important;white-space:normal!important}
+.car-card .details .ca-visible-car-year{color:#5d7187;font-size:.8em;font-weight:700}
+
+/* Fix card text contrast on the white listing card, for all packages */
+.car-card .details{display:block!important;visibility:visible!important;opacity:1!important;background:#fff!important;color:#132c45!important;padding:14px!important;min-height:135px!important}
+.car-card .details .price{display:block!important;color:#0c2742!important;visibility:visible!important;opacity:1!important}
+.car-card .details .meta,.car-card .details .seller{display:block!important;color:#51657b!important;visibility:visible!important;opacity:1!important}
+.car-card .details .ca-visible-car-name{color:#132c45!important}
 </style>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
