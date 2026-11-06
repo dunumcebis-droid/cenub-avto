@@ -668,6 +668,8 @@ async function caSaveProfile(){
 }
 
 // Cənub Avto: server-side listings, public read and authenticated uploads.
+// Match the anonymous column grant; internal package notes stay private.
+const CA_LISTING_COLUMNS='id,satici_id,marka,model,il,qiymet,yurus,seher,tesvir,veziyyet,yaradildi,neqliyyat_novu,nesil,ban_novu,yanacaq,suretler_qutusu,muherrik_hecmi,at_gucu,reng,bazar_ucun,oturacaq_sayi,techizat,sekiller,telefon,ca_data,paket_adi,paket_baslayir,paket_bitir';
 let caRemoteCars=[],caListingsError=false;
 function caListingPayload(d){return {satici_id:currentUser.id,marka:d.make,model:d.model,il:d.year,qiymet:d.price,yurus:Number(String(d.mileage||d.km||'0').replace(/\D/g,''))||0,seher:d.city||'',tesvir:d.description||d.desc||'',veziyyet:'gozlemede',neqliyyat_novu:d.vehicleType||d.vehicle||'',nesil:d.generation||'',ban_novu:d.body||d.bodyType||'',yanacaq:d.fuel||'',suretler_qutusu:d.gear||'',muherrik_hecmi:Number(d.engine)||null,at_gucu:Number(d.horsepower||d.hp)||null,reng:d.color||'',bazar_ucun:d.market||'',oturacaq_sayi:Number(d.seats)||null,techizat:d.equipment||[],sekiller:Object.values(d.photos||{}).flat(),telefon:d.phone||currentUser.phone||'',ca_data:d};}
 // Paid packages come from the approved database state, never the seller's original form selection.
@@ -729,7 +731,7 @@ function caRemoteToCar(r){
   photo:photos[0]||d.photo,photos:photos.length?{front:photos}:d.photos||{},pack:caEffectivePackage(r),packageStarts:r.paket_baslayir||null,packageEnds:r.paket_bitir||null,veziyyet:r.veziyyet,status:r.veziyyet,approvedAt:r.tesdiq_tarixi||null};
 }
 async function caUpdatePublicStats(){const el=document.getElementById('caTodayApproved');if(!el)return;try{const fmt=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Baku',year:'numeric',month:'2-digit',day:'2-digit'});const today=fmt.format(new Date());const approved=caRemoteCars.filter(c=>c.veziyyet==='aktiv'&&c.approvedAt&&fmt.format(new Date(c.approvedAt))===today);el.textContent=String(approved.length);}catch(e){el.textContent='—';}}
-async function caFetchListings(){try{const rows=await caRequest('/rest/v1/elanlar?select=*&order=yaradildi.desc&limit=500','GET',null,await caToken());caRemoteCars=(rows||[]).map(caRemoteToCar);caListingsError=false;render();renderCabinet();caUpdatePublicStats();}catch(err){caListingsError=true;render();console.warn('Elanlar serverdən oxunmadı:',err.message);const cabinet=document.getElementById('cabinetList');if(document.body.classList.contains('cabinet-open')&&cabinet)cabinet.insertAdjacentHTML('afterbegin','<div class="empty">Elanlar serverdən yenilənmədi. İnterneti və giriş sessiyasını yoxlayın.</div>')}}
+async function caFetchListings(){try{const rows=await caRequest('/rest/v1/elanlar?select='+CA_LISTING_COLUMNS+'&order=yaradildi.desc&limit=500','GET',null,await caToken());caRemoteCars=(rows||[]).map(caRemoteToCar);caListingsError=false;render();renderCabinet();caUpdatePublicStats();}catch(err){caListingsError=true;render();console.warn('Elanlar serverdən oxunmadı:',err.message);const cabinet=document.getElementById('cabinetList');if(document.body.classList.contains('cabinet-open')&&cabinet)cabinet.insertAdjacentHTML('afterbegin','<div class="empty">Elanlar serverdən yenilənmədi. İnterneti və giriş sessiyasını yoxlayın.</div>')}}
 async function caPreparePhoto(file){
  if(!file.type.startsWith('image/'))throw Error('Yalnız şəkil faylları seç.');
  if(file.size>25*1024*1024)throw Error('Şəkil 25 MB-dan böyükdür.');

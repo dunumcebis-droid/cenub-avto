@@ -10,7 +10,7 @@ const context = vm.createContext({ console });
 // Execute the actual production functions, without the page's network requests,
 // authentication setup, browser storage or DOM initialization.
 function productionFunction(name) {
-  const start = source.search(new RegExp(`function ${name}\\s*\\(`));
+  const start = source.search(new RegExp(`(?:async\\s+)?function ${name}\\s*\\(`));
   assert.notEqual(start, -1, `Production function ${name} must exist`);
   for (let end = source.indexOf('}', start); end !== -1; end = source.indexOf('}', end + 1)) {
     const candidate = source.slice(start, end + 1);
@@ -229,4 +229,38 @@ test('VIP eligibility remains tied to approved, unexpired database packages', ()
   assert.equal(caEffectivePackage({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }), 'Pulsuz');
   assert.equal(caRemoteToCar({ ...base, ca_data: { pack: 'Pulsuz' } }).pack, 'VIP');
   assert.equal(caRemoteToCar({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }).pack, 'Pulsuz');
+});
+
+test('the public listing request selects exactly the reviewed 28 columns and excludes the internal note', async () => {
+  const declaration = source.match(/const CA_LISTING_COLUMNS\s*=\s*(['"])[^'"\n]+\1;/);
+  assert.ok(declaration, 'The public projection must be explicitly declared');
+  const expected = [
+    'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
+    'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
+    'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
+    'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
+    'paket_adi', 'paket_baslayir', 'paket_bitir',
+  ];
+  let request;
+  const requestContext = vm.createContext({
+    caRequest: async (pathname, method) => { request = { pathname, method }; return []; },
+    caToken: async () => null,
+    caRemoteToCar: row => row,
+    render() {}, renderCabinet() {}, caUpdatePublicStats() {},
+    console,
+  });
+  vm.runInContext(declaration[0], requestContext);
+  const declared = vm.runInContext('CA_LISTING_COLUMNS', requestContext).split(',');
+  assert.equal(new Set(declared).size, 28);
+  assert.deepEqual(declared.slice().sort(), expected.slice().sort());
+  assert.ok(!declared.includes('paket_tesdiq_qeydi'));
+  assert.ok(!declared.includes('*'));
+  assert.ok(!declared.includes('tesdiq_tarixi'), 'Do not request a column absent from the actual database');
+  const fetchListings = productionFunction('caFetchListings');
+  await vm.runInContext(`(${fetchListings.toString()})()`, requestContext);
+  const url = new URL(request.pathname, 'https://example.invalid');
+  assert.equal(request.method, 'GET');
+  assert.equal(url.pathname, '/rest/v1/elanlar');
+  assert.equal(url.searchParams.get('select'), declared.join(','));
+  assert.equal(url.searchParams.get('order'), 'yaradildi.desc');
 });

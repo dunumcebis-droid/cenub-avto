@@ -20,7 +20,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*_brows
 git diff --check
 ```
 
-- 13 Node testi: məlumat çevrilməsi, köhnə formatlar, sıfır/boş sahələr, rəqəmlər, sıralama, şəkil istinadları və VIP uyğunluğu.
+- 14 Node testi: məlumat çevrilməsi, köhnə formatlar, sıfır/boş sahələr, rəqəmlər, sıralama, şəkil istinadları və VIP uyğunluğu.
 - 7 Chromium testi: 1440, 768, 375 və 320 px ekranlarda mətn və şəkil həndəsəsi; filtr, sıralama, seçilmişlər, müqayisə, kabinet, klaviatura, xəta və təkrar yükləmə.
 - Bütün 8 JavaScript blokunun sintaksisi `node --check` ilə yoxlanılıb.
 - Brauzer testləri şəbəkə cavablarını sınaq məlumatları ilə əvəz edir; həqiqi bazaya yazmır.
@@ -35,19 +35,16 @@ Bu dəyərlərin yeni sətirlə birləşdirilmiş siyahısının SHA-256 izi:
 
 Paket uyğunluğu və sıralaması, elan payload-u, şəkil hazırlama/yükləmə, serverə yazma/silmə və qalereya məlumatlarını oxuma funksiyalarının kodu dəyişdirilməyib.
 
-## Canlı saytda aşkarlanan ayrıca maneə
+## Elanların real API ilə yoxlanması
 
-Canlı `index.html` ilkin GitHub faylı ilə eynidir. Açıq ziyarətçi üçün Supabase elan sorğusunun cavabı:
+İlkin açıq sorğu `401 / 42501 — permission denied for table elanlar` qaytarırdı. İstifadəçinin konkret təsdiqindən sonra yalnız elanların 28 açıq sütununa SELECT icazəsi verildi. Saytın sorğusu bu sütunları açıq sadalayır; daxili admin qeydi sorğulanmır.
 
-```text
-HTTP 401
-code: 42501
-message: permission denied for table elanlar
-hint: GRANT SELECT ON public.elanlar TO anon
-```
+Açıq API indi HTTP 200 qaytarır: 2 aktiv elan görünür, 5 gözləyən elan görünmür. Daxili admin qeydinə giriş rədd edilir. Mövcud RLS siyasətləri və daxil olmuş istifadəçilərin icazələri saxlanılıb. Bütün 7 elanın məlumat, şəkil və paket hash-ləri dəyişməyib.
 
-Frontend düzəlişi baza icazəsini dəyişmir. Buna görə canlı elanların tam işlədiyini hələ təsdiqləmək olmaz.
+Real anonim API ilə yerli HTML brauzer yoxlaması uğurludur: 2 real şəkil yüklənib, kartların məlumatları və detallar düzgündür, 1440/375 px görünüş və 1 VIP elan təsdiqlənib. Canlı yayımdan sonra HTML-nin test edilmiş faylla eyniliyi və real kartlar ayrıca yoxlanır.
 
-`supabase-listing-diagnostics.sql` faylının işlək hissəsi yalnız baza icazələrini və RLS qaydalarını oxuyur. Mümkün düzəliş şərh şəklində verilib: əvvəlcə RLS və ictimaiyyətə açıla biləcək sütunlar yoxlanmalıdır. Bu iş zamanı Supabase icazələri, elan qeydləri, VIP vəziyyətləri və yüklənmiş şəkillər dəyişdirilməyib.
+Tətbiq olunan SQL və yoxlamalar [PUBLIC_LISTING_ACCESS.md](PUBLIC_LISTING_ACCESS.md) sənədindədir.
 
-İstifadəçi birbaşa `main` budağına göndərmə və canlı yoxlama üçün icazə verib. Frontend testləri ayrıca sınaq məlumatları ilə aparılıb. Canlı elanların tam yoxlanması Supabase-də ictimai oxuma icazəsinin bərpasını tələb edir.
+## Mövcud məsləhət qeydləri
+
+Dəyişiklikdən əvvəl və sonra Supabase təhlükəsizlik məsləhətləri eynidir; bu oxuma icazəsi yeni xəbərdarlıq yaratmayıb. Admin/ödəniş cədvəllərində siyasətin olmaması, mövcud SECURITY DEFINER funksiyaları və parol qorunması bu məhdud düzəlişdə dəyişdirilməyib. İstinadlar: [RLS siyasətləri](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy), [anon funksiyalar](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable), [daxil olmuş istifadəçi funksiyaları](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable), [parol qorunması](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).

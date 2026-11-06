@@ -8,12 +8,21 @@ import os
 import re
 from pathlib import Path
 import unittest
+from urllib.parse import parse_qs, urlsplit
 
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'http://127.0.0.1:8765/'
 PHOTO = 'https://fixture.invalid/portrait.svg'
+# Public response contract: excludes the internal package approval note.
+PUBLIC_COLUMNS = frozenset((
+    'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
+    'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
+    'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
+    'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
+    'paket_adi', 'paket_baslayir', 'paket_bitir',
+))
 
 
 def fixtures():
@@ -70,7 +79,10 @@ class CardBrowserTests(unittest.TestCase):
                     '<rect width="300" height="1800" fill="#96b2c3"/></svg>'))
             elif '/rest/v1/elanlar?' in req.url:
                 self.assertEqual(req.method, 'GET', 'Production mutations are forbidden in tests')
-                request.fulfill(content_type='application/json', body=json.dumps(fixtures()))
+                columns = self.assert_public_select(req.url)
+                rows = [{key: value for key, value in row.items() if key in columns}
+                        for row in fixtures()]
+                request.fulfill(content_type='application/json', body=json.dumps(rows))
             else:
                 request.abort()
 
@@ -83,7 +95,24 @@ class CardBrowserTests(unittest.TestCase):
         self.assertFalse(self.errors, 'Uncaught browser errors')
         self.assertFalse([item for item in self.requests if item[0] not in ('GET', 'HEAD')],
                          'Offline tests must not issue writes')
+        reads = [(method, url) for method, url in self.requests if '/rest/v1/elanlar?' in url]
+        self.assertTrue(reads, 'The page must request public listings')
+        for method, url in reads:
+            self.assertEqual(method, 'GET')
+            self.assert_public_select(url)
         self.context.close()
+
+    def assert_public_select(self, url):
+        query = parse_qs(urlsplit(url).query)
+        self.assertEqual(len(query.get('select', [])), 1)
+        columns = query['select'][0].split(',')
+        self.assertNotIn('*', columns, 'The public request must not read every column')
+        self.assertNotIn('paket_tesdiq_qeydi', columns, 'Internal approval notes stay private')
+        self.assertEqual(len(columns), len(PUBLIC_COLUMNS), 'No duplicate or extra public columns')
+        self.assertEqual(set(columns), PUBLIC_COLUMNS)
+        self.assertEqual(query.get('order'), ['yaradildi.desc'])
+        self.assertEqual(query.get('limit'), ['500'])
+        return set(columns)
 
     def text(self, selector):
         return self.page.locator(selector).inner_text()
