@@ -34,18 +34,21 @@ test('all original embedded image bytes and 56 reference identities are preserve
 test('the initial HTML stays small and classic script execution order is preserved', () => {
   const page = loadPageSource(root);
   assert.ok(Buffer.byteLength(page.html) < 100 * 1024, 'Static image bytes must not inflate the HTML response');
-  assert.equal(page.scripts.length, 8);
+  assert.equal(page.scripts.length, 10);
   assert.deepEqual(page.scripts.map(script => script.path), [
-    'assets/js/01-main.js', 'assets/js/02-mileage-input.js', 'assets/js/03-bmw-series.js',
+    'assets/js/00-auth-callback.js', 'assets/js/01-main.js', 'assets/js/02-mileage-input.js', 'assets/js/03-bmw-series.js',
     'assets/js/04-bmw-picker.js', 'assets/js/05-filters-toggle.js', 'assets/js/06-extra-tools.js',
-    'assets/js/07-admin.js', 'assets/js/08-equipment-toggle.js',
+    'assets/js/07-admin.js', 'assets/js/08-equipment-toggle.js', 'assets/js/09-auth.js',
   ]);
   for (const script of page.scripts) {
-    assert.match(script.attributes, /\bdefer\b/);
+    if (script.path === 'assets/js/00-auth-callback.js') assert.doesNotMatch(script.attributes, /\bdefer\b/);
+    else assert.match(script.attributes, /\bdefer\b/);
     assert.doesNotMatch(script.attributes, /\b(?:async|type\s*=\s*["']module["'])\b/);
   }
   assert.doesNotMatch(page.html + page.source, /data:image\/(?:jpeg|png);base64,/);
   assert.match(page.html, /<link[^>]+href="assets\/site\.css"/);
+  assert.ok(page.html.indexOf('00-auth-callback.js') < page.html.indexOf('assets/site.css'));
+  assert.match(page.html, /<meta name="referrer" content="no-referrer"/);
   const hero = page.html.match(/<img\b[^>]*alt="Premium idman avtomobili"[^>]*>/)?.[0];
   assert.ok(hero);
   assert.match(hero, /loading="eager"/);

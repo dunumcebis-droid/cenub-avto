@@ -14,13 +14,17 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Elan siyahısı serverdə süzülür və sıralanır, səhifədə 24 elan göstərilir. Ümumi say üçün kodda əvvəlki 500 elan məhdudiyyəti yoxdur. Satıcının elanları ayrıca 100-lük hissələrlə oxunur.
 - «Bu gün təsdiqlənən» göstəricisi server hesabından gəlir; sıfır düzgün göstərilir. Uğursuz sorğu əvvəlki uğurlu məlumatları silmir, köhnə sorğu cavabı yeni səhifəni əvəz etmir.
 
-Serverdə səhifələmə və elan idarəetməsi üçün `20261107060719_fix_listing_management_and_paginated_browse` Supabase miqrasiyası tətbiq edilib; 59 geri qaytarılan SQL yoxlaması keçib. Tətbiq olunan SQL-in istinadı [database/applied-listing-management.sql](database/applied-listing-management.sql) faylındadır. Son kod üzərində 55 Node və 19 Chromium testi keçib. GitHub Pages yayımı və real elanlarla 1440/375 px canlı yoxlama da uğurludur; sübutlar [VERIFICATION.md](VERIFICATION.md) sənədində toplanır.
+Serverdə səhifələmə və elan idarəetməsi üçün `20261107060719_fix_listing_management_and_paginated_browse` Supabase miqrasiyası tətbiq edilib; 59 geri qaytarılan SQL yoxlaması keçib. Tətbiq olunan SQL-in istinadı [database/applied-listing-management.sql](database/applied-listing-management.sql) faylındadır. Əvvəlki kart düzəlişləri canlı saytda yoxlanıb. Admin panelinin səhifələməsi, təsdiqdən sonra yenilənmə və parol bərpası axınının yeni sübutları [ADMIN_AUTH_VERIFICATION.md](ADMIN_AUTH_VERIFICATION.md), əvvəlki mərhələnin nəticələri isə [VERIFICATION.md](VERIFICATION.md) sənədindədir.
+
+## Admin və parol bərpası
+
+Admin elanları və paket sorğuları serverdə axtarılır və 24-lük səhifələrə bölünür. Təsdiqdən sonra əsas siyahı, VIP hissəsi və sayğac yenilənir. Girişdə «Şifrəni unutdum» axını, bərpa linkinin doğrulanması və yeni parol forması var. Real e-poçtun çatdırılması SMTP/yönləndirmə ayarlarından asılıdır; bu asılılıqlar və sınaq əhatəsi [yoxlama sənədində](ADMIN_AUTH_VERIFICATION.md) göstərilib.
 
 ## Fayllar və şəkillərin qorunması
 
 - `index.html`: səhifənin quruluşu; əvvəlki 12,47 MB əvəzinə təxminən 46 KB.
 - `assets/site.css`: əvvəlki 9 stil blokunun ardıcıllığı qorunmuş vahid stil faylı.
-- `assets/js/01-main.js`: elanlar, hesab, redaktə, filtrlər və əsas interfeys. Digər 7 JavaScript faylı HTML-dəki əvvəlki icra ardıcıllığı ilə ayrıca `defer` skriptləridir.
+- `assets/js/01-main.js`: elanlar, hesab, redaktə, filtrlər və əsas interfeys. İlkin digər 7 faylın ardıcıllığı qorunub. Əlavə `00-auth-callback.js` URL-i resurslardan əvvəl təmizləyir, `09-auth.js` isə parol bərpasını idarə edir.
 - `assets/images/`: 56 daxili şəkil istinadının 46 unikal faylı. Şəkillər yalnız base64-dən fayla çıxarılıb; baytları dəyişdirilməyib, yenidən kodlaşdırılmayıb.
 - `assets/manifest.json`: ilkin istinadlar, fayl yolları, ölçülər və SHA-256 izləri. `tests/assets.test.cjs` fayllardan ilkin data URI-lərini yenidən quraraq eyniliyi yoxlayır.
 - `tests/`: Node, Chromium və tranzaksiya sonunda geri qaytarılan SQL yoxlamaları.

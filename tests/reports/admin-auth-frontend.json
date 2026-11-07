@@ -1,0 +1,21 @@
+{
+  "kind": "offline frontend regression",
+  "node": {
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0,
+    "newAdminAuth": 16,
+    "previousCardsAndManagement": 19,
+    "runtimeSeconds": 51.655
+  },
+  "jsSyntaxFiles": 10,
+  "diffCheck": true,
+  "realEmailsSent": 0,
+  "realPasswordsChanged": 0,
+  "realAdminMutations": 0
+}

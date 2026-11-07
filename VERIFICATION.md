@@ -1,4 +1,6 @@
-# Cənub Avto — dəyişiklik və yoxlama qeydləri
+# Cənub Avto — əvvəlki kart düzəlişlərinin yoxlama qeydləri
+
+Sonrakı admin və parol bərpası yeniləmələri [ADMIN_AUTH_VERIFICATION.md](ADMIN_AUTH_VERIFICATION.md) sənədindədir. Bu sənəd `d7f2817` kart/səhifələmə mərhələsinin tarixçəsidir.
 
 Düzəlişlər `main`-ə göndərilib, Supabase miqrasiyası tətbiq edilib və GitHub Pages-də yayımlanmış versiya real elanlarla yoxlanıb. Aşağıdakı nəticələr 7 noyabr 2026-cı il yoxlamasına aiddir.
 

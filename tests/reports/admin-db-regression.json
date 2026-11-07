@@ -1,0 +1,20 @@
+{
+  "passed_count": 15,
+  "passed_tests": [
+    "admin_metadata_excludes_private_notes_and_images",
+    "all_1205_ads_reachable_without_duplicates",
+    "all_1205_payment_requests_reachable_without_duplicates",
+    "anon_denied_ca_admin_browse_listings",
+    "anon_denied_ca_admin_browse_payments",
+    "existing_listing_rows_unchanged",
+    "existing_payment_rows_unchanged",
+    "invalid_status_rejected",
+    "new_and_changed_admin_read_functions_are_invoker",
+    "non_admin_denied_ca_admin_browse_listings",
+    "non_admin_denied_ca_admin_browse_payments",
+    "old_pending_listing_visible_with_server_filter",
+    "old_pending_payment_request_visible",
+    "out_of_range_page_clamps_to_last_page",
+    "search_finds_old_record_across_all_pages"
+  ]
+}

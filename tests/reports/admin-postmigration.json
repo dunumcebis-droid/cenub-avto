@@ -1,0 +1,128 @@
+{
+  "migrationVersion": "20261107113829",
+  "migrationSource": "database/admin-pagination.sql",
+  "verifiedAt": "2026-11-07T11:45:53Z",
+  "verificationMode": "Read-only counts, complete-row aggregate hashes, role privileges and Supabase advisors after migration",
+  "rollbackRegression": {
+    "report": "admin-db-regression.json",
+    "passedChecks": 15,
+    "fixtureListings": 1205,
+    "fixturePaymentRequests": 1205,
+    "pagesOf24": 51
+  },
+  "dataPreservation": {
+    "listingCount": 7,
+    "paymentRequestCount": 2,
+    "remainingFixtureListings": 0,
+    "listingHashBefore": "a09af4e1d1c74c80eb68c14d5f83f0fc",
+    "listingHashAfter": "a09af4e1d1c74c80eb68c14d5f83f0fc",
+    "paymentHashBefore": "83a00d414d0739e16ad252cbdd02e88e",
+    "paymentHashAfter": "83a00d414d0739e16ad252cbdd02e88e",
+    "listingRowsPhotosAndPackagesUnchanged": true,
+    "paymentRowsUnchanged": true,
+    "hashMethod": "md5(jsonb_agg(to_jsonb(row) order by id)::text)"
+  },
+  "privileges": {
+    "rls_enabled": {
+      "elanlar": true,
+      "paket_sorgulari": true
+    },
+    "listing_count": 7,
+    "admin_functions": {
+      "ca_admin_list": {
+        "anon_execute": false,
+        "security_invoker": true,
+        "authenticated_execute": true
+      },
+      "ca_admin_browse_listings": {
+        "anon_execute": false,
+        "security_invoker": true,
+        "authenticated_execute": true
+      },
+      "ca_admin_browse_payments": {
+        "anon_execute": false,
+        "security_invoker": true,
+        "authenticated_execute": true
+      },
+      "ca_admin_paket_sorgulari": {
+        "anon_execute": false,
+        "security_invoker": false,
+        "authenticated_execute": true
+      }
+    },
+    "fixture_listing_count": 0,
+    "payment_request_count": 2,
+    "browser_truncate_denied": true,
+    "protected_writes_denied": true,
+    "internal_note_read_denied_to_anon": true,
+    "private_payment_table_read_denied": true,
+    "internal_note_read_denied_to_authenticated": true
+  },
+  "advisors": {
+    "security": {
+      "totalFindings": 10,
+      "levels": {
+        "INFO": 2,
+        "WARN": 8
+      },
+      "findings": [
+        {
+          "name": "rls_enabled_no_policy",
+          "title": "RLS Enabled No Policy",
+          "level": "INFO",
+          "count": 2,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+          "level": "WARN",
+          "count": 7,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "title": "Leaked Password Protection Disabled",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+        }
+      ]
+    },
+    "performance": {
+      "totalFindings": 5,
+      "levels": {
+        "INFO": 3,
+        "WARN": 2
+      },
+      "findings": [
+        {
+          "name": "unused_index",
+          "title": "Unused Index",
+          "level": "INFO",
+          "count": 3,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+        },
+        {
+          "name": "multiple_permissive_policies",
+          "title": "Multiple Permissive Policies",
+          "level": "WARN",
+          "count": 2,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0006_multiple_permissive_policies"
+        }
+      ]
+    }
+  },
+  "remainingConstraints": {
+    "leakedPasswordProtection": {
+      "enabled": false,
+      "organizationPlan": "Free",
+      "paidPlanRequired": "Pro or above",
+      "availableConnectorAuthConfigMethod": false,
+      "activationNotPerformed": true,
+      "documentation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+    },
+    "guardedExistingDefinerFunctions": "The existing private payment/admin functions remain guarded. The three listing/payment metadata read functions checked here use SECURITY INVOKER.",
+    "performance": "Three indexes are currently reported as unused; two multiple-permissive-policy findings remain. No index or policy was removed during this read-only verification."
+  }
+}

@@ -752,3 +752,6 @@ body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5f
 .cabinet-card{background:linear-gradient(135deg,#14263c,#1b344c)!important;color:#edf5ff!important;border-color:#31536b!important}
 .cabinet-card .meta{color:#a8c1d3!important}.cabinet-card .price{color:#54decf!important}
 .cabinet-card .cab-actions button:not(.delete){background:#28c7b7;color:#09243a}
+
+/* Recovery messages and paged admin controls. */
+#authMessage:empty{display:none}#authMessage{font-size:13px;overflow-wrap:anywhere}#authMessage[role="alert"]{color:#b53636}.auth-overlay{overflow-y:auto}.auth-box{max-height:calc(100dvh - 32px);overflow-y:auto}.auth-actions{flex-wrap:wrap}#caAdminPanel input,#caAdminPanel select{min-width:0;max-width:100%;padding:10px;border:1px solid #536a85;border-radius:9px;background:#12233b;color:#fff}#caAdminPanel input{flex:1 1 180px}#caAdminActionMsg{overflow-wrap:anywhere}
