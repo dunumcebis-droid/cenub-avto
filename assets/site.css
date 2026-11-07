@@ -861,7 +861,8 @@ footer a{color:#6ee7d8;text-decoration:underline;text-underline-offset:3px}
 /* Supplied brand artwork is preserved; the viewport trims only empty margins. */
 html{scroll-padding-top:var(--ca-header-clearance,152px)}
 .ca-site-brand{display:inline-flex;flex:0 1 264px;width:264px;max-width:100%;min-width:0;line-height:0;text-decoration:none;border-radius:12px}
-.ca-site-logo{display:block;width:100%;aspect-ratio:2.64;overflow:hidden;border-radius:12px;background:#000}
+/* Screen blends the supplied artwork's black background into the header. */
+.ca-site-logo{display:block;width:100%;aspect-ratio:2.64;overflow:hidden;border-radius:12px;background:#000;mix-blend-mode:screen}
 .ca-site-logo img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 48.5%;transform:scale(1.12)}
 .ca-site-brand:focus-visible{outline:3px solid #ffcd6c;outline-offset:5px}
 .ca-brand-slogan{font-size:13px;line-height:1.7;letter-spacing:0}
