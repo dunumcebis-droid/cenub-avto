@@ -1,0 +1,14 @@
+{
+  "kind": "one user-authorized real recovery email request",
+  "httpStatus": 200,
+  "acceptedByAuthService": true,
+  "attempts": 1,
+  "requestedAt": "2026-11-07T11:58:06.064230+00:00",
+  "realPasswordWrites": 0,
+  "inboxDeliveryConfirmed": true,
+  "recoverySendRecordedForAuthorizedAccount": true,
+  "newPasswordScreenConfirmedByUser": true,
+  "confirmationSource": "User confirmed receipt and the new-password screen",
+  "confirmedAt": "2026-11-07T12:00:24.308437+00:00",
+  "authConfigurationRead": false
+}
