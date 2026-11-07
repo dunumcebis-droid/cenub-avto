@@ -1,0 +1,1 @@
+function caToggleFilters(force){var box=document.getElementById('caFilterContent'),btn=document.getElementById('caFilterLaunch');if(!box||!btn)return;var open=typeof force==='boolean'?force:box.hidden;box.hidden=!open;btn.setAttribute('aria-expanded',String(open));if(open){box.scrollIntoView({behavior:'smooth',block:'start'});}}

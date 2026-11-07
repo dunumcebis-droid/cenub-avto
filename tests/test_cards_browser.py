@@ -4,30 +4,32 @@ Run: python3 -m unittest discover -s tests -p 'test_*_browser.py' -v
 Requires Python Playwright and Chromium (CHROMIUM_PATH may override its path).
 """
 import json
+import mimetypes
 import os
 import re
 from pathlib import Path
 import unittest
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'http://127.0.0.1:8765/'
 PHOTO = 'https://fixture.invalid/portrait.svg'
+FIXTURE_IDS = {key:f'00000000-0000-4000-8000-{index:012d}' for index,key in enumerate(('vip','premium','standard','free-expensive','free-cheap','missing','pending'),1)}
 # Public response contract: excludes the internal package approval note.
 PUBLIC_COLUMNS = frozenset((
     'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
     'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
     'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
     'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
-    'paket_adi', 'paket_baslayir', 'paket_bitir',
+    'paket_adi', 'paket_baslayir', 'paket_bitir', 'tesdiq_tarixi',
 ))
 
 
 def fixtures():
     def row(id, make, model, year, price, mileage, package='Pulsuz', **extra):
-        return dict(id=id, marka=make, model=model, il=year, qiymet=price,
+        return dict(id=FIXTURE_IDS[id], marka=make, model=model, il=year, qiymet=price,
                     yurus=mileage, seher='Bakı', yanacaq='Benzin',
                     suretler_qutusu='Avtomat', veziyyet='aktiv',
                     paket_adi=package, paket_bitir='2099-01-01T00:00:00Z',
@@ -41,10 +43,63 @@ def fixtures():
         row('free-expensive', 'Kia', 'Sportage', 2020, 30000, 76543,
             ca_data={'description': 'Sınaq avtomobili', 'engine': '2.0 L benzin'}),
         row('free-cheap', 'LADA', 'Niva', 2015, 12500, 88000),
-        {'id': 'missing', 'veziyyet': 'aktiv', 'paket_adi': 'Pulsuz', 'sekiller': []},
-        {'id': 'pending', 'marka': 'Hidden', 'model': 'Pending', 'veziyyet': 'gozlemede',
+        {'id': FIXTURE_IDS['missing'], 'veziyyet': 'aktiv', 'paket_adi': 'Pulsuz', 'sekiller': []},
+        {'id': FIXTURE_IDS['pending'], 'marka': 'Hidden', 'model': 'Pending', 'veziyyet': 'gozlemede',
          'paket_adi': 'VIP', 'paket_bitir': '2099-01-01T00:00:00Z', 'sekiller': []},
     ]
+
+
+def browse_fixture_response(rows, payload, today_approved=3):
+    """Emulate the reviewed read-only browse RPC; this is not a SQL/RLS proof."""
+    assert set(payload) == {'p_filters','p_page','p_page_size'}
+    assert payload['p_page_size'] == 24 and int(payload['p_page']) >= 1
+    filters = payload['p_filters']
+    active = [row for row in rows if row.get('veziyyet') == 'aktiv']
+    rank = {'VIP':0,'Premium':1,'Standart':2,'Pulsuz':3}
+
+    def field(row, key, fallback):
+        value = row.get(key)
+        return value if value is not None and str(value).strip() else (row.get('ca_data') or {}).get(fallback)
+
+    def number(value):
+        if value is None or str(value).strip() == '':
+            return None
+        match = re.search(r'[0-9][0-9 ,.]*', str(value))
+        return float(re.sub(r'[ ,]', '', match.group())) if match else None
+
+    def matches(row):
+        for key, remote in (('make','marka'),('model','model'),('city','seher')):
+            if filters.get(key) and str(filters[key]).casefold() not in str(field(row,remote,key) or '').casefold():
+                return False
+        if filters.get('pack','all') != 'all' and row.get('paket_adi','Pulsuz') != filters['pack']:
+            return False
+        for key, remote, fallback, direction in (
+            ('price','qiymet','price','max'),('priceMin','qiymet','price','min'),
+            ('priceMax','qiymet','price','max'),('yearMin','il','year','min'),
+            ('yearMax','il','year','max'),('kmMin','yurus','mileage','min'),
+            ('kmMax','yurus','mileage','max')):
+            bound = filters.get(key)
+            if bound is not None and str(bound).strip() != '':
+                value = number(field(row,remote,fallback))
+                if value is None or (direction=='min' and value<float(bound)) or (direction=='max' and value>float(bound)):
+                    return False
+        return True
+
+    selected = [row for row in active if matches(row)]
+    def sort_key(row):
+        package = rank.get(row.get('paket_adi','Pulsuz'),3)
+        price = number(field(row,'qiymet','price'))
+        if filters.get('sort') in ('priceAsc','priceDesc'):
+            return (package, price is None, (price or 0) * (-1 if filters['sort']=='priceDesc' else 1))
+        return (package,)
+    selected.sort(key=sort_key)
+    size, page = 24, int(payload['p_page'])
+    project = lambda row: {key:value for key,value in row.items() if key in PUBLIC_COLUMNS}
+    return {'items':[project(row) for row in selected[(page-1)*size:page*size]],
+            'total':len(selected),'page':page,'page_size':size,
+            'total_pages':max(1,(len(selected)+size-1)//size),
+            'vip_items':[project(row) for row in active if row.get('paket_adi')=='VIP'][:6],
+            'today_approved':today_approved}
 
 
 class CardBrowserTests(unittest.TestCase):
@@ -73,30 +128,51 @@ class CardBrowserTests(unittest.TestCase):
             self.requests.append((req.method, req.url))
             if req.url == ORIGIN:
                 request.fulfill(content_type='text/html', body=self.html)
+            elif req.url.startswith(ORIGIN):
+                target = (ROOT / unquote(urlsplit(req.url).path).lstrip('/')).resolve()
+                allowed = target.is_relative_to(ROOT.resolve()) and (target == ROOT/'index.html' or target.is_relative_to(ROOT/'assets'))
+                if allowed and target.is_file():
+                    request.fulfill(content_type=mimetypes.guess_type(target.name)[0] or 'application/octet-stream',
+                                    body=target.read_bytes())
+                else:
+                    request.abort()
             elif req.url.startswith(PHOTO):
                 request.fulfill(content_type='image/svg+xml', body=(
                     '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="1800">'
                     '<rect width="300" height="1800" fill="#96b2c3"/></svg>'))
+            elif urlsplit(req.url).path == '/rest/v1/rpc/ca_browse_listings':
+                self.assertEqual(req.method,'POST')
+                response = browse_fixture_response(fixtures(), req.post_data_json)
+                request.fulfill(content_type='application/json',body=json.dumps(response))
             elif '/rest/v1/elanlar?' in req.url:
                 self.assertEqual(req.method, 'GET', 'Production mutations are forbidden in tests')
                 columns = self.assert_public_select(req.url)
+                query=parse_qs(urlsplit(req.url).query)
+                selected=fixtures()
+                if 'satici_id' in query:
+                    selected=[row for row in selected if 'eq.'+str(row.get('satici_id',''))==query['satici_id'][0]]
+                if 'id' in query and query['id'][0].startswith('in.('):
+                    ids=query['id'][0][4:-1].split(',')
+                    selected=[row for row in selected if row.get('id') in ids and row.get('veziyyet')=='aktiv']
+                offset=int(query.get('offset',['0'])[0]);limit=int(query.get('limit',['100'])[0])
                 rows = [{key: value for key, value in row.items() if key in columns}
-                        for row in fixtures()]
+                        for row in selected[offset:offset+limit]]
                 request.fulfill(content_type='application/json', body=json.dumps(rows))
             else:
                 request.abort()
 
         self.page.route('**/*', route)
         self.page.goto(ORIGIN, wait_until='load')
-        self.page.wait_for_function('caRemoteCars.length === 7')
+        self.page.wait_for_function('caRemoteCars.length === 6')
         self.page.wait_for_function('document.querySelectorAll("#allGrid .car-card").length === 6')
 
     def tearDown(self):
         self.assertFalse(self.errors, 'Uncaught browser errors')
-        self.assertFalse([item for item in self.requests if item[0] not in ('GET', 'HEAD')],
-                         'Offline tests must not issue writes')
+        self.assertFalse([item for item in self.requests if item[0] not in ('GET','HEAD') and
+                          not (item[0]=='POST' and urlsplit(item[1]).path=='/rest/v1/rpc/ca_browse_listings')],
+                         'Only the mocked read-only browse RPC may use POST')
+        self.assertTrue(any(method=='POST' and urlsplit(url).path=='/rest/v1/rpc/ca_browse_listings' for method,url in self.requests))
         reads = [(method, url) for method, url in self.requests if '/rest/v1/elanlar?' in url]
-        self.assertTrue(reads, 'The page must request public listings')
         for method, url in reads:
             self.assertEqual(method, 'GET')
             self.assert_public_select(url)
@@ -110,8 +186,7 @@ class CardBrowserTests(unittest.TestCase):
         self.assertNotIn('paket_tesdiq_qeydi', columns, 'Internal approval notes stay private')
         self.assertEqual(len(columns), len(PUBLIC_COLUMNS), 'No duplicate or extra public columns')
         self.assertEqual(set(columns), PUBLIC_COLUMNS)
-        self.assertEqual(query.get('order'), ['yaradildi.desc'])
-        self.assertEqual(query.get('limit'), ['500'])
+        self.assertEqual(query.get('limit'), ['100'])
         return set(columns)
 
     def text(self, selector):
@@ -165,7 +240,7 @@ class CardBrowserTests(unittest.TestCase):
         self.assertEqual(self.page.locator('#vipGrid .car-card').count(), 1)
         self.assertIn('BMW 530', self.text('#vipGrid'))
         self.assertNotIn('Hidden Pending', self.text('#allGrid'))
-        self.page.select_option('#sortListings', 'priceAsc')
+        self.page.evaluate("async()=>{document.getElementById('sortListings').value='priceAsc';await caFetchListings(1)}")
         names = self.page.locator('#allGrid .ca-visible-car-name').all_text_contents()
         self.assertIn('BMW 530', names[0])
         self.assertIn('Toyota Corolla', names[1])
@@ -173,7 +248,7 @@ class CardBrowserTests(unittest.TestCase):
         self.assertLess(next(i for i,n in enumerate(names) if 'LADA' in n),
                         next(i for i,n in enumerate(names) if 'Kia' in n))
         self.assertIn('Marka və model qeyd edilməyib', names[-1])
-        self.page.evaluate("setFilter('VIP',document.querySelector('.pill'))")
+        self.page.evaluate("async()=>await setFilter('VIP',document.querySelector('.pill'))")
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 1)
         self.assertIn('BMW 530', self.text('#allGrid'))
 
@@ -193,14 +268,14 @@ class CardBrowserTests(unittest.TestCase):
         self.assertEqual(self.text('#detailTitle'), 'BMW 530')
 
     def test_favorites_comparison_and_nested_keyboard(self):
-        self.page.evaluate("currentUser={id:'test-owner',phone:'+994000000000'}")
+        self.page.evaluate("currentUser={id:'test-owner',phone:'+994000000000'};caSession={access_token:'offline-token',expires_at:4102444800,user:{id:'test-owner'}}")
         card = self.page.locator('#allGrid .car-card').filter(has_text='Toyota Corolla')
         card.locator('.favorite-btn').focus()
         self.page.keyboard.press('Enter')
         self.assertFalse(self.page.locator('#detailOverlay').is_visible(),
                          'Favorite keyboard activation must not open details')
         self.assertTrue(card.locator('.favorite-btn').evaluate("e=>e.classList.contains('is-favorite')"))
-        self.page.evaluate('renderBuyerFavorites()')
+        self.page.evaluate('async()=>{await caFetchFavoriteListings();renderBuyerFavorites()}')
         self.assertEqual(self.page.locator('#buyerFavoritesList .car-card').count(), 1)
         self.assertIn('Toyota Corolla', self.page.locator('#buyerFavoritesList').text_content())
         card.locator('.ca-compare').focus()
@@ -213,20 +288,20 @@ class CardBrowserTests(unittest.TestCase):
         self.assertIn('0 km', self.text('#caDialogBody'))
 
     def test_formatted_mileage_filter_and_search(self):
-        self.page.evaluate('''() => {
+        self.page.evaluate('''async() => {
             document.getElementById('caKmMin').value='90000';
             document.getElementById('caKmMax').value='95000';
-            searchCars();
+            await searchCars();
         }''')
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 1)
         self.assertIn('Hyundai Santa Fe', self.text('#allGrid'))
-        self.page.evaluate('clearCarSearch()')
+        self.page.evaluate('async()=>await clearCarSearch()')
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 6)
-        self.page.evaluate("document.getElementById('caKmMax').value='0';searchCars()")
+        self.page.evaluate("async()=>{document.getElementById('caKmMax').value='0';await searchCars()}")
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 1)
         self.assertIn('Toyota Corolla', self.text('#allGrid'))
-        self.page.evaluate('clearCarSearch()')
-        self.page.evaluate("document.getElementById('searchMake').value='Toyota';searchCars()")
+        self.page.evaluate('async()=>await clearCarSearch()')
+        self.page.evaluate("async()=>{document.getElementById('searchMake').value='Toyota';await searchCars()}")
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 1)
         self.assertIn('Toyota Corolla', self.text('#allGrid'))
 
@@ -238,14 +313,14 @@ class CardBrowserTests(unittest.TestCase):
             if fail[0]:
                 req = route.request
                 self.requests.append((req.method, req.url))
-                self.assertEqual(req.method, 'GET')
+                self.assertEqual(req.method, 'POST')
                 route.fulfill(status=401, content_type='application/json', body=json.dumps({
                     'code': '42501', 'message': 'permission denied for table elanlar'}))
             else:
                 route.fallback()
 
-        self.page.route(re.compile(r'/rest/v1/elanlar\?'), temporarily_denied)
-        self.page.evaluate('async () => {caRemoteCars=[];await caFetchListings()}')
+        self.page.route(re.compile(r'/rest/v1/rpc/ca_browse_listings'), temporarily_denied)
+        self.page.evaluate('''async()=>{caRemoteCars=[];caPageCars=[];caVipCars=[];Object.assign(caBrowseState,{loaded:false,total:0,totalPages:0,page:1,requestedPage:1,error:false,todayApproved:null});await caFetchListings(1)}''')
         self.assertEqual(self.text('#countLabel'), 'Elanlar yüklənmədi')
         self.assertIn('Elanları yükləmək mümkün olmadı', self.text('#allGrid'))
         self.assertEqual(self.page.locator('#allGrid .car-card').count(), 0)
@@ -256,10 +331,11 @@ class CardBrowserTests(unittest.TestCase):
         self.assertEqual(self.page.locator('#vipGrid .car-card').count(), 1)
 
     def test_seller_cabinet_keeps_metadata_status_and_cover(self):
-        self.page.evaluate("""() => {
+        self.page.evaluate("""async() => {
             currentUser={id:'test-owner',phone:'+994000000000'};
+            caSession={access_token:'offline-token',expires_at:4102444800,user:{id:'test-owner'}};
             document.body.classList.add('cabinet-open');
-            renderCabinet();
+            await caFetchMyListings();renderCabinet();
         }""")
         self.assertEqual(self.text('#cabTotal'), '5')
         self.assertEqual(self.text('#cabVip'), '1')

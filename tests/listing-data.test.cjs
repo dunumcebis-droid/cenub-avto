@@ -1,10 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const vm = require('node:vm');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const source = require('./source-loader.cjs').loadPageSource().source;
 const context = vm.createContext({ console });
 
 // Execute the actual production functions, without the page's network requests,
@@ -27,7 +25,7 @@ function productionFunction(name) {
 
 const helperNames = [
   'caValue', 'caNumber', 'caFormatNumber', 'caFormatPrice',
-  'caFormatMileage', 'caCarName', 'caEffectivePackage', 'caRemoteToCar',
+  'caFormatMileage', 'caCarName', 'caEffectivePackage', 'caStoredPhotoGroups', 'caRemoteToCar',
   'caComparePackages', 'caComparePrices', 'caNum',
 ];
 const rankDeclaration = source.match(/const caPackageRank\s*=\s*\{[^;]+\};/);
@@ -215,6 +213,8 @@ test('mapping preserves uploaded photo URLs and category lists', () => {
   const dbCar = caRemoteToCar({ id: 'db-photos', sekiller: urls });
   assert.equal(dbCar.photo, urls[0]);
   assert.deepEqual(plain(Object.values(dbCar.photos).flat()), urls);
+  assert.deepEqual(plain(dbCar._photoOrder), urls);
+  assert.notEqual(dbCar._photoOrder, urls, 'Original photo order must be copied, not mutated through the mapper');
 });
 
 test('VIP eligibility remains tied to approved, unexpired database packages', () => {
@@ -229,38 +229,36 @@ test('VIP eligibility remains tied to approved, unexpired database packages', ()
   assert.equal(caEffectivePackage({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }), 'Pulsuz');
   assert.equal(caRemoteToCar({ ...base, ca_data: { pack: 'Pulsuz' } }).pack, 'VIP');
   assert.equal(caRemoteToCar({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }).pack, 'Pulsuz');
+  for (const [name, ageDays, expected] of [['Premium', 6, 'Pulsuz'], ['Standart', 4, 'Pulsuz'], ['VIP', 14, 'VIP']]) {
+    const approved = new Date(now - ageDays * 86400000).toISOString();
+    assert.equal(caEffectivePackage({ paket_adi: name, veziyyet: 'aktiv', paket_bitir: null, tesdiq_tarixi: approved }),
+      expected, `${name} uses the canonical fallback term when no end date exists`);
+  }
+  for (const name of ['VIP', 'Premium', 'Standart']) {
+    assert.equal(caEffectivePackage({ paket_adi: name, veziyyet: 'aktiv', paket_bitir: future,
+      tesdiq_tarixi: new Date(now - 365 * 86400000).toISOString() }), name,
+      'An explicit future database end date remains authoritative');
+    assert.equal(caEffectivePackage({ paket_adi: name, veziyyet: 'aktiv', paket_bitir: past,
+      tesdiq_tarixi: new Date(now - 86400000).toISOString() }), 'Pulsuz',
+      'An explicit expired database end date remains authoritative');
+  }
 });
 
-test('the public listing request selects exactly the reviewed 28 columns and excludes the internal note', async () => {
+test('the reviewed listing projection includes the approval timestamp and excludes the internal note', () => {
   const declaration = source.match(/const CA_LISTING_COLUMNS\s*=\s*(['"])[^'"\n]+\1;/);
-  assert.ok(declaration, 'The public projection must be explicitly declared');
+  assert.ok(declaration, 'The listing projection must be explicitly declared');
   const expected = [
     'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
     'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
     'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
     'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
-    'paket_adi', 'paket_baslayir', 'paket_bitir',
+    'paket_adi', 'paket_baslayir', 'paket_bitir', 'tesdiq_tarixi',
   ];
-  let request;
-  const requestContext = vm.createContext({
-    caRequest: async (pathname, method) => { request = { pathname, method }; return []; },
-    caToken: async () => null,
-    caRemoteToCar: row => row,
-    render() {}, renderCabinet() {}, caUpdatePublicStats() {},
-    console,
-  });
+  const requestContext = vm.createContext({});
   vm.runInContext(declaration[0], requestContext);
   const declared = vm.runInContext('CA_LISTING_COLUMNS', requestContext).split(',');
-  assert.equal(new Set(declared).size, 28);
+  assert.equal(new Set(declared).size, 29);
   assert.deepEqual(declared.slice().sort(), expected.slice().sort());
   assert.ok(!declared.includes('paket_tesdiq_qeydi'));
   assert.ok(!declared.includes('*'));
-  assert.ok(!declared.includes('tesdiq_tarixi'), 'Do not request a column absent from the actual database');
-  const fetchListings = productionFunction('caFetchListings');
-  await vm.runInContext(`(${fetchListings.toString()})()`, requestContext);
-  const url = new URL(request.pathname, 'https://example.invalid');
-  assert.equal(request.method, 'GET');
-  assert.equal(url.pathname, '/rest/v1/elanlar');
-  assert.equal(url.searchParams.get('select'), declared.join(','));
-  assert.equal(url.searchParams.get('order'), 'yaradildi.desc');
 });

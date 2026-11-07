@@ -1,0 +1,754 @@
+/* Original style block 1 */
+:root{--green:#123d32;--green2:#1d5948;--cream:#f5f1e7;--paper:#fffdf7;--lime:#d7f36a;--orange:#f28b45;--ink:#18251f;--muted:#718078;--line:#e5e4d9}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{background:var(--green);color:white;padding:18px max(18px,calc((100% - 1120px)/2));}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:900;font-size:23px;letter-spacing:-1px}.brand span{color:var(--lime)}.tag{font-size:11px;color:#c9d8cf;letter-spacing:2px;margin-top:4px}
+nav{display:flex;gap:18px;font-size:13px}nav a{color:white;text-decoration:none}.header-sell{background:var(--lime);color:var(--green);white-space:nowrap;padding:11px 14px;font-size:13px}
+#sellPage{display:none;min-height:75vh;padding:28px 0 50px}.sell-open #sellPage{display:block}.sell-open .hero,.sell-open main,.sell-open #cabinetPage{display:none}.cabinet-open .hero,.cabinet-open main,.cabinet-open #sellPage{display:none}#cabinetPage{display:none;min-height:75vh;padding:28px 0 50px}.cabinet-open #cabinetPage{display:block}.cabinet-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.cabinet-card{display:grid;grid-template-columns:110px 1fr auto;gap:14px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:12px;margin:10px 0}.cabinet-card img{width:110px;height:78px;object-fit:cover;border-radius:8px}.cabinet-card .cab-actions{display:flex;gap:7px;flex-wrap:wrap}.cabinet-card .cab-actions button{padding:9px 12px;font-size:12px}.cabinet-card .delete{background:#f8e1dc;color:#8b2d20}.cabinet-stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.cabinet-stat{background:#edf0e8;border-radius:10px;padding:12px 16px;font-size:13px}.cabinet-stat b{display:block;font-size:20px;color:var(--green)}.edit-banner{display:none;background:#fff4d7;color:#624b14;padding:10px 13px;border-radius:9px;margin:12px 0;font-size:13px}@media(max-width:600px){.cabinet-card{grid-template-columns:78px 1fr}.cabinet-card img{width:78px;height:68px}.cabinet-card .cab-actions{grid-column:1/-1}.cabinet-head{align-items:flex-start;flex-direction:column}}
+.sell-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.back-btn{background:#e6eadf;color:var(--green)}
+@media(max-width:760px){.search select{font-size:13px;padding-left:9px;padding-right:6px}.header-sell{padding:10px 11px;font-size:12px}}
+.wrap{max-width:1120px;margin:auto;padding:0 18px}
+.hero{background:var(--green);color:white;padding:40px 0 48px;overflow:hidden}.hero-in{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+.kicker{color:var(--lime);font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(38px,7vw,70px);line-height:.98;letter-spacing:-3px;margin:14px 0}.hero p{color:#d4e0d8;max-width:470px;line-height:1.6;font-size:15px}
+.orbit{min-height:230px;display:grid;place-items:center;position:relative}.circle{width:220px;height:220px;border:1px solid #668276;border-radius:50%;display:grid;place-items:center;transform:rotate(-12deg)}.circle:before,.circle:after{content:"";position:absolute;border:1px solid #668276;border-radius:50%;inset:22px}.circle:after{inset:46px}.car{font-size:95px;transform:rotate(12deg);filter:drop-shadow(0 12px 12px #061b15)}
+.search{background:var(--paper);padding:17px;border-radius:16px;display:grid;grid-template-columns:repeat(4,1fr) auto;gap:9px;margin-top:24px;box-shadow:0 12px 30px #0a211a22}
+input,select{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;padding:13px 11px;background:white;color:var(--ink);font-size:14px;min-width:0}
+button,.btn{border:0;border-radius:9px;padding:13px 17px;background:var(--lime);color:var(--green);font-weight:800;cursor:pointer;font-size:14px}
+.section{padding:38px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:18px}.section h2{font-size:27px;letter-spacing:-1px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:6px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px}.pill{border:1px solid var(--line);border-radius:30px;padding:8px 13px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.pill.active{background:var(--green);color:white;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.car-card{background:var(--paper);border:1px solid var(--line);border-radius:15px;overflow:hidden;position:relative}.photo{height:155px;background:linear-gradient(135deg,#dce5d9,#a9b9ad);display:grid;place-items:center;font-size:65px;position:relative}.flag{position:absolute;top:12px;left:12px;background:var(--lime);color:var(--green);font-size:10px;font-weight:900;padding:6px 9px;border-radius:20px}.details{padding:14px}.details h3{margin:0 0 8px;font-size:17px}.price{font-weight:900;font-size:20px;color:var(--green)}.meta{font-size:12px;color:var(--muted);margin-top:8px}.seller{font-size:12px;color:var(--muted);margin-top:10px}
+.addbox{background:var(--green);color:white;border-radius:18px;padding:24px}.addbox h2{margin:0 0 8px}.addbox p{color:#d0ddd5;font-size:13px;line-height:1.5}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}.formgrid input,.formgrid select,.formgrid textarea{background:#fff}.formgrid textarea{width:100%;min-height:132px;resize:vertical;border:1px solid var(--line);border-radius:9px;padding:13px;font:inherit;line-height:1.55;color:var(--ink)}.formgrid textarea:focus{outline:2px solid var(--lime);border-color:var(--green)}.wide{grid-column:1/-1}.submit{background:var(--lime);width:100%;margin-top:12px}
+footer{background:#0d2d25;color:#d4e0d8;padding:26px 18px;text-align:center;font-size:12px;margin-top:36px}.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:12px}
+.car-card{cursor:pointer;transition:transform .18s,box-shadow .18s}.car-card:active{transform:scale(.985)}
+.detail-overlay{display:none;position:fixed;inset:0;background:#071b16dd;z-index:1000;overflow-y:auto;padding:18px}.detail-overlay.open{display:block}.detail-panel{max-width:760px;margin:20px auto;background:var(--paper);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px #0005}.detail-top{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;background:var(--green);color:white}.detail-top strong{font-size:17px}.detail-close{background:#ffffff20;color:white;padding:8px 12px}.gallery{position:relative;background:#172820;min-height:230px;display:flex;align-items:center;justify-content:center}.gallery img{display:block;width:100%;height:min(62vh,470px);object-fit:contain}.gallery-empty{color:white;font-size:14px;padding:55px;text-align:center}.gallery-nav{position:absolute;top:50%;transform:translateY(-50%);border-radius:50%;width:42px;height:42px;padding:0;background:#0009;color:white;font-size:24px}.gallery-prev{left:12px}.gallery-next{right:12px}.gallery-counter{position:absolute;bottom:12px;right:14px;background:#0009;color:white;padding:6px 10px;border-radius:20px;font-size:12px}.gallery-thumbs{display:flex;gap:8px;overflow-x:auto;padding:10px;background:#edf0e8}.gallery-thumbs button{padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;flex:0 0 66px;height:54px;background:#ddd}.gallery-thumbs button.active{border-color:var(--green)}.gallery-thumbs img{width:100%;height:100%;object-fit:cover}.detail-content{padding:20px}.detail-content h2{margin:0 0 8px;font-size:24px}.detail-price{font-size:26px;font-weight:900;color:var(--green);margin:8px 0 16px}.detail-specs{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.detail-spec{background:#f0f2e9;padding:11px;border-radius:9px;font-size:13px}.detail-spec b{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.seller-description{margin-top:18px;padding:16px;background:#f0f2e9;border-radius:12px}.seller-description h3{margin:0 0 9px;color:var(--green);font-size:16px}.seller-description p{margin:0;line-height:1.7;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.detail-contact{display:flex;gap:10px;margin-top:17px;flex-wrap:wrap}.detail-contact a,.detail-contact button{flex:1;text-align:center;text-decoration:none;min-width:130px}.detail-contact a{background:var(--green);color:white;border-radius:9px;padding:13px;font-weight:800}.detail-category{font-size:12px;color:var(--muted);font-weight:800;padding:12px 20px 0}.detail-empty{padding:16px 20px;color:var(--muted);font-size:13px}@media(max-width:500px){.detail-overlay{padding:0}.detail-panel{margin:0 auto;min-height:100vh;border-radius:0}.gallery{min-height:220px}.gallery img{height:48vh}.detail-content{padding:16px}.detail-content h2{font-size:21px}}
+.empty{background:var(--paper);border:1px dashed #c8d0c8;border-radius:14px;padding:25px;text-align:center;color:var(--muted);grid-column:1/-1}
+.photo-upload{grid-column:1/-1;background:#ffffff12;border:1px solid #ffffff30;border-radius:12px;padding:14px}.photo-upload h3{margin:0 0 5px;font-size:16px}.photo-help{font-size:12px;color:#d0ddd5;line-height:1.5;margin:0 0 12px}.photo-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo-group{background:#ffffff0d;border:1px solid #ffffff2b;border-radius:10px;padding:11px}.photo-group label{display:block;font-weight:700;font-size:13px;margin-bottom:8px}.photo-group input{background:white;color:var(--ink);font-size:12px;padding:9px}.photo-preview{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.photo-preview img{width:64px;height:54px;object-fit:cover;border-radius:7px;border:1px solid #ffffff55}.photo-count{font-size:11px;color:#d0ddd5;margin-top:6px}@media(max-width:440px){.photo-groups{grid-template-columns:1fr}}
+@media(max-width:760px){nav{display:none}.hero-in{grid-template-columns:1fr}.orbit{min-height:155px}.circle{width:155px;height:155px}.car{font-size:67px}.search{grid-template-columns:1fr 1fr}.search button{grid-column:1/-1}.grid{grid-template-columns:1fr 1fr}.photo{height:125px}.formgrid{grid-template-columns:1fr}}
+@media(max-width:440px){.search select{font-size:12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.photo{height:105px;font-size:48px}.details{padding:10px}.details h3{font-size:14px;line-height:1.25}.price{font-size:16px}.meta,.seller{font-size:10px;line-height:1.4}.flag{top:7px;left:7px;font-size:9px;padding:5px 7px}.section-head{align-items:start;flex-direction:column}h1{letter-spacing:-2px}}
+
+.autocomplete-wrap{position:relative;min-width:0}.autocomplete-wrap input{width:100%}.auth-overlay{display:none;position:fixed;inset:0;background:#071b16dd;z-index:2000;padding:16px;align-items:center;justify-content:center}.auth-overlay.open{display:flex}.auth-box{width:min(100%,430px);background:var(--paper);border-radius:18px;padding:24px;box-shadow:0 20px 60px #0005}.auth-box h2{margin:0 0 8px;color:var(--green)}.auth-box p{font-size:13px;line-height:1.55;color:var(--muted)}.auth-box input{margin:7px 0}.auth-actions{display:flex;gap:8px;margin-top:12px}.auth-actions button{flex:1}.auth-switch{background:#e8eee6;color:var(--green)}.auth-warning{font-size:11px!important;background:#fff3d7;padding:10px;border-radius:9px;color:#6d5518!important}.account-chip{font-size:11px;color:#d8e4dc;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.auth-box{padding:19px}.top nav{display:none}}
+
+/* Turbo.az üslubunda marka/model seçim pəncərəsi */
+.picker-overlay{display:none;position:fixed;inset:0;background:#071b16bb;z-index:2200;padding:18px;overflow-y:auto;align-items:flex-start;justify-content:center}
+.picker-overlay.open{display:flex}
+.picker-panel{width:min(760px,100%);max-height:90vh;margin:5vh auto;background:var(--paper);border-radius:17px;box-shadow:0 24px 70px #0005;overflow-y:auto;overflow-x:hidden}
+.picker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 20px;background:var(--green);color:white}
+.picker-head h3{margin:0;font-size:19px}.picker-close{background:#ffffff20;color:white;padding:8px 12px}
+.picker-search-wrap{padding:16px 18px 10px;background:#f0f2e9}.picker-search{width:100%;padding:14px 15px;border:1px solid #d8ded4;border-radius:10px;font-size:16px;background:#fff}
+.picker-caption{padding:10px 20px 5px;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.picker-note{padding:0 20px 10px;color:#849087;font-size:11px}
+.picker-list{display:grid;grid-template-columns:minmax(0,1fr);gap:0;padding:0 12px 14px;max-height:none;overflow:visible}.picker-section-title{grid-column:1/-1;padding:13px 8px 7px;color:var(--green);font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid #e7ece4;margin:4px 4px 6px}.picker-option{width:calc(100% - 8px)}
+.picker-option{display:flex;align-items:center;gap:12px;background:white;border:1px solid #edf0e8;color:var(--ink);border-radius:10px;text-align:left;padding:10px 12px;margin:4px;font-weight:700;font-size:14px;min-height:66px;transition:.15s}.picker-option:hover,.picker-option:focus{background:#f2f6ed;border-color:#b7c9ad;outline:none;box-shadow:0 3px 12px #123d3212}.brand-logo-box{width:43px;height:43px;flex:0 0 43px;border:1px solid #edf0e8;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;padding:5px}.brand-logo-box img{width:100%;height:100%;object-fit:contain}.brand-logo-fallback{display:none;width:100%;height:100%;place-items:center;background:#edf2e9;color:var(--green);font-size:11px;font-weight:900;border-radius:50%}.brand-option-name{display:flex;flex-direction:column;gap:3px}.brand-option-name small{font-size:10px;color:#829087;font-weight:500;letter-spacing:.2px}
+.picker-option:hover,.picker-option:focus{background:#edf4e7;border-color:#b7c9ad;outline:none}
+.picker-empty{grid-column:1/-1;text-align:center;padding:24px;color:var(--muted);font-size:14px}
+.picker-custom{margin:0 16px 16px;width:calc(100% - 32px);background:var(--lime);color:var(--green)}
+input.picker-trigger{cursor:pointer;background-color:#fff;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,#567064 50%),linear-gradient(135deg,#567064 50%,transparent 50%);background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+@media(max-width:560px){.picker-overlay{padding:0;align-items:flex-start}.picker-panel{margin:0;border-radius:0;min-height:100%;max-height:none;width:100%;overflow:visible}.picker-list{grid-template-columns:minmax(0,1fr);max-height:none;overflow:visible}.picker-head{padding:16px}.picker-search-wrap{position:static;top:auto;z-index:auto}}
+
+/* Cənub Avto — Premium UI yenilənməsi (mövcud funksiyaları saxlayır) */
+:root{--green:#102f29;--green2:#17614e;--cream:#f4f6f3;--paper:#ffffff;--lime:#c8f36a;--orange:#ff9b54;--ink:#17241f;--muted:#718078;--line:#e4eae5;--shadow:0 16px 42px rgba(16,47,41,.09)}
+html{scroll-behavior:smooth;scroll-padding-top:90px}body{background:linear-gradient(180deg,#f7f9f7 0%,#eef3ef 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:80;background:rgba(13,43,36,.96);backdrop-filter:blur(16px);box-shadow:0 8px 28px rgba(5,25,19,.16);border-bottom:1px solid rgba(255,255,255,.08)}
+.top{min-height:68px}.brand{font-size:25px;letter-spacing:-1.3px}.tag{font-size:9px;letter-spacing:2.5px}.top nav a{font-weight:650;opacity:.86;transition:.2s}.top nav a:hover{opacity:1;color:var(--lime)}
+.header-sell,.back-btn,button,.btn{transition:transform .18s,box-shadow .18s,background .18s,border-color .18s}.header-sell{border-radius:11px;padding:12px 17px;box-shadow:0 7px 18px rgba(200,243,106,.16)}button:hover,.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(16,47,41,.12)}button:active{transform:translateY(0)}
+.hero{position:relative;background:radial-gradient(ellipse at 82% 25%,rgba(79,143,111,.34),transparent 34%),linear-gradient(125deg,#0d2b24 0%,#164b3d 58%,#102f29 100%);padding:54px 0 58px}.hero:after{content:"";position:absolute;inset:auto 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,243,106,.55),transparent)}.hero-in{position:relative;z-index:1}.kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid rgba(200,243,106,.26);border-radius:30px;background:rgba(200,243,106,.08);letter-spacing:1.6px}.hero h1{font-weight:900;line-height:1.01;letter-spacing:-3.5px}.hero p{font-size:16px;color:#d7e6dd}.orbit{filter:drop-shadow(0 22px 35px rgba(0,0,0,.16))}.circle{border-color:rgba(211,239,220,.3);background:radial-gradient(circle,rgba(255,255,255,.08),transparent 68%)}
+.search{position:relative;z-index:3;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;margin-top:30px;padding:14px;border:1px solid rgba(255,255,255,.75);border-radius:18px;box-shadow:0 22px 55px rgba(0,0,0,.2)}input,select{border-color:#dfe7e1;border-radius:11px;padding:14px 13px;min-height:48px;font:inherit;font-size:14px;transition:border-color .18s,box-shadow .18s}input:focus,select:focus,textarea:focus{outline:none;border-color:#3b8a6d;box-shadow:0 0 0 4px rgba(59,138,109,.12)}input:disabled{background:#f1f3f1;color:#9aa49e}.search-actions{display:flex;gap:7px}.search-actions button{white-space:nowrap;min-height:48px}.search-actions .clear-search{background:#edf2ed;color:#4b5e53;border:1px solid #dce5de}
+.section{padding:46px 0}.section h2{font-size:clamp(23px,3vw,30px);font-weight:850;letter-spacing:-1.2px}.sub{font-size:13px;color:#77857c}.section-head{margin-bottom:20px}.listing-toolbar{align-items:center}.sort-control{display:flex;align-items:center;gap:9px;color:#68786e;font-size:12px;font-weight:700}.sort-control select{min-width:155px;min-height:42px;padding:9px 32px 9px 11px;background:#fff}
+.pills{gap:9px;margin:17px 0 22px}.pill{background:#fff;border-color:#e0e8e2;color:#64746a;padding:10px 16px;font-weight:750}.pill.active{background:var(--green);border-color:var(--green);box-shadow:0 6px 15px rgba(16,47,41,.16)}
+.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.car-card{border:1px solid #e5ebe6;border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(18,49,38,.045);transition:transform .22s,box-shadow .22s,border-color .22s}.car-card:hover{transform:translateY(-5px);border-color:#c7d9cc;box-shadow:0 18px 38px rgba(18,49,38,.12)}.photo{height:190px;background:linear-gradient(135deg,#e7eee8,#cddbd1)}.photo img{transition:transform .35s}.car-card:hover .photo img{transform:scale(1.035)}.flag{background:#d9f78a;border:1px solid rgba(16,47,41,.08);box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:10px;letter-spacing:.25px}.details{padding:16px}.details h3{font-size:17px;font-weight:800;letter-spacing:-.35px;min-height:42px}.price{font-size:21px;letter-spacing:-.5px}.meta{font-size:12px;color:#718078;line-height:1.45}.seller{font-weight:700;color:#3e755c}
+.addbox{position:relative;overflow:hidden;background:radial-gradient(ellipse at 95% 0%,rgba(91,153,117,.27),transparent 34%),linear-gradient(135deg,#102f29,#174c3e);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 22px 50px rgba(16,47,41,.15)}.addbox h2{font-size:28px;letter-spacing:-1px}.addbox>p{font-size:14px;color:#d2e1d8}.formgrid{gap:12px;margin-top:20px}.formgrid input,.formgrid select,.formgrid textarea{border:1px solid #dce6df;border-radius:11px;min-height:48px}.formgrid textarea{min-height:165px;line-height:1.65}.photo-upload{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.18);border-radius:15px;padding:16px}.photo-group{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.16);border-radius:12px}.photo-group input{min-height:unset;padding:9px;border-radius:9px}.photo-preview img{width:76px;height:62px;border-radius:9px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.submit{min-height:52px;border-radius:12px;font-size:15px;letter-spacing:.1px;box-shadow:0 8px 20px rgba(200,243,106,.13)}
+.cabinet-card{background:#fff;border-color:#e4ebe5;border-radius:15px;box-shadow:0 6px 20px rgba(16,47,41,.05)}.cabinet-stat{background:#fff;border:1px solid #e4ebe5;border-radius:13px;box-shadow:0 5px 16px rgba(16,47,41,.04)}.cabinet-stat b{font-size:23px}.empty{background:#fff;border-color:#d6e1d9;border-radius:16px;padding:32px}.note{line-height:1.7}
+footer{background:#0b2922;border-top:1px solid rgba(255,255,255,.08);padding:30px 18px;font-size:12px;letter-spacing:.2px}
+:focus-visible{outline:3px solid rgba(200,243,106,.9);outline-offset:2px}
+@media(max-width:900px){.search{grid-template-columns:repeat(2,minmax(0,1fr))}.search-actions{grid-column:1/-1}.search-actions button{flex:1}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.photo{height:165px}}
+@media(max-width:760px){header{padding:10px 0}.top{flex-wrap:wrap;min-height:unset}.top nav{display:flex;order:3;width:100%;overflow-x:auto;padding:7px 0 1px;gap:20px;white-space:nowrap}.top nav a{font-size:12px}.top>div:last-child{margin-left:auto}.hero{padding:35px 0 42px}.hero-in{gap:8px}.hero h1{letter-spacing:-2.3px}.orbit{min-height:145px}.circle{width:150px;height:150px}.car{font-size:65px}.search{margin-top:19px}.section{padding:34px 0}.grid{gap:12px}.photo{height:140px}.details{padding:12px}.details h3{font-size:15px;min-height:38px}.price{font-size:18px}.listing-toolbar{align-items:flex-start;flex-direction:column}.sort-control{width:100%;justify-content:space-between}.sort-control select{flex:1;max-width:220px}}
+@media(max-width:480px){.wrap{padding-left:13px;padding-right:13px}.brand{font-size:22px}.back-btn{padding:9px 10px;font-size:12px}.header-sell{padding:10px 11px;font-size:11px}.top>div:last-child{gap:6px!important}.top .back-btn{font-size:11px}.hero h1{font-size:40px}.hero p{font-size:14px}.hero-in{grid-template-columns:1fr .48fr}.orbit{min-width:0}.circle{width:112px;height:112px}.circle:before{inset:13px}.circle:after{inset:27px}.car{font-size:49px}.search{padding:10px;gap:8px;border-radius:14px}.search input,.search select{font-size:12px;padding:11px 9px;min-height:44px}.search-actions button{min-height:44px;padding:10px 12px;font-size:12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.photo{height:112px}.details{padding:9px}.details h3{font-size:13px;min-height:34px}.price{font-size:16px}.meta,.seller{font-size:10px}.flag{font-size:8px;padding:4px 6px}.addbox{padding:17px;border-radius:17px}.addbox h2{font-size:23px}.formgrid{gap:9px}.photo-groups{grid-template-columns:1fr}.detail-specs{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* Alıcı kabineti: seçilmiş elanlar */
+.car-card{position:relative}.favorite-btn{position:absolute;z-index:4;top:10px;right:10px;width:39px;height:39px;min-width:39px;padding:0;border-radius:50%;background:rgba(255,255,255,.95);color:#53645a;font-size:23px;line-height:1;box-shadow:0 5px 16px rgba(0,0,0,.13);display:grid;place-items:center}.favorite-btn.is-favorite{background:#fff0ef;color:#e34c55}.favorite-btn:hover{transform:scale(1.07)}#buyerFavoritesPanel{padding-top:12px}#buyerFavoritesList{margin-top:15px}
+
+
+/* CƏNUB AVTO — yeni premium marka/model seçimi */
+:root{--picker-navy:#07162d;--picker-navy2:#0b2344;--picker-blue:#24c8f4;--picker-gold:#d9f36a}
+.picker-overlay{display:none;position:fixed;inset:0;z-index:2200;padding:clamp(10px,3vw,28px);overflow-y:auto;align-items:center;justify-content:center;background:rgba(2,8,20,.86);backdrop-filter:blur(12px)}
+.picker-overlay.open{display:flex}
+.picker-panel{width:min(760px,100%);max-height:min(92vh,900px);margin:auto;background:linear-gradient(160deg,#0c2140 0%,#07162d 58%,#091b34 100%);color:#f4f8ff;border:1px solid rgba(81,190,235,.3);border-radius:24px;overflow:hidden;box-shadow:0 30px 100px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.035) inset;display:flex;flex-direction:column}
+.picker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px;background:linear-gradient(110deg,#102d52,#0b1e39);border-bottom:1px solid rgba(110,190,235,.17);color:#fff}
+.picker-head h3{margin:0;font-size:clamp(19px,3vw,23px);font-weight:850;letter-spacing:-.5px}.picker-head h3:before{content:"✦";color:var(--picker-blue);margin-right:10px}.picker-close{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#e8f5ff;padding:9px 13px;border-radius:10px}
+.picker-search-wrap{padding:17px 20px 10px;background:transparent;position:sticky;top:0;z-index:4}.picker-search{width:100%;padding:15px 17px;border:1px solid rgba(91,194,235,.36);border-radius:13px;font-size:15px;color:#fff;background:#07162d;box-shadow:0 8px 24px rgba(0,0,0,.16)}.picker-search::placeholder{color:#8ea5bf}.picker-search:focus{border-color:var(--picker-blue);box-shadow:0 0 0 4px rgba(36,200,244,.12)}
+.picker-caption{padding:10px 22px 5px;font-size:11px;font-weight:900;color:#83dff7;text-transform:uppercase;letter-spacing:1.5px}.picker-note{padding:0 22px 12px;color:#9bb0c8;font-size:11px}
+.picker-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:0 16px 18px;overflow-y:auto;overscroll-behavior:contain;min-height:80px;max-height:calc(92vh - 190px);scrollbar-width:thin;scrollbar-color:#2c668a #0b1b32}
+.picker-section-title{grid-column:1/-1;padding:13px 8px 7px;color:#a5eaff;font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid rgba(118,190,226,.2);margin:3px 2px 4px}
+.picker-option{width:100%;display:flex;align-items:center;gap:14px;background:linear-gradient(110deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid rgba(137,184,218,.18);color:#f5f9ff;border-radius:14px;text-align:left;padding:11px 14px;margin:0;font-weight:750;font-size:14px;min-height:68px;transition:background .18s,border-color .18s,transform .18s,box-shadow .18s;cursor:pointer}
+.picker-option:hover,.picker-option:focus-visible{background:linear-gradient(105deg,rgba(36,200,244,.18),rgba(36,200,244,.055));border-color:rgba(36,200,244,.72);outline:none;box-shadow:0 8px 24px rgba(0,0,0,.2),0 0 0 2px rgba(36,200,244,.08);transform:translateY(-1px)}
+.brand-logo-box{width:46px;height:46px;flex:0 0 46px;border:1px solid rgba(150,211,241,.2);border-radius:13px;background:linear-gradient(145deg,#fff,#e8f2f8);display:grid;place-items:center;overflow:hidden;padding:6px;box-shadow:0 5px 16px rgba(0,0,0,.16)}.brand-logo-box img{width:100%;height:100%;object-fit:contain}.brand-logo-fallback{display:none;width:100%;height:100%;place-items:center;background:linear-gradient(145deg,#eaf8ff,#c8e9f7);color:#102b4c;font-size:12px;font-weight:950;border-radius:8px}.brand-option-name{display:flex;flex-direction:column;gap:4px;font-size:14px}.brand-option-name small{font-size:10px;color:#9eb4cc;font-weight:500;letter-spacing:.3px}.model-option-mark{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,rgba(36,200,244,.2),rgba(36,200,244,.06));border:1px solid rgba(36,200,244,.25);color:#8de9ff;font-size:19px}.model-option-name{display:flex;flex-direction:column;gap:4px}.model-option-name small{font-size:10px;color:#9eb4cc;font-weight:500}
+.picker-empty{grid-column:1/-1;text-align:center;padding:28px 18px;color:#b2c4d8;font-size:13px;border:1px dashed rgba(135,184,218,.25);border-radius:14px}.picker-custom{margin:0 16px 16px;width:calc(100% - 32px);background:linear-gradient(90deg,#bcecff,#d9f36a);color:#07162d;border-radius:12px;min-height:48px}
+input.picker-trigger{cursor:pointer;background-color:#fff;padding-right:38px;background-image:linear-gradient(45deg,transparent 50%,#567064 50%),linear-gradient(135deg,#567064 50%,transparent 50%);background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+/* Smart technical fields: model-matched engine hints, visual body cards and color chips */
+.engine-hints{grid-column:1/-1;margin-top:-4px;padding:12px 13px;border:1px solid rgba(141,205,235,.22);border-radius:12px;background:rgba(255,255,255,.055)}.engine-hints-title{font-size:11px;color:#b8d8e9;font-weight:800;margin-bottom:9px}.engine-hint-list{display:flex;gap:7px;flex-wrap:wrap}.engine-hint{border:1px solid rgba(116,199,234,.3);background:rgba(20,76,112,.45);color:#e8f8ff;border-radius:20px;padding:7px 11px;font-size:11px;min-height:unset}.engine-hint:hover{border-color:#55d7fa;background:rgba(36,151,204,.3)}
+.body-visual-picker{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 2px}.body-visual-option{display:flex;align-items:center;gap:9px;min-height:58px;padding:9px 11px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(163,205,230,.2);color:#eaf5ff;text-align:left;font-size:12px}.body-visual-option.active{border-color:#42d5f6;background:rgba(36,200,244,.18);box-shadow:0 0 0 2px rgba(36,200,244,.08)}.body-visual-option:hover{border-color:#42d5f6}
+.color-picker{grid-column:1/-1;display:flex;gap:9px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid rgba(163,205,230,.18)}.color-chip{width:31px;height:31px;min-width:31px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.65);box-shadow:0 2px 8px rgba(0,0,0,.18)}.color-chip.active{outline:3px solid #48d8f7;outline-offset:2px}.color-chip-label{font-size:11px;color:#c8d9e8;margin-right:4px}
+@media(max-width:560px){.picker-overlay{padding:0;align-items:stretch}.picker-panel{margin:0;border-radius:0;min-height:100%;max-height:none;width:100%;border-left:0;border-right:0}.picker-head{padding:16px}.picker-search-wrap{padding:13px 14px 8px}.picker-caption{padding-left:16px}.picker-note{padding-left:16px}.picker-list{padding:0 12px 18px;max-height:none;flex:1}.picker-option{min-height:64px}.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.engine-hints{padding:10px}}
+
+
+/* Cənub Avto — mərhələli premium seçim pəncərələri */
+.generation-overlay{display:none;position:fixed;inset:0;z-index:2300;background:rgba(3,12,20,.88);backdrop-filter:blur(14px);padding:clamp(10px,3vw,28px);align-items:center;justify-content:center;overflow:auto}
+.generation-overlay.open{display:flex}.generation-panel{width:min(900px,100%);max-height:min(90vh,900px);overflow:auto;background:linear-gradient(150deg,#102b28,#142f3c 65%,#1a3940);color:#f4fbf8;border:1px solid #ffffff25;border-radius:24px;box-shadow:0 30px 90px #0008;padding:clamp(18px,3vw,30px)}
+.generation-top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}.generation-kicker{font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#b8e87b;font-weight:800}.generation-panel h3{font-size:clamp(22px,4vw,30px);margin:7px 0}.generation-sub{color:#c4d8d5;font-size:13px;line-height:1.55;margin-bottom:18px}.generation-close{border:1px solid #ffffff35;background:#ffffff12;color:white;border-radius:12px;padding:9px 12px}
+.generation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.generation-card{padding:0;text-align:left;overflow:hidden;border:1px solid #ffffff25;border-radius:16px;background:#ffffff0b;color:#fff;transition:.2s}.generation-card:hover,.generation-card:focus{border-color:#b8e87b;transform:translateY(-2px);box-shadow:0 12px 30px #0003}.generation-photo{height:170px;background:linear-gradient(145deg,#e9f0ed,#b8c9c5);display:flex;align-items:center;justify-content:center;overflow:hidden}.generation-photo{position:relative}.generation-photo img{width:100%;height:100%;object-fit:cover}.generation-credit{position:absolute;left:6px;right:6px;bottom:6px;padding:4px 6px;border-radius:6px;background:#071b16cc;color:#fff;font-size:9px;line-height:1.25;max-height:34px;overflow:hidden;text-align:left}.generation-info{padding:13px 14px 15px}.generation-name{font-size:17px;font-weight:850}.generation-years{font-size:12px;color:#bfe77e;margin-top:5px;font-weight:750}.generation-desc{font-size:11px;color:#c2d2d0;margin-top:6px;line-height:1.4}.generation-manual{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:15px;padding:13px;border:1px dashed #ffffff4a;border-radius:14px;background:#ffffff09}.generation-manual input{flex:1;min-width:180px;background:#fff;color:#172b29;border-radius:10px;padding:12px;border:0}.generation-manual button{background:#c4ee7c;color:#172b29;border-radius:10px;padding:12px 16px;font-weight:850}
+.body-visual-option{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:125px;padding:8px;border-radius:13px;background:rgba(255,255,255,.07);border:1px solid rgba(163,205,230,.2);color:#eaf5ff;text-align:center;font-size:12px;font-weight:750}.body-visual-option .body-picture{height:78px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#edf3ef,#c5d5cf);border-radius:9px;overflow:hidden}.body-visual-option .body-picture svg{display:none}.body-visual-option.active{border-color:#b8e87b;background:rgba(184,232,123,.16);box-shadow:0 0 0 2px rgba(184,232,123,.1)}
+.form-step-hint{grid-column:1/-1;color:#cfe0d8;font-size:12px;padding:9px 12px;background:#ffffff0c;border:1px solid #ffffff18;border-radius:10px}
+@media(max-width:560px){.generation-overlay{padding:0;align-items:stretch}.generation-panel{max-height:none;min-height:100%;border-radius:0;padding:18px 14px}.generation-grid{grid-template-columns:1fr}.generation-photo{height:155px}}
+
+
+/* Real-photo selectors: no pictograms, vector car icons or silhouette placeholders. */
+.body-visual-picker{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.body-visual-option{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-height:0;padding:8px;border-radius:14px;text-align:center}
+.body-visual-option .body-picture{height:112px;width:100%;display:block;position:relative;overflow:hidden;border-radius:9px;background:linear-gradient(145deg,#e7efeb,#bdcec7)}
+.body-visual-option .body-picture img{width:100%;height:100%;display:block;object-fit:cover}
+.body-visual-option .body-label{font-size:12px;font-weight:800}
+.generation-photo{position:relative;background:#e7efeb}
+.generation-photo img{width:100%;height:100%;object-fit:cover}
+.photo-not-found{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;background:#e7efeb;color:#42534d;font-size:12px;text-align:center}
+.photo-not-found[hidden]{display:none}
+.photo-credit{position:absolute;left:5px;right:5px;bottom:4px;z-index:2;color:#fff;background:#071b16c9;padding:3px 5px;border-radius:5px;font-size:9px;line-height:1.2;max-height:28px;overflow:hidden}
+.generation-reference{cursor:default}
+.generation-manual input{flex:1 1 190px;min-width:0}
+.photo-example{position:relative;height:118px;margin:0 0 9px;overflow:hidden;border-radius:9px;background:#e7efeb;border:1px solid #ffffff32}
+.photo-example img{display:block;width:100%;height:100%;object-fit:cover}
+.photo-example-caption{position:absolute;left:6px;bottom:6px;padding:4px 7px;border-radius:6px;background:#071b16c9;color:#fff;font-size:10px;font-weight:750}
+.photo-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e7efeb;color:#60736b;font-size:12px}
+.gallery-empty{font-size:14px;color:#dce7e1;padding:55px;text-align:center}
+@media(max-width:560px){.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.body-visual-option .body-picture{height:105px}.photo-example{height:145px}}
+
+
+/* Cənub Avto: vahid lokal foto kataloqu və aydın seçim kartları */
+.body-visual-picker{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.body-visual-option{min-height:0;padding:9px;background:linear-gradient(150deg,#10233d,#09172b);border:1px solid rgba(120,177,220,.24);border-radius:15px;cursor:pointer;transition:.18s}
+.body-visual-option .body-picture{height:112px;background:#0b1a2d;border-radius:10px}
+.body-visual-option .body-picture img{width:100%;height:100%;object-fit:cover}
+.body-visual-option .body-label{padding:4px 0 2px;font-size:13px;color:#f4f8ff}
+.body-visual-option.active{border:2px solid #149bff;background:linear-gradient(145deg,#123e69,#0c2747);box-shadow:0 0 0 3px #168bff30,0 12px 25px #00142b80}
+.generation-overlay{background:rgba(2,10,24,.9)}
+.generation-panel{background:linear-gradient(145deg,#081b34,#102b4a 58%,#07172c);border:1px solid #258fe966;border-radius:22px}
+.generation-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.generation-card{display:block;width:100%;cursor:pointer;text-align:left;background:linear-gradient(155deg,#142b46,#091a30);border:1px solid #9bc8ef30;border-radius:15px}
+.generation-photo{height:155px;background:#0b1b30}
+.generation-photo img{object-fit:cover}
+.generation-info{padding:12px 13px 14px}
+.generation-name{font-size:17px;color:#fff}
+.generation-years{color:#65c4ff;font-size:13px}
+.generation-desc{color:#b8cde1}
+.generation-card.selected,.generation-card:focus-visible{border:2px solid #168fff;box-shadow:0 0 0 3px #168fff30,0 14px 30px #00152d;outline:none}
+.generation-manual{background:#07172b;border-color:#3185c766}
+.generation-manual input{background:#10243c;color:#fff;border:1px solid #ffffff25}
+.generation-manual input::placeholder{color:#a7bad0}
+.generation-manual button{background:linear-gradient(90deg,#087fe5,#28b7ff);color:#fff}
+.photo-credit{position:absolute;left:6px;right:6px;bottom:6px;padding:4px 6px;border-radius:6px;background:#06172bd9;color:#e4f3ff;font-size:9px;line-height:1.25;text-align:left}
+@media(max-width:700px){.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.generation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.generation-photo{height:125px}}
+@media(max-width:420px){.generation-grid{grid-template-columns:1fr}.generation-photo{height:170px}}
+
+
+/* Cənub Avto — vizual keyfiyyət və uyğun ölçü düzəlişləri */
+.brand-logo-box{position:relative;width:54px;height:54px;flex:0 0 54px;border-radius:15px;padding:5px;background:#fff;box-shadow:0 5px 16px rgba(0,0,0,.18)}
+.brand-logo-box img{position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:contain;background:#fff}
+.brand-logo-fallback{position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);border-radius:10px;font-size:13px;letter-spacing:-.4px}
+.generation-grid{grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px}
+.generation-card{display:flex;flex-direction:column;min-width:0}
+.generation-photo{height:auto;aspect-ratio:16/10;min-height:0;background:linear-gradient(145deg,#eaf0f5,#c8d6df)}
+.generation-photo img{width:100%;height:100%;object-fit:contain;padding:7px;background:linear-gradient(145deg,#edf3f7,#dbe5ec)}
+.generation-info{min-height:112px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.generation-name{line-height:1.25}.generation-years{font-size:13px}
+.generation-card.selected,.generation-card.active,.generation-card[aria-pressed="true"]{border:2px solid #b8e87b;background:rgba(184,232,123,.15);box-shadow:0 0 0 3px rgba(184,232,123,.15),0 14px 32px #0004}
+.photo-groups{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.photo-example{height:auto;aspect-ratio:4/3;border-radius:13px;background:#e8eef2}
+.photo-example img{object-fit:contain;padding:5px;background:linear-gradient(145deg,#f4f7f9,#e0e8ed)}
+.body-visual-picker{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:13px}
+.body-visual-option .body-picture{height:auto;aspect-ratio:4/3;background:#e8eef2}
+.body-visual-option .body-picture img{object-fit:contain;padding:4px;background:linear-gradient(145deg,#f4f7f9,#e0e8ed)}
+@media(max-width:560px){.generation-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.generation-photo{aspect-ratio:4/3}.generation-info{padding:10px;min-height:100px}.generation-name{font-size:14px}.generation-years{font-size:11px}.photo-groups{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo-example{aspect-ratio:1/1}.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.brand-logo-box{width:48px;height:48px;flex-basis:48px}}
+
+
+/* Cənub Avto — foto əsaslı seçimlərin yekun ölçüləri */
+.generation-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.generation-card{display:flex;flex-direction:column;min-width:0}
+.generation-photo{height:auto;aspect-ratio:16/9;min-height:145px}
+.generation-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.generation-info{flex:1}
+.body-visual-picker{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.body-visual-option{display:flex;flex-direction:column;align-items:stretch;min-width:0;min-height:0;padding:9px}
+.body-visual-option .body-picture{height:auto;aspect-ratio:4/3;width:100%;display:block;overflow:hidden}
+.body-visual-option .body-picture img{display:block;width:100%;height:100%;object-fit:cover}
+.photo-groups{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.photo-group{min-width:0}
+.photo-example{height:auto;aspect-ratio:16/9;min-height:130px;margin:0 0 11px}
+.photo-example img{display:block;width:100%;height:100%;object-fit:cover}
+.photo-example-caption{font-size:11px;padding:5px 8px}
+.body-visual-option .body-picture svg,.generation-photo svg{display:none!important}
+@media(max-width:760px){.generation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.generation-photo{min-height:125px}.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.generation-grid{grid-template-columns:1fr}.generation-photo{min-height:170px}.photo-groups{grid-template-columns:1fr}.photo-example{min-height:175px}}
+
+
+/* FINAL FIX: brand typography and natural photo proportions */
+.brand{display:block;white-space:nowrap;word-break:keep-all;overflow:visible;font-size:25px;letter-spacing:-.45px;line-height:1.15}
+.brand span{display:inline;color:var(--lime);white-space:nowrap}
+.top>div:first-child{flex:0 0 auto;min-width:max-content}
+.car{font-size:clamp(17px,2.4vw,25px)!important;font-weight:950;letter-spacing:.4px;line-height:1.1;white-space:nowrap;color:#fff;transform:rotate(12deg);filter:drop-shadow(0 3px 5px #061b15)}
+.circle{overflow:visible}
+/* The photo itself must never be stretched or cropped into a narrow strip. */
+.generation-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.generation-photo{height:auto!important;aspect-ratio:4/3!important;min-height:0!important;display:flex;align-items:center;justify-content:center;padding:8px;background:linear-gradient(145deg,#edf3f7,#dbe5ec);overflow:hidden}
+.generation-photo img{display:block;width:100%;height:100%;object-fit:contain!important;object-position:center center;padding:0!important;background:transparent!important}
+.body-visual-picker{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.body-visual-option .body-picture{height:auto!important;aspect-ratio:4/3!important;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px;background:#edf2f4;overflow:hidden}
+.body-visual-option .body-picture img{width:100%;height:100%;object-fit:contain!important;object-position:center center;padding:0!important;background:transparent!important}
+.photo-groups{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}
+.photo-example{height:auto!important;aspect-ratio:4/3!important;min-height:0!important;padding:7px;background:#edf2f4;display:flex;align-items:center;justify-content:center}
+.photo-example img{width:100%;height:100%;object-fit:contain!important;object-position:center center;padding:0!important;background:transparent!important}
+.photo-preview img{width:76px;height:64px;object-fit:contain;background:#edf2f4;padding:3px}
+@media(max-width:560px){
+ .brand{font-size:21px;letter-spacing:-.25px}
+ .top{align-items:center;gap:8px}
+ .top>div:first-child{min-width:max-content}
+ .generation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .generation-photo{aspect-ratio:4/3!important}
+ .photo-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .photo-example{aspect-ratio:4/3!important}
+ .body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:380px){.generation-grid,.photo-groups{grid-template-columns:1fr}}
+
+
+/* CƏNUB AVTO — MODERN PREMIUM VISUAL REFRESH (layout-only; existing flows preserved) */
+:root{
+ --green:#0b1830;--green2:#102b4d;--cream:#f3f6fb;--paper:#ffffff;
+ --lime:#22d3c5;--orange:#ffb45e;--ink:#101b2d;--muted:#718096;--line:#e3eaf3;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',Arial,Helvetica,sans-serif;background:#f3f6fb;color:#101b2d}
+header{
+ position:sticky;top:0;z-index:80;padding:13px max(18px,calc((100% - 1240px)/2));
+ background:rgba(7,18,37,.94);backdrop-filter:blur(18px);
+ border-bottom:1px solid rgba(148,183,220,.16);
+ box-shadow:0 8px 30px rgba(3,12,27,.18)
+}
+.top{max-width:1240px;min-height:54px}
+.brand{font-size:26px;letter-spacing:-1.1px;font-weight:900}
+.brand span{color:#22d3c5}
+.tag{color:#a8bad1;font-size:10px;letter-spacing:2.4px;font-weight:800}
+nav{gap:24px;font-size:13px;font-weight:700}
+nav a{color:#d8e4f3;transition:color .2s}
+nav a:hover{color:#22d3c5}
+.header-sell{background:linear-gradient(135deg,#22d3c5,#58e5d4);color:#06213a;border-radius:13px;padding:12px 18px;font-weight:900;box-shadow:0 8px 22px #22d3c52c}
+.back-btn{background:#e9f0f8;color:#17304d;border-radius:12px;font-weight:800}
+.account-chip{color:#d8e4f3}
+.hero{
+ position:relative;isolation:isolate;overflow:hidden;padding:52px 0 34px;
+ color:#fff;background:
+ radial-gradient(ellipse at 78% 22%,rgba(27,126,177,.25),transparent 38%),
+ linear-gradient(118deg,#07152b 0%,#0b2341 55%,#102c4b 100%);
+}
+.hero:before{content:"";position:absolute;z-index:-1;width:520px;height:520px;right:-190px;top:-250px;border:1px solid #5ce8dc22;border-radius:50%;box-shadow:0 0 0 45px #5ce8dc0b,0 0 0 90px #5ce8dc08}
+.hero-in{max-width:1240px;grid-template-columns:1.05fr .95fr;gap:42px;min-height:300px}
+.kicker{color:#42e1d4;letter-spacing:2.5px;font-size:11px}
+h1{font-size:clamp(40px,5.4vw,68px);line-height:1.02;letter-spacing:-2.8px;margin:17px 0 16px;font-weight:900}
+.hero p{color:#c0cee0;max-width:510px;line-height:1.8;font-size:15px}
+.orbit{
+ min-height:300px;border-radius:28px;overflow:hidden;position:relative;
+ background-image:linear-gradient(90deg,rgba(5,17,34,.08),rgba(5,17,34,.02)),url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1400&q=88');
+ background-position:center;background-size:cover;
+ box-shadow:0 24px 65px rgba(0,0,0,.34);border:1px solid rgba(174,216,245,.2)
+}
+.orbit:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,17,34,.30),transparent 55%)}
+.orbit .circle,.orbit .car{display:none!important}
+.search{
+ position:relative;z-index:2;background:rgba(255,255,255,.98);padding:17px;
+ border:1px solid #dce7f2;border-radius:20px;grid-template-columns:repeat(4,minmax(0,1fr)) auto;
+ gap:10px;margin-top:25px;box-shadow:0 22px 55px rgba(0,0,0,.22)
+}
+.search input,.search select{
+ border:1px solid #dce5ef;border-radius:12px;background:#f7f9fc;color:#17263c;
+ padding:14px 13px;font-family:inherit;font-size:13px;font-weight:650;outline:none;transition:.2s
+}
+.search input:focus,.search select:focus{border-color:#22bfb5;box-shadow:0 0 0 3px #22d3c522;background:#fff}
+.search-actions{display:flex;gap:7px}
+.search-actions button{background:linear-gradient(135deg,#17bfb5,#27d7c7);color:#05233a;border-radius:12px;padding:13px 19px;font-weight:900}
+.search-actions .clear-search{background:#eaf0f7;color:#42546b}
+.wrap{max-width:1240px}
+.section{padding:48px 0}
+.section-head{margin-bottom:21px}
+.section h2{font-size:clamp(23px,3vw,30px);letter-spacing:-1.1px;font-weight:900;color:#12233a}
+.sub{color:#74849a;font-size:13px}
+.pills{gap:9px;margin:16px 0 22px}
+.pill{background:#fff;border:1px solid #dce5ef;color:#52647b;border-radius:999px;padding:10px 16px;font-weight:800;transition:.2s}
+.pill:hover{border-color:#22cfc2;color:#0d8d88}
+.pill.active{background:#0c2340;border-color:#0c2340;color:#fff;box-shadow:0 7px 18px #0c234026}
+.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.car-card{
+ background:#fff;border:1px solid #e1e9f2;border-radius:20px;overflow:hidden;
+ box-shadow:0 8px 25px rgba(20,43,70,.055);transition:transform .22s,box-shadow .22s,border-color .22s
+}
+.car-card:hover{transform:translateY(-5px);border-color:#b8e9e5;box-shadow:0 20px 42px rgba(20,43,70,.13)}
+.photo{height:auto;aspect-ratio:16/10;min-height:175px;background:linear-gradient(135deg,#dfeaf4,#c8d8e8);font-size:0}
+/* Keep every cover inside its frame; badges retain their own size. */
+.car-card .photo{overflow:hidden}
+.car-card .photo>.car-cover{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0}
+.car-card .photo>.flag{width:auto;height:auto;z-index:1}
+.photo img{display:block;width:100%;height:100%;object-fit:cover}
+.photo-placeholder{font-size:13px;color:#52647b}
+.flag{top:13px;left:13px;background:#22d3c5;color:#05253d;border-radius:999px;padding:7px 11px;font-size:10px;letter-spacing:.2px}
+.favorite-btn{top:12px;right:12px;border-radius:50%;width:39px;height:39px;background:rgba(7,20,39,.72);color:#fff;backdrop-filter:blur(8px);font-size:21px}
+.favorite-btn.is-favorite{background:#e84e72;color:#fff}
+.details{padding:17px 18px 19px}
+.details h3{font-size:17px;letter-spacing:-.35px;color:#14243b;font-weight:900}
+.price{font-size:21px;color:#087f85;font-weight:900;letter-spacing:-.5px}
+.meta{color:#78879b;font-size:12px;line-height:1.6}
+.seller{color:#168e91;font-weight:800;font-size:12px}
+.listing-toolbar{align-items:center}
+.sort-control{display:flex;align-items:center;gap:9px;color:#718096;font-size:12px;font-weight:800}
+.sort-control select{background:#fff;border:1px solid #dce5ef;border-radius:11px;padding:10px 12px;color:#263a53}
+.addbox{
+ background:linear-gradient(135deg,#081a34,#102e50 65%,#0b3b52);color:#fff;
+ border:1px solid #2b5577;border-radius:24px;padding:clamp(20px,4vw,36px);
+ box-shadow:0 22px 50px rgba(9,30,56,.18)
+}
+.addbox h2{font-size:27px;letter-spacing:-.8px;font-weight:900}
+.addbox p,.photo-help{color:#c0d0e2}
+.formgrid{gap:13px}
+.formgrid input,.formgrid select,.formgrid textarea{
+ border:1px solid #d8e3ef;border-radius:12px;background:#f8fafc;color:#14243b;
+ padding:14px;font-family:inherit;font-size:13px;font-weight:600
+}
+.formgrid input:focus,.formgrid select:focus,.formgrid textarea:focus{outline:0;border-color:#22d3c5;box-shadow:0 0 0 3px #22d3c522}
+.submit{background:linear-gradient(135deg,#22d3c5,#68ead9);color:#05233a;border-radius:13px;font-weight:900}
+.photo-upload{border:1px solid #5b7895;background:#ffffff0a;border-radius:16px}
+.photo-group{border-radius:14px}
+.photo-example{border-radius:13px}
+footer{background:#061329;color:#aebed1;border-top:1px solid #203b59}
+.detail-overlay{background:rgba(3,12,27,.86);backdrop-filter:blur(8px)}
+.detail-panel{border-radius:22px;box-shadow:0 30px 90px #0008}
+.detail-top{background:#0b2341}
+.detail-price{color:#07888c}
+.detail-spec{background:#eef4f8;border:1px solid #e0e9f1;border-radius:12px}
+.seller-description{background:#eef4f8;border-radius:14px}
+.detail-contact a{background:#087f85;border-radius:12px}
+.cabinet-card{background:#fff;border:1px solid #e0e8f1;border-radius:16px;box-shadow:0 7px 20px #142b4608}
+.cabinet-stat{background:#eaf3f7;border:1px solid #dbe8ef;border-radius:13px}
+.cabinet-stat b{color:#087f85}
+.empty{background:#fff;border:1px dashed #b8c8d9;border-radius:18px}
+@media(max-width:900px){
+ .hero-in{grid-template-columns:1fr .8fr;gap:22px}
+ .search{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .search-actions{grid-column:1/-1}
+ .search-actions button{flex:1}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ header{padding:10px 12px}
+ .top{gap:7px;flex-wrap:wrap}
+ .brand{font-size:20px;letter-spacing:-.6px}
+ .tag{font-size:9px;letter-spacing:1.7px}
+ nav{display:none}
+ .header-sell{padding:10px 12px;font-size:12px}
+ .hero{padding:31px 0 25px}
+ .hero-in{grid-template-columns:1fr;gap:18px;min-height:0}
+ h1{font-size:clamp(36px,10vw,48px);letter-spacing:-1.9px}
+ .hero p{font-size:13px}
+ .orbit{min-height:190px;border-radius:20px;background-position:center 56%}
+ .search{margin-top:17px;padding:12px;border-radius:16px;gap:8px}
+ .search input,.search select{padding:12px 9px;font-size:12px}
+ .search-actions button{padding:12px 10px;font-size:12px}
+ .section{padding:34px 0}
+ .section-head{align-items:flex-start}
+ .section h2{font-size:23px}
+ .grid{gap:12px}
+ .photo{min-height:125px}
+ .details{padding:12px}
+ .details h3{font-size:14px}
+ .price{font-size:17px}
+ .meta,.seller{font-size:11px}
+ .pills{overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px}
+ .pill{white-space:nowrap}
+ .formgrid{grid-template-columns:1fr}
+ .wide{grid-column:auto}
+ .cabinet-card{grid-template-columns:78px 1fr}
+ .cabinet-card img{width:78px;height:68px}
+ .cabinet-card .cab-actions{grid-column:1/-1}
+}
+@media(max-width:390px){
+ .grid{grid-template-columns:1fr}
+ .photo{aspect-ratio:16/9}
+ .section-head{flex-direction:column;align-items:stretch}
+ .sort-control{justify-content:space-between}
+}
+
+
+/* 2026 editorial automotive redesign */
+:root{--ink:#eaf0f7;--muted:#9aa9bb;--paper:#111d2c;--cream:#081321;--line:rgba(176,202,228,.13);--green:#081321;--green2:#10243a;--lime:#b9f34b;--orange:#48d7ef}
+html{scroll-behavior:smooth}body{background:#081321;color:#eaf0f7;font-family:'Manrope',Arial,sans-serif;letter-spacing:-.01em}header{position:sticky;top:0;z-index:100;background:rgba(7,18,32,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(174,205,236,.12);padding-top:14px;padding-bottom:14px}.top{max-width:1320px}.brand{font-size:25px;letter-spacing:-1.4px}.brand span{color:#b9f34b}.tag{color:#8da2bb;font-size:9px;letter-spacing:3px}.top nav{gap:28px}.top nav a{color:#c7d3e1;font-weight:650;font-size:12px;transition:.2s}.top nav a:hover{color:#b9f34b}.back-btn{background:#17283c;color:#dce8f5;border:1px solid #294057}.header-sell{background:#b9f34b;color:#071321;border-radius:9px;font-weight:900;padding:12px 18px}.hero{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 12% 5%,#163552 0%,transparent 43%),linear-gradient(115deg,#081321 0%,#0c1d30 55%,#071321 100%);padding:58px 0 66px}.hero:after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#b9f34b66,transparent)}.hero-in{max-width:1320px;grid-template-columns:.86fr 1.14fr;gap:48px;min-height:450px}.hero-copy{padding:22px 0;position:relative;z-index:2}.kicker{display:inline-flex;align-items:center;gap:10px;color:#a9c2dc;font-size:10px;letter-spacing:2px;font-weight:850}.live-dot{width:7px;height:7px;border-radius:50%;background:#b9f34b;box-shadow:0 0 0 5px #b9f34b20}.hero h1{font-size:clamp(54px,7vw,96px);line-height:.94;letter-spacing:-6px;font-weight:900;margin:25px 0 20px;color:#f4f7fb}.hero h1 em{font-style:normal;color:#b9f34b}.hero p{font-size:15px;line-height:1.9;color:#a9b8ca;max-width:440px}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:27px}.hero-actions button{min-height:49px;padding:0 20px;border-radius:9px;background:#b9f34b;color:#081321;font-weight:900}.hero-actions button span{font-size:18px;margin-left:14px}.hero-actions .hero-secondary{background:transparent;color:#eaf0f7;border:1px solid #52657b}.hero-proof{display:flex;gap:19px;flex-wrap:wrap;margin-top:35px;color:#8095ad;font-size:10px;font-weight:700;letter-spacing:.2px}.hero-visual{height:430px;position:relative;border-radius:18px;overflow:hidden;border:1px solid #ffffff20;box-shadow:0 35px 90px #0008;background:#172b40}.hero-visual img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.8)}.hero-image-shade{position:absolute;inset:0;background:linear-gradient(90deg,#07132155,transparent 55%),linear-gradient(0deg,#06111ddd,transparent 48%)}.hero-image-label{position:absolute;left:30px;bottom:28px;display:grid;gap:6px}.hero-image-label span{font-size:9px;letter-spacing:2.8px;color:#b9f34b;font-weight:900}.hero-image-label strong{font-size:24px;letter-spacing:-1px}.hero-floating{position:absolute;right:22px;top:22px;display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:#071321cc;border:1px solid #ffffff25;backdrop-filter:blur(12px);font-size:10px;color:#d7e3ef;line-height:1.5}.hero-floating b{font-size:24px;color:#b9f34b}.search{max-width:1200px;margin:-32px auto 0;position:relative;z-index:5;background:#f5f8fc;border:1px solid #ffffff30;border-radius:14px;padding:13px;box-shadow:0 20px 55px #0006;grid-template-columns:1.2fr 1.2fr 1fr 1fr auto}.search input,.search select{border:1px solid #dbe3ec;border-radius:8px;background:#fff;color:#17283b;font-size:13px;min-height:49px}.search button{border-radius:8px;background:#b9f34b;color:#071321;font-weight:900;min-height:49px}.wrap{max-width:1320px}.brand-showcase{padding:78px 18px 34px}.showcase-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}.eyebrow{font-size:9px;letter-spacing:2.5px;color:#b9f34b;font-weight:900}.showcase-head h2,.section h2{font-size:clamp(26px,3vw,38px);letter-spacing:-1.6px;margin:9px 0 7px;font-weight:900;color:#f0f5fb}.showcase-head p{color:#8ea1b8;font-size:13px;margin:0}.showcase-count{font-size:10px;letter-spacing:1.6px;color:#71859c;font-weight:800}.brand-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px}.brand-tile{position:relative;min-height:170px;padding:19px;text-align:left;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;overflow:hidden;border:1px solid #ffffff19;border-radius:13px;color:#fff;background:#14263a;transition:.25s}.brand-tile:before{content:'';position:absolute;inset:0;background-size:cover;background-position:center;opacity:.55;transition:transform .5s}.brand-tile:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#071321 0%,#07132155 65%,#07132122)}.brand-tile:hover{transform:translateY(-5px);border-color:#b9f34b88;box-shadow:0 18px 35px #0005}.brand-tile:hover:before{transform:scale(1.07)}.bmw-tile:before{background-image:url('https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=700&q=80')}.mercedes-tile:before{background-image:url('https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=700&q=80')}.toyota-tile:before{background-image:url('https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&w=700&q=80')}.audi-tile:before{background-image:url('https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=700&q=80')}.hyundai-tile:before{background-image:url('images/fa78e138ebffddfce0cebec1ab24c0b70fa95fdfdff73fc4313e83f05f95f99e.png')}.brand-tile>*{position:relative;z-index:1}.brand-tile-logo{font-size:12px;letter-spacing:2px;font-weight:900;color:#b9f34b;margin-bottom:auto;align-self:flex-end}.brand-tile strong{font-size:18px;letter-spacing:-.5px}.brand-tile small{font-size:10px;color:#b1c0d1;margin-top:4px}.tile-arrow{position:absolute!important;right:17px;bottom:19px;color:#b9f34b;font-size:20px}.bmw-series-panel{margin-top:20px;padding:22px;border-radius:16px;background:linear-gradient(135deg,#10243a,#0b192a);border:1px solid #ffffff1b}.bmw-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.bmw-panel-head h3{font-size:22px;margin:5px 0 0}.bmw-close{background:#1c3046;color:#dce7f4;border:1px solid #ffffff20;padding:8px 13px}.bmw-series-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}.bmw-series-card{position:relative;min-width:0;padding:0;overflow:hidden;text-align:left;border:1px solid #ffffff20;border-radius:10px;background:#172b41;color:white;display:flex;flex-direction:column;gap:4px;transition:.2s}.bmw-series-card:hover,.bmw-series-card.active{border-color:#b9f34b;transform:translateY(-3px)}.bmw-series-card img{width:100%;height:86px;object-fit:cover;display:block;opacity:.85}.bmw-series-card span{font-size:8px;letter-spacing:1.5px;color:#b9f34b;font-weight:900;padding:8px 9px 0}.bmw-series-card strong{font-size:13px;padding:0 9px}.bmw-series-card i{font-size:8px;font-style:normal;color:#8fa3ba;padding:0 9px 10px}.bmw-models{margin-top:18px;padding-top:17px;border-top:1px solid #ffffff1c}.bmw-models-title{font-size:13px;font-weight:900;margin-bottom:11px}.bmw-model-chips{display:flex;flex-wrap:wrap;gap:8px}.bmw-model-chip{background:#1b3048;border:1px solid #ffffff20;color:#e8f2fc;border-radius:8px;padding:9px 13px;font-size:11px}.bmw-model-chip:hover{border-color:#b9f34b;color:#b9f34b}.section{padding:55px 0}.section-head{margin-bottom:23px}.section h2{font-size:30px}.sub{color:#91a2b6}.car-card{background:#111f30;border:1px solid #ffffff15;border-radius:13px;box-shadow:0 12px 30px #0002;transition:transform .22s,border-color .22s}.car-card:hover{transform:translateY(-5px);border-color:#b9f34b55;box-shadow:0 20px 38px #0004}.photo{background:#182b40}.details h3{color:#edf4fb}.price{color:#b9f34b}.meta,.seller{color:#8da0b6}.pill{border-color:#34485e;color:#9db0c4}.pill.active{background:#b9f34b;color:#071321;border-color:#b9f34b}.addbox{background:linear-gradient(135deg,#102943,#0d1b2b);border:1px solid #ffffff1b;border-radius:18px}.addbox p{color:#9fb0c2}.formgrid input,.formgrid select,.formgrid textarea{background:#f6f8fb;color:#14243a}.cabinet-stat{background:#17283c;color:#cbd8e6}.cabinet-stat b{color:#b9f34b}.cabinet-card{background:#111f30;border-color:#ffffff18}.cabinet-card .delete{background:#492a32;color:#ffb8be}.detail-panel,.auth-box{background:#111f30;color:#eaf0f7}.detail-top{background:#0b1a2b}.auth-box h2{color:#f1f6fb}.auth-box p{color:#9eafc1}.auth-box input{background:#f5f8fb;color:#17283b}footer{background:#050d17;color:#8193a8;border-top:1px solid #ffffff14}.note{color:#8193a8}
+@media(max-width:900px){.hero-in{grid-template-columns:1fr 1fr;gap:22px}.hero-visual{height:360px}.brand-tiles{grid-template-columns:repeat(3,1fr)}.bmw-series-grid{grid-template-columns:repeat(4,1fr)}.search{grid-template-columns:repeat(2,1fr)}.search button{grid-column:1/-1}}
+@media(max-width:620px){header{padding:10px 0}.top{flex-wrap:nowrap}.top nav{display:none}.brand{font-size:21px}.header-sell{padding:10px 12px;font-size:11px}.hero{padding:25px 0 45px}.hero-in{grid-template-columns:1fr;gap:20px}.hero-copy{padding:9px 0}.hero h1{font-size:56px;letter-spacing:-3.8px;margin:17px 0 13px}.hero p{font-size:13px;line-height:1.7}.hero-visual{height:245px;border-radius:12px}.hero-image-label{left:17px;bottom:16px}.hero-image-label strong{font-size:18px}.hero-floating{right:12px;top:12px;padding:8px 11px}.hero-proof{margin-top:22px;gap:12px;font-size:9px}.search{margin:-20px 13px 0;padding:10px;gap:7px;grid-template-columns:1fr 1fr}.search input,.search select{font-size:11px;padding:10px 8px;min-height:43px}.search button{font-size:12px;min-height:44px}.brand-showcase{padding:48px 13px 22px}.showcase-head{align-items:flex-start;gap:10px}.showcase-head h2{font-size:25px}.showcase-head p{font-size:11px;line-height:1.6}.showcase-count{display:none}.brand-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.brand-tile{min-height:140px;padding:13px}.brand-tile strong{font-size:15px}.brand-tile small{font-size:9px}.bmw-series-panel{padding:14px;margin-top:13px}.bmw-series-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bmw-series-card img{height:95px}.bmw-series-card strong{font-size:12px}.section{padding:34px 0}.section h2{font-size:24px}.grid{gap:9px}.photo{height:125px}.details{padding:10px}.details h3{font-size:13px}.price{font-size:17px}.section-head{align-items:flex-start}.listing-toolbar{gap:10px}.sort-control{width:100%}}
+
+
+
+/* Subtle slideshow-like motion without moving the layout */
+.bmw-series-card img,.body-visual-option .body-picture img{animation:photoDrift 10s ease-in-out infinite alternate}
+.bmw-series-card:nth-child(even) img,.body-visual-option:nth-child(even) .body-picture img{animation-delay:-3s}
+@keyframes photoDrift{0%{transform:scale(1) translateX(0)}100%{transform:scale(1.055) translateX(-1.2%)}}
+@media(prefers-reduced-motion:reduce){.bmw-series-card img,.body-visual-option .body-picture img{animation:none;transition:none}}
+
+/* BMW + body-style visual refinement: accurate proportions, motion and mobile clarity */
+.bmw-series-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.bmw-series-card{border-radius:15px;background:linear-gradient(145deg,#172d46,#09182b);box-shadow:0 8px 24px #0003;isolation:isolate}
+.bmw-series-card img{width:100%;aspect-ratio:4/3;height:auto;object-fit:cover;display:block;opacity:1;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .5s;filter:saturate(1.12) contrast(1.04)}
+.bmw-series-card:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#061321ef 0%,transparent 65%);pointer-events:none}
+.bmw-series-card span,.bmw-series-card strong,.bmw-series-card i{position:relative;z-index:1}
+.bmw-series-card:hover img,.bmw-series-card.active img{transform:scale(1.075);filter:saturate(1.3) contrast(1.08)}
+.bmw-series-card.active{box-shadow:0 0 0 2px #b9f34b,0 16px 34px #0006}
+.bmw-models{animation:bmwReveal .42s cubic-bezier(.2,.8,.2,1) both}
+.bmw-model-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:9px}
+.bmw-model-chip{min-height:42px;text-align:center;border-radius:10px;background:linear-gradient(135deg,#1a3552,#10243b);font-weight:750;transition:transform .22s,background .22s,border-color .22s}
+.bmw-model-chip:hover{transform:translateY(-3px);background:linear-gradient(135deg,#245078,#15324e)}
+.body-visual-picker{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.body-visual-option{border-radius:17px;overflow:hidden;padding:9px;background:linear-gradient(155deg,#142b45,#09182b);box-shadow:0 9px 24px #0003;transition:transform .28s,border-color .28s,box-shadow .28s;}
+.body-visual-option .body-picture{width:100%;aspect-ratio:4/3;height:auto!important;min-height:0;border-radius:11px;overflow:hidden;background:#0a1728;position:relative}
+.body-visual-option .body-picture img{width:100%;height:100%;object-fit:cover!important;object-position:center;display:block;transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .5s;filter:saturate(1.1) contrast(1.04)}
+.body-visual-option .body-picture:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#06132135);pointer-events:none}
+.body-visual-option .body-label{font-size:13px;padding:9px 3px 5px;font-weight:850;letter-spacing:.1px}
+.body-visual-option:hover{transform:translateY(-5px);border-color:#43d7f5;box-shadow:0 18px 38px #0006}
+.body-visual-option:hover .body-picture img{transform:scale(1.09);filter:saturate(1.28) contrast(1.08)}
+.body-visual-option.active{border:2px solid #b9f34b;background:linear-gradient(145deg,#183a59,#0c2036);box-shadow:0 0 0 3px #b9f34b22,0 16px 35px #0006}
+.generation-card{transition:transform .3s,border-color .3s,box-shadow .3s;overflow:hidden}
+.generation-photo{aspect-ratio:4/3!important;min-height:0!important;height:auto!important;padding:0!important;background:#0b1a2c!important;overflow:hidden}
+.generation-photo img{width:100%;height:100%;object-fit:cover!important;padding:0!important;transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .6s}
+.generation-card:hover .generation-photo img{transform:scale(1.055);filter:saturate(1.16)}
+@keyframes bmwReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){.bmw-series-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.bmw-series-card img{aspect-ratio:4/3}.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.body-visual-option .body-picture{aspect-ratio:4/3}.bmw-model-chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){.bmw-series-card strong{font-size:12px}.body-visual-option .body-label{font-size:12px}}
+
+/* PHOTO REPLACEMENT FIX — consistent landscape framing and restrained motion */
+.bmw-series-card{min-width:0;overflow:hidden}
+.bmw-series-card img{display:block;width:100%;height:auto!important;aspect-ratio:4/3;object-fit:cover!important;object-position:center;opacity:1!important;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .65s}
+.bmw-series-card:hover img,.bmw-series-card:focus-visible img{transform:scale(1.07);filter:saturate(1.12) brightness(1.06)}
+.body-visual-option .body-picture{height:auto!important;aspect-ratio:4/3;overflow:hidden;border-radius:11px;background:#071525}
+.body-visual-option .body-picture img{width:100%;height:100%;object-fit:cover!important;display:block;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .65s}
+.body-visual-option:hover .body-picture img{transform:scale(1.06);filter:saturate(1.1) brightness(1.05)}
+.bmw-models{padding-bottom:14px}
+.bmw-model-chips{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;max-height:none!important;overflow:visible!important}
+.bmw-model-chip{min-height:40px;white-space:normal;line-height:1.25}
+@media(max-width:560px){.bmw-series-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.bmw-series-card img{aspect-ratio:4/3}.body-visual-picker{grid-template-columns:repeat(2,minmax(0,1fr))!important}.body-visual-option .body-picture{aspect-ratio:4/3}}
+@media(prefers-reduced-motion:reduce){.bmw-series-card img,.body-visual-option .body-picture img{transition:none}}
+
+
+/* Photo frame correction: show the complete car, no stretched or over-cropped samples. */
+[data-example-photo], [data-body-photo], [data-gen-photo] {
+  display:block !important; width:100% !important; height:auto !important; aspect-ratio:4 / 3 !important;
+  object-fit:contain !important; object-position:center center !important; background:#0b1b2e !important;
+  border-radius:14px;
+}
+.generation-photo { aspect-ratio:4 / 3 !important; min-height:0 !important; background:#0b1b2e !important; }
+.generation-photo img { width:100% !important; height:100% !important; object-fit:contain !important; }
+
+
+/* Foto limitinin seçimdən əvvəl aydın göstərilməsi */
+.ca-photo-limit{display:inline-block;margin-left:6px;padding:5px 9px;border-radius:999px;background:#22d3c526;border:1px solid #22d3c575;color:#9ff9ee;font-size:11px;font-weight:800;vertical-align:middle;white-space:nowrap}
+@media(max-width:420px){.ca-photo-limit{margin-left:4px;font-size:10px;padding:4px 7px}}
+
+
+/* Cənub Avto 2026: premium modern listings, filters and cabinets; hero and brand discovery preserved */
+:root{--cream:#101a2b;--paper:#17263b;--ink:#f0f6ff;--muted:#a8b9cb;--line:#30445c;--green:#0b1c30;--lime:#35d4c5}
+body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5ff}
+.section:not(.hero){color:#edf5ff}.section .sub,.meta{color:#a9bbce}.section h2{color:#f3f8ff}
+.car-card{background:linear-gradient(155deg,#1a2c43,#122239)!important;border:1px solid #38506a!important;border-radius:22px!important;box-shadow:0 16px 42px #020c1b55!important;overflow:hidden}
+.car-card:hover{border-color:#36c9c1!important;box-shadow:0 22px 48px #020c1b88!important}.car-card .details{padding:17px}.car-card h3{color:#f4f8ff!important;font-size:17px}.car-card .price{color:#55e1d0!important;font-size:22px}.car-card .seller{color:#a9d9d4}.car-card .photo{height:auto!important;aspect-ratio:16/10;background:#0c1c30}.car-card .photo img{width:100%;height:100%;object-fit:cover}
+.pill{background:#1a2d45!important;border:1px solid #38516c!important;color:#d4e3f2!important;border-radius:999px!important}.pill.active{background:#2bc8bc!important;color:#082235!important;border-color:#2bc8bc!important}
+.sort-control,.sort-control select{color:#c6d8ea}.sort-control select{background:#192b42;border-color:#40536b}
+#caAdvanced,.ca-filter-panel,.cabinet-card,.cabinet-stat{background:#182b42!important;color:#eef5ff!important;border:1px solid #344c66!important;border-radius:18px!important;box-shadow:0 12px 32px #07142655}
+#caAdvanced input,#caAdvanced select,.cabinet-card input{background:#102239;color:#f4f8ff;border-color:#3a5470}
+#caAdvanced label{color:#d7e6f3}.cabinet-card .price,.cabinet-stat b{color:#52ddcc!important}.cabinet-card .meta{color:#adc1d6}
+.detail-panel{background:#15263d;color:#edf5ff}.detail-content{background:#15263d}.detail-content h2{color:#fff}.detail-price{color:#56e0d0}.detail-spec,.seller-description{background:#213650;color:#eaf3fd}.detail-spec b{color:#a9bed4}.seller-description h3{color:#61dfd1}
+.addbox{background:linear-gradient(140deg,#142940,#0c1b30)!important;border:1px solid #39536b!important}.addbox input,.addbox select,.addbox textarea{background:#1b3049!important;color:#f2f8ff!important;border:1px solid #49617b!important}.addbox input::placeholder,.addbox textarea::placeholder{color:#b0c0d1}.photo-group{background:#1a3049!important;border-color:#42607c!important}
+.empty{background:#192b42;color:#b9cadd;border-color:#405773}.ca-today{max-width:1120px;margin:20px auto 0;padding:15px 20px;background:linear-gradient(105deg,#17364b,#1a3b4a);border:1px solid #2b847e;border-radius:16px;color:#d9f5f0;font-weight:700;text-align:center}.ca-today strong{color:#6cf2dc;font-size:23px}
+#caAdminPanel .ca-item{border-radius:20px;background:#142a42;border-color:#3a5670}
+@media(max-width:600px){.car-card .details{padding:11px}.car-card h3{font-size:14px}.car-card .price{font-size:17px}.ca-today{margin:12px 12px 0}}
+
+/* Elan kartları: hər paketdə mətnin görünməsi, tünd dizayna uyğun kontrast */
+.car-card .details{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;height:auto!important;min-height:145px!important;padding:16px!important;background:#142a42!important;color:#eaf5ff!important;overflow:visible!important}
+.car-card .details .ca-visible-car-name{display:block!important;visibility:visible!important;opacity:1!important;color:#ffffff!important;font-size:19px!important;font-weight:850!important;line-height:1.35!important;margin-bottom:9px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.car-card .details .ca-visible-car-year{font-size:14px;color:#a9bed3}
+.car-card .details .price{display:block!important;color:#55e1d0!important;font-weight:800!important;font-size:22px!important;visibility:visible!important}
+.car-card .details .meta{display:block!important;color:#b3c5d7!important;visibility:visible!important;opacity:1!important}
+.car-card .details .seller{display:block!important;color:#a9d9d4!important;visibility:visible!important;opacity:1!important}
+
+/* Original style block 2 */
+.ca-advanced{margin:14px auto 26px;padding:24px;border:1px solid rgba(105,168,204,.28);border-radius:24px;background:linear-gradient(135deg,#101f38,#182e4c 65%,#173d4b);color:#f4f8ff;box-shadow:0 18px 45px #05101d35;max-width:1200px}
+.ca-advanced *{box-sizing:border-box}.ca-advanced-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}.ca-advanced h3{margin:0;font-size:22px;color:#fff}.ca-advanced p{margin:4px 0 0;color:#bfd0e4;font-size:13px}.ca-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.ca-filter-field{display:flex;flex-direction:column;gap:6px;min-width:0}.ca-filter-field label{font-size:12px;font-weight:700;color:#d8e7f7}.ca-filter-field input,.ca-filter-field select{width:100%;min-width:0;border:1px solid #48617e;border-radius:12px;background:#10213b;color:#fff;padding:12px;font-size:14px;min-height:44px}.ca-filter-field input::placeholder{color:#aabbd0}.ca-filter-wide{grid-column:1/-1}.ca-equip{display:flex;flex-wrap:wrap;gap:8px}.ca-equip label{cursor:pointer;border:1px solid #526a82;background:#10243f;border-radius:100px;padding:8px 12px;font-size:12px;color:#e7f2ff}.ca-equip label:has(input:checked){background:#176e80;border-color:#61cbd6}.ca-equip input{accent-color:#2de0d0;margin-right:5px}.ca-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.ca-actions button{border:0;border-radius:12px;padding:12px 20px;font-weight:800;cursor:pointer}.ca-primary{background:#45d6be;color:#082238}.ca-secondary{background:#334b65;color:#fff}.ca-seller-fields{display:contents}.ca-seller-equip{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;padding:12px;border-radius:14px;background:#15273b}.ca-seller-equip label{font-size:13px;color:white;display:inline-flex;align-items:center;gap:5px}.ca-seller-equip input{accent-color:#2fcfb5}.ca-seller-title{grid-column:1/-1;color:#fff;font-weight:800;margin:10px 0 0}.ca-seller-fields input,.ca-seller-fields select{min-width:0}
+@media(max-width:850px){.ca-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){.ca-advanced{padding:16px;border-radius:18px}.ca-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ca-filter-field input,.ca-filter-field select{font-size:13px;padding:10px}.ca-advanced h3{font-size:19px}}
+
+/* Cənub Avto: tək filtr girişi və eyni ölçülü premium təchizat kartları */
+.ca-filter-entry{margin-top:20px;margin-bottom:14px}.ca-filter-launch{display:flex;align-items:center;gap:16px;width:100%;text-align:left;border:1px solid #66c8ba;border-radius:20px;background:linear-gradient(115deg,#102c44,#173c51 65%,#155b5c);color:white;padding:18px 22px;box-shadow:0 12px 32px #07192a29;cursor:pointer}.ca-launch-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:#36cbb6;color:#092b36;font-size:29px;font-weight:900}.ca-launch-copy{display:flex;flex-direction:column;gap:4px;flex:1}.ca-launch-copy strong{font-size:21px}.ca-launch-copy small{font-size:13px;color:#d5eae9}.ca-launch-arrow{font-size:29px;transition:transform .2s}.ca-filter-launch[aria-expanded="true"] .ca-launch-arrow{transform:rotate(180deg)}.ca-filter-content[hidden]{display:none!important}.ca-filter-content>.wrap{padding-top:0}.ca-filter-content .search{margin-top:0}
+.ca-equip,.ca-seller-equip{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important}.ca-equip label,.ca-seller-equip label{box-sizing:border-box;display:flex!important;align-items:center!important;justify-content:flex-start;gap:9px!important;min-width:0;min-height:62px;padding:13px 12px!important;border-radius:13px!important;border:1px solid #496781!important;background:linear-gradient(145deg,#193653,#10263e)!important;color:#eff8ff!important;font-size:13px!important;font-weight:650!important;line-height:1.35!important;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;overflow-wrap:anywhere}.ca-equip label:hover,.ca-seller-equip label:hover{border-color:#6de2d2!important;transform:translateY(-1px)}.ca-equip label:has(input:checked),.ca-seller-equip label:has(input:checked){border-color:#38dec3!important;background:linear-gradient(145deg,#116b72,#16455a)!important;box-shadow:inset 0 0 0 1px #3cd4c066}.ca-equip input,.ca-seller-equip input{flex:0 0 auto;width:17px;height:17px;margin:0!important;accent-color:#2fe0c2}.ca-seller-equip{padding:14px!important;border-radius:17px!important}
+@media(max-width:950px){.ca-equip,.ca-seller-equip{grid-template-columns:repeat(3,minmax(0,1fr))!important}}@media(max-width:620px){.ca-equip,.ca-seller-equip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.ca-equip label,.ca-seller-equip label{min-height:67px;padding:10px!important;font-size:12px!important}.ca-filter-launch{padding:14px;gap:12px}.ca-launch-icon{width:44px;height:44px}.ca-launch-copy strong{font-size:19px}.ca-launch-copy small{font-size:11px}}
+
+/* CENUB AVTO — 2026 premium equipment selector refresh (both buyer & seller) */
+.ca-equip,.ca-seller-equip{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:13px!important;padding:20px!important;border-radius:25px!important;
+  background:linear-gradient(145deg,#0a1729 0%,#122c45 55%,#0b2035 100%)!important;
+  border:1px solid rgba(129,196,220,.28)!important;
+  box-shadow:0 20px 48px rgba(3,12,26,.24),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  width:100%;box-sizing:border-box;
+}
+.ca-equip label,.ca-seller-equip label{
+  position:relative;display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  gap:13px!important;min-width:0;min-height:91px!important;box-sizing:border-box;
+  padding:19px 15px!important;border-radius:19px!important;
+  border:1px solid rgba(152,186,219,.28)!important;
+  background:linear-gradient(140deg,rgba(43,75,109,.82),rgba(16,37,61,.94))!important;
+  color:#f4f9ff!important;font-size:14px!important;font-weight:750!important;
+  letter-spacing:.01em;line-height:1.35!important;overflow-wrap:break-word;
+  cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 6px 15px rgba(0,0,0,.12);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.ca-equip label::after,.ca-seller-equip label::after{
+  content:'+';position:absolute;top:9px;right:10px;width:19px;height:19px;
+  display:grid;place-items:center;border-radius:7px;color:#afc9df;
+  background:rgba(255,255,255,.07);font-size:16px;font-weight:700;line-height:1;
+}
+.ca-equip label:hover,.ca-seller-equip label:hover{
+  transform:translateY(-3px)!important;border-color:#76d9d3!important;
+  box-shadow:0 13px 25px rgba(0,0,0,.24),0 0 0 1px rgba(82,224,205,.14)!important;
+}
+.ca-equip label:has(input:checked),.ca-seller-equip label:has(input:checked){
+  background:linear-gradient(125deg,#11646d,#13576a 60%,#17456a)!important;
+  border-color:#4ef0d0!important;color:#fff!important;
+  box-shadow:0 0 0 1px rgba(71,235,207,.38),0 12px 27px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+.ca-equip label:has(input:checked)::after,.ca-seller-equip label:has(input:checked)::after{
+  content:'✓';color:#062f36;background:#63f4d5;
+}
+.ca-equip input[type=checkbox],.ca-seller-equip input[type=checkbox]{
+  appearance:none!important;-webkit-appearance:none!important;
+  flex:0 0 34px!important;width:34px!important;height:34px!important;margin:0!important;
+  border:1px solid rgba(145,210,221,.44)!important;border-radius:11px!important;
+  background:linear-gradient(140deg,#234760,#18344e)!important;
+  display:grid!important;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.ca-equip input[type=checkbox]::before,.ca-seller-equip input[type=checkbox]::before{
+  content:'✦';font-size:18px;color:#a8d8e4;line-height:1;
+}
+.ca-equip input[type=checkbox]:checked,.ca-seller-equip input[type=checkbox]:checked{
+  background:#5af0d0!important;border-color:#7effe4!important;
+}
+.ca-equip input[type=checkbox]:checked::before,.ca-seller-equip input[type=checkbox]:checked::before{content:'✓';color:#063b43;font-size:21px;font-weight:900}
+.ca-equip input[type=checkbox]:focus-visible,.ca-seller-equip input[type=checkbox]:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media(max-width:1000px){.ca-equip,.ca-seller-equip{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:660px){
+  .ca-equip,.ca-seller-equip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;padding:12px!important;border-radius:19px!important}
+  .ca-equip label,.ca-seller-equip label{min-height:94px!important;padding:16px 10px!important;gap:9px!important;border-radius:15px!important;font-size:12px!important}
+  .ca-equip input[type=checkbox],.ca-seller-equip input[type=checkbox]{width:30px!important;height:30px!important;flex-basis:30px!important}
+  .ca-equip label::after,.ca-seller-equip label::after{top:6px;right:6px;width:16px;height:16px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.ca-equip label,.ca-seller-equip label{transition:none!important}}
+
+/* Original style block 3 */
+/* Cənub Avto — buyer filter complete layout redesign V2 */
+#caFilterContent{background:radial-gradient(ellipse at 8% 5%,#183852 0%,transparent 42%),#091626;padding:22px 0 38px;border-top:1px solid #28445d}
+#caFilterContent .wrap{max-width:1220px}
+#caFilterContent .ca-search-main{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr)) auto!important;align-items:center;gap:10px!important;background:#13273d!important;border:1px solid #36536d!important;border-radius:22px!important;padding:18px!important;margin:0 0 16px!important;box-shadow:none!important}
+#caFilterContent .ca-search-main input,#caFilterContent .ca-search-main select{background:#0c1c2d!important;color:#f2f8ff!important;border:1px solid #35526b!important;min-height:52px!important}
+#caFilterContent .ca-search-main input::placeholder{color:#a2b5c9}
+#caAdvanced{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;max-width:none!important}
+#caAdvanced .ca-advanced-head{background:linear-gradient(115deg,#18344e,#10263b 75%,#173d49);padding:28px 30px;border:1px solid #34556e;border-radius:23px;margin:0 0 16px;display:flex;align-items:center;justify-content:space-between}
+#caAdvanced .ca-advanced-head h3{font-size:clamp(25px,3.6vw,39px)!important;letter-spacing:-1.3px;line-height:1.15;margin:7px 0 9px!important;color:#f5faff!important}
+#caAdvanced .ca-advanced-head p{margin:0!important;color:#aebfd1!important;font-size:13px!important}
+.ca-filter-eyebrow{color:#43d9c8;font-size:10px;font-weight:900;letter-spacing:2px}
+.ca-filter-count{font-size:32px;font-weight:900;color:#42d6c4;white-space:nowrap}.ca-filter-count span{display:block;color:#a4b7ca;font-size:9px;letter-spacing:1.5px}
+#caAdvanced .ca-filter-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;align-items:stretch}
+#caAdvanced .ca-section-label{grid-column:1/-1;color:#cbd9e9;font-size:12px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;padding:16px 4px 3px;border-bottom:1px solid #28445b}
+#caAdvanced .ca-filter-field:not(.ca-equipment-tile),#caAdvanced .ca-range-tile{background:#14293e!important;border:1px solid #2b4760!important;border-radius:16px!important;padding:13px!important;min-width:0;box-shadow:none!important}
+#caAdvanced .ca-filter-field label,#caAdvanced .ca-range-heading{display:block!important;color:#b9ccde!important;font-size:11px!important;font-weight:800!important;letter-spacing:.1px;margin:0 0 9px!important}
+#caAdvanced .ca-filter-field input,#caAdvanced .ca-filter-field select{width:100%;min-width:0;background:#0a1b2c!important;color:#f5f9ff!important;border:1px solid #35516a!important;border-radius:11px!important;padding:11px!important;min-height:46px!important}
+#caAdvanced .ca-range-tile{grid-column:span 2}
+#caAdvanced .ca-range-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#caAdvanced .ca-range-inputs .ca-filter-field{padding:0!important;border:0!important;background:transparent!important}
+#caAdvanced .ca-range-inputs label{font-size:10px!important;margin-bottom:5px!important}
+#caAdvanced .ca-equipment-tile{grid-column:1/-1!important;background:#13293d!important;border:1px solid #35556d!important;border-radius:20px!important;padding:14px!important;margin-top:10px}
+#caAdvanced .ca-equip-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#caAdvanced .ca-equip-toggle{flex:1;min-width:200px;max-width:380px;text-align:left;padding:15px 18px;border-radius:13px;background:linear-gradient(100deg,#1e5161,#217a78)!important;color:white!important;font-size:14px!important}
+#caEquipSummary{font-size:12px;color:#a9c6d4}
+#caEquipOptions[hidden]{display:none!important}
+#caAdvanced #caEquipOptions{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:7px!important;padding:12px 0 0!important;margin:0!important;border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important}
+#caAdvanced #caEquipOptions label{min-height:42px!important;padding:8px 9px!important;border-radius:10px!important;font-size:11px!important;line-height:1.25!important;display:flex!important;align-items:center!important;gap:7px!important;background:#0d2033!important;border:1px solid #31506a!important;color:#e1edf7!important;margin:0!important}
+#caAdvanced #caEquipOptions label:has(input:checked){background:#164b50!important;border-color:#38d6c5!important;color:white!important}
+#caAdvanced #caEquipOptions input{appearance:auto!important;min-height:0!important;width:15px!important;height:15px!important;flex:0 0 15px!important;accent-color:#2bd7c4!important;margin:0!important;padding:0!important}
+#caAdvanced .ca-actions{margin:18px 0 0!important;display:flex!important;gap:12px!important;justify-content:flex-end!important}
+#caAdvanced .ca-actions button{min-height:50px!important;border-radius:13px!important;padding:12px 23px!important}
+@media(max-width:950px){#caFilterContent .ca-search-main{grid-template-columns:repeat(2,minmax(0,1fr))!important}#caFilterContent .ca-search-main .search-actions{grid-column:1/-1}#caAdvanced .ca-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#caAdvanced #caEquipOptions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:560px){#caFilterContent{padding:12px 0 24px}#caFilterContent .ca-search-main{padding:10px!important;gap:7px!important}#caAdvanced .ca-advanced-head{padding:19px 17px;border-radius:17px}#caAdvanced .ca-filter-count{display:none}#caAdvanced .ca-filter-grid{gap:8px!important}#caAdvanced .ca-filter-field:not(.ca-equipment-tile),#caAdvanced .ca-range-tile{padding:10px!important;border-radius:12px!important}#caAdvanced .ca-range-tile{grid-column:1/-1}#caAdvanced #caEquipOptions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}#caAdvanced #caEquipOptions label{font-size:10px!important;padding:7px!important}#caAdvanced .ca-actions{flex-direction:column}#caAdvanced .ca-actions button{width:100%}}
+
+/* Original style block 4 */
+.ca-status-confirmed,.ca-status-rejected{display:inline-flex;align-items:center;padding:11px 14px;border-radius:11px;font-weight:800;font-size:14px}.ca-status-confirmed{color:#b7f3d0;background:#16603a55;border:1px solid #46ba7a88}.ca-status-rejected{color:#ffc8cb;background:#872e3655;border:1px solid #c75c6588}
+
+/* Original style block 5 */
+/* Cənub Avto: consistent photo framing for every brand and photo angle */
+[data-example-photo], [data-body-photo], [data-gen-photo] {
+  width:100%; aspect-ratio:4/3; height:auto; object-fit:cover;
+  object-position:center; display:block; border-radius:14px;
+}
+.photo-example, .body-photo, .generation-photo { overflow:hidden; }
+.bmw-picker-series { margin:10px 0; border:1px solid rgba(111,190,231,.22); border-radius:16px; overflow:hidden; background:linear-gradient(135deg,rgba(31,55,82,.94),rgba(10,25,45,.96)); }
+.bmw-picker-series-head { width:100%; display:flex; align-items:center; gap:14px; padding:15px 16px; border:0; color:#f5f9ff; background:transparent; text-align:left; font:inherit; cursor:pointer; }
+.bmw-picker-series-head .series-number { display:grid; place-items:center; width:48px; height:48px; flex:0 0 48px; border-radius:13px; background:rgba(43,190,232,.13); border:1px solid rgba(67,202,239,.32); color:#8be7ff; font-weight:800; font-size:20px; }
+.bmw-picker-series-head .series-label { flex:1; font-weight:750; font-size:17px; }
+.bmw-picker-series-head .series-count { color:#a8bfd5; font-size:12px; }
+.bmw-picker-series-head .series-arrow { color:#8be7ff; font-size:23px; transition:transform .22s ease; }
+.bmw-picker-series.open .series-arrow { transform:rotate(90deg); }
+.bmw-picker-series-models { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:0 12px 13px; }
+.bmw-picker-series-models .picker-option { min-width:0; padding:11px 12px; border-radius:11px; border:1px solid rgba(130,171,205,.18); background:rgba(7,20,38,.66); color:#eef7ff; text-align:left; }
+.bmw-picker-series-models .picker-option small { display:block; color:#9db3c9; font-size:11px; margin-top:3px; }
+@media(max-width:420px){.bmw-picker-series-models{grid-template-columns:1fr 1fr;gap:6px}.bmw-picker-series-models .picker-option{font-size:13px;padding:10px 8px}}
+
+/* Original style block 6 */
+/* Eyni premium nəsil foto nümunəsi bütün marka/model seçimlərində */
+#generationGrid .generation-photo{width:100%;height:auto!important;aspect-ratio:4/3;overflow:hidden;background:#0b1b30;border-radius:16px 16px 0 0;}
+#generationGrid .generation-photo img[data-gen-photo]{display:block;width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center!important;border-radius:0!important;}
+/* BMW seriya başlıqları: mobil ekranda mətn və ox heç vaxt sıxılıb gizlənməsin */
+#pickerList .bmw-picker-series{display:block;width:100%;min-height:0;overflow:hidden;margin:10px 0;border:1px solid rgba(111,190,231,.28);border-radius:16px;background:linear-gradient(135deg,#1b3552,#0c1d34);}
+#pickerList .bmw-picker-series-head{box-sizing:border-box;display:grid!important;grid-template-columns:48px minmax(0,1fr) 24px!important;align-items:center!important;gap:12px!important;width:100%!important;min-height:78px!important;height:auto!important;padding:12px 14px!important;overflow:visible!important;white-space:normal!important;color:#f5f9ff!important;visibility:visible!important;opacity:1!important;}
+#pickerList .bmw-picker-series-head .series-number{display:grid!important;place-items:center!important;width:48px!important;height:48px!important;min-width:48px!important;max-width:48px!important;flex:none!important;color:#8be7ff!important;font-size:20px!important;line-height:1!important;visibility:visible!important;}
+#pickerList .bmw-picker-series-head .series-label{display:block!important;min-width:0!important;color:#f5f9ff!important;font-size:17px!important;font-weight:800!important;line-height:1.35!important;visibility:visible!important;opacity:1!important;}
+#pickerList .bmw-picker-series-head .series-count{display:block!important;color:#a8bfd5!important;font-size:11px!important;font-weight:600!important;}
+#pickerList .bmw-picker-series-head .series-arrow{display:block!important;color:#8be7ff!important;font-size:25px!important;line-height:1!important;text-align:center!important;visibility:visible!important;opacity:1!important;}
+#pickerList .bmw-picker-series-models{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;padding:0 12px 13px!important;}
+#pickerList .bmw-picker-series-models .picker-option{box-sizing:border-box;display:block!important;width:100%!important;min-height:48px!important;height:auto!important;padding:10px 12px!important;color:#f2f8ff!important;background:#10243b!important;border:1px solid rgba(130,190,220,.24)!important;border-radius:10px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;visibility:visible!important;opacity:1!important;}
+#pickerList .bmw-picker-series-models .picker-option small{display:block!important;margin-top:4px!important;color:#9dbbd2!important;font-size:10px!important;}
+@media(max-width:420px){#pickerList .bmw-picker-series-models{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;}#pickerList .bmw-picker-series-models .picker-option{padding:9px 8px!important;font-size:12px!important;}}
+
+/* Original style block 7 */
+#caToolsBar{position:fixed;right:16px;bottom:18px;z-index:9000;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100vw - 32px)}
+.ca-tool{background:#102b4a;color:#fff;border:1px solid #56c9b7;border-radius:16px;padding:12px 16px;font:700 13px system-ui;box-shadow:0 8px 30px #0018;cursor:pointer}
+.ca-tool:focus-visible,.ca-compare:focus-visible{outline:3px solid #ffcd6c;outline-offset:3px}
+.ca-compare{position:relative;z-index:2;display:block;width:calc(100% - 20px);margin:8px 10px 10px;padding:9px;background:#123756;color:#dffcf5;border:1px solid #49c5ad;border-radius:12px;cursor:pointer;font-weight:750}
+#caOverlay{display:none;position:fixed;inset:0;z-index:12000;background:#071526d9;padding:18px;overflow:auto;align-items:center;justify-content:center}
+#caOverlay.ca-open{display:flex}#caDialog{width:min(980px,100%);max-height:92vh;overflow:auto;border:1px solid #2b7284;border-radius:24px;background:#0c2037;color:#eff9ff;padding:22px;box-shadow:0 20px 70px #0008}
+#caDialog h2{margin:0 0 12px}#caDialog p{line-height:1.65}#caDialog button{cursor:pointer}.ca-compare-table{width:100%;border-collapse:collapse;min-width:500px}.ca-compare-table td,.ca-compare-table th{border-bottom:1px solid #34516b;padding:11px;text-align:left;vertical-align:top}.ca-compare-scroll{overflow:auto}.ca-dialog-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.ca-dialog-close{background:#26425c;color:white;border:1px solid #6485a1;border-radius:12px;padding:9px 14px}
+@media(max-width:600px){#caToolsBar{left:10px;right:10px;bottom:8px;justify-content:center}.ca-tool{padding:10px 12px;font-size:12px}#caDialog{padding:15px}}
+
+/* Original style block 8 */
+#caAdminLaunch{display:none;position:fixed;bottom:18px;right:16px;z-index:9997;background:#b9f34b;color:#081b2d;border:0;border-radius:14px;padding:12px 18px;font-weight:800;box-shadow:0 8px 35px #0008}
+#caAdminPanel{display:none;position:fixed;inset:0;z-index:9998;overflow:auto;background:#071525;color:#f4f9ff;padding:20px 14px;font-family:system-ui,sans-serif}
+#caAdminPanel .ca-wrap{max-width:980px;margin:auto}#caAdminPanel button{cursor:pointer;border:1px solid #4b6479;border-radius:11px;padding:9px 12px;background:#18344b;color:white;font-weight:700}
+#caAdminPanel .ca-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}#caAdminPanel .ca-list{display:grid;gap:12px}
+#caAdminPanel .ca-item{padding:16px;background:#10263c;border:1px solid #2b4963;border-radius:16px}
+#caAdminPanel .ca-item strong{font-size:18px}#caAdminPanel .ca-item p{color:#b8c9d8;overflow-wrap:anywhere}
+#caAdminPanel .ca-yes{background:#367a36}#caAdminPanel .ca-no{background:#833d43}
+#caAdminPanel .ca-payment{border-top:1px solid #36536b;margin-top:20px;padding-top:18px}
+#caAdminPanel .ca-pay-status{color:#a6c3d8;font-size:13px}
+
+/* Original style block 9 */
+/* Fix: BMW series cards were being vertically compressed inside the picker grid */
+#pickerList.bmw-series-layout-active,
+#pickerList:has(> .bmw-picker-series){
+  display:block!important;
+  width:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:8px 14px 24px!important;
+  box-sizing:border-box!important;
+}
+#pickerList > .bmw-picker-series{
+  display:block!important;
+  position:relative!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:82px!important;
+  max-height:none!important;
+  flex:none!important;
+  margin:0 0 12px!important;
+  padding:0!important;
+  overflow:visible!important;
+  border:1px solid rgba(111,190,231,.32)!important;
+  border-radius:17px!important;
+  background:linear-gradient(135deg,#1b3552,#0c1d34)!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-head{
+  box-sizing:border-box!important;
+  display:grid!important;
+  position:relative!important;
+  width:100%!important;
+  height:80px!important;
+  min-height:80px!important;
+  max-height:none!important;
+  grid-template-columns:54px minmax(0,1fr) 28px!important;
+  align-items:center!important;
+  gap:13px!important;
+  margin:0!important;
+  padding:12px 16px!important;
+  overflow:visible!important;
+  border:0!important;
+  border-radius:16px!important;
+  background:transparent!important;
+  color:#f5f9ff!important;
+  text-align:left!important;
+  white-space:normal!important;
+  line-height:normal!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-head .series-number{
+  display:grid!important;place-items:center!important;box-sizing:border-box!important;
+  width:52px!important;height:52px!important;min-width:52px!important;max-width:52px!important;
+  margin:0!important;padding:0!important;border-radius:14px!important;
+  background:rgba(43,190,232,.13)!important;border:1px solid rgba(67,202,239,.32)!important;
+  color:#8be7ff!important;font-size:20px!important;font-weight:850!important;line-height:1!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-head .series-label{
+  display:block!important;min-width:0!important;margin:0!important;padding:0!important;
+  color:#f5f9ff!important;font-size:18px!important;font-weight:800!important;line-height:1.35!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-head .series-count{
+  display:block!important;margin-top:3px!important;color:#a8bfd5!important;font-size:11px!important;font-weight:600!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-head .series-arrow{
+  display:block!important;color:#8be7ff!important;font-size:27px!important;line-height:1!important;text-align:center!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-models{
+  display:grid!important;position:relative!important;box-sizing:border-box!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;
+  width:100%!important;height:auto!important;max-height:none!important;
+  margin:0!important;padding:0 12px 13px!important;overflow:visible!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-models > .picker-option{
+  display:block!important;box-sizing:border-box!important;width:100%!important;height:auto!important;
+  min-height:52px!important;max-height:none!important;margin:0!important;padding:11px 12px!important;
+  overflow:visible!important;white-space:normal!important;text-align:left!important;
+  color:#f2f8ff!important;background:#10243b!important;border:1px solid rgba(130,190,220,.24)!important;
+  border-radius:11px!important;font-size:14px!important;line-height:1.35!important;
+}
+#pickerList > .bmw-picker-series > .bmw-picker-series-models > .picker-option small{
+  display:block!important;margin-top:4px!important;color:#9dbbd2!important;font-size:10px!important;
+}
+@media(max-width:420px){
+ #pickerList > .bmw-picker-series > .bmw-picker-series-head{height:78px!important;min-height:78px!important;padding:10px 12px!important;grid-template-columns:50px minmax(0,1fr) 24px!important;gap:10px!important}
+ #pickerList > .bmw-picker-series > .bmw-picker-series-models{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ #pickerList > .bmw-picker-series > .bmw-picker-series-models > .picker-option{padding:9px 8px!important;font-size:12px!important}
+}
+
+/* CƏNUB AVTO — universal, make/model-independent body reference gallery */
+.body-visual-option .body-picture{height:auto!important;aspect-ratio:4/3!important;width:100%!important;overflow:hidden!important;border-radius:14px!important;background:#0a1b2e!important}
+.body-visual-option .body-picture img{width:100%!important;height:100%!important;aspect-ratio:4/3!important;object-fit:cover!important;object-position:center center!important;border-radius:14px!important}
+.body-visual-option{min-height:0!important}
+
+/* Cənub Avto: şəxsi kabinet statuslarının aydın görünüşü */
+.ca-cab-status{display:inline-flex;margin-top:9px;padding:6px 11px;border-radius:999px;background:#183c52;color:#d7f8f1;border:1px solid #367587;font-size:11px;font-weight:800}
+.cabinet-card{background:linear-gradient(135deg,#14263c,#1b344c)!important;color:#edf5ff!important;border-color:#31536b!important}
+.cabinet-card .meta{color:#a8c1d3!important}.cabinet-card .price{color:#54decf!important}
+.cabinet-card .cab-actions button:not(.delete){background:#28c7b7;color:#09243a}
