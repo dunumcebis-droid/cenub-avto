@@ -2,9 +2,9 @@
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let owner=null,authorized=false,verifySequence=0,busy=false,sessionEpoch=0;
-const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false});
+const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false,linked:null});
 let ads=state(),payments=state();
-function reset(){sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
+function reset(){sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();if(el('caPayLinkedNotice')){el('caPayLinkedNotice').replaceChildren();el('caPayLinkedNotice').hidden=true;}el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
 window.caAdminSessionChanged=()=>{if(owner!==(currentUser?.id||null))reset();};
 async function rpc(name,body,expected=owner){
  const t=await caToken();
@@ -18,11 +18,31 @@ async function verify(){
  catch(error){if(seq===verifySequence&&owner===expected){authorized=false;el('caAdminLaunch').style.display='none';el('caAdminPanel').style.display='none';}return false;}
 }
 function pager(s,id,handler){el(id).innerHTML=s.pages>1?`<div class="ca-actions"><button type="button" onclick="${handler}(-1)" ${s.loading||s.page<=1?'disabled':''}>← Əvvəlki</button><span>${s.page} / ${s.pages}</span><button type="button" onclick="${handler}(1)" ${s.loading||s.page>=s.pages?'disabled':''}>Növbəti →</button></div>`:'';}
+function packageInfo(x){
+ const names=['VIP','Premium','Standart','Pulsuz'];
+ const requested=names.includes(x.requested_package)?x.requested_package:'Pulsuz';
+ const approved=names.includes(x.approved_package)?x.approved_package:null;
+ const status=['free','pending','confirmed','rejected','legacy_unrequested'].includes(x.package_status)?x.package_status:'unknown';
+ const labels={free:'Pulsuz elan',pending:requested+' sorğusu · paket təsdiqi gözləyir',confirmed:requested+' sorğusu · paket təsdiqlənib',rejected:requested+' sorğusu · paket rədd edilib',legacy_unrequested:requested+' · sorğu tarixçəsi tapılmadı',unknown:'Paket məlumatı yüklənməyib'};
+ const hints={pending:'Əvvəl aşağıdakı paket sorğusunu yoxlayıb təsdiqlə, sonra elanı ayrıca yayımla.',confirmed:x.veziyyet==='aktiv'?'Paket təsdiqi qeyd olunub. Elan yayımdadır.':'Paket təsdiqi qeyd olunub. Elanı ayrıca təsdiqləyərək yayımla.',rejected:'Paket sorğusu rədd edilib. Elanı yayımlamadan əvvəl paket sorğusunu həll et.',legacy_unrequested:'Bu paket üçün təsdiq sorğusu tapılmadı. Paket tarixçəsini yoxla.',unknown:'Elanı yayımlamadan əvvəl siyahını yenilə və paket məlumatını yoxla.'};
+ return {status,label:labels[status],hint:hints[status]||'',approved,canPublish:status==='free'||status==='confirmed'};
+}
+function packageMarkup(x){
+ const info=packageInfo(x),request=typeof x.package_request_id==='string'?x.package_request_id:'';
+ return `<div class="ca-package-box"><span class="ca-package-badge ca-package-${info.status}" data-package-status="${info.status}">${esc(info.label)}</span>${info.approved&&info.approved!=='Pulsuz'?`<p class="ca-package-recorded">Qeydiyyatdakı paket: ${esc(info.approved)}</p>`:''}${info.hint?`<p class="ca-package-hint">${esc(info.hint)}</p>`:''}${request?`<button type="button" class="ca-package-link" data-package-request-id="${esc(request)}" data-listing-id="${esc(x.id)}">↓ Paket sorğusuna bax</button>`:''}</div>`;
+}
+function drawPaymentLink(){
+ let notice=el('caPayLinkedNotice');
+ if(!notice){notice=document.createElement('div');notice.id='caPayLinkedNotice';notice.setAttribute('role','status');el('caPayList').before(notice);}
+ notice.innerHTML=payments.linked?`<p>${esc(payments.linked.label)} üçün seçilmiş paket sorğusu.</p><button type="button" onclick="caPayClearLinked()">Bütün sorğulara qayıt</button>`:'';
+ notice.hidden=!payments.linked;
+}
 function drawAds(){
- el('caAdminList').innerHTML=ads.rows.map(x=>`<article class="ca-item"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p><p>${esc(String(x.tesvir||'').slice(0,250))}</p><div class="ca-actions">${x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv">✓ Təsdiqlə</button>`}${x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>'}${x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:''}</div></article>`).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
+ el('caAdminList').innerHTML=ads.rows.map(x=>{const info=packageInfo(x);return `<article class="ca-item" data-ad-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p>${packageMarkup(x)}<p>${esc(String(x.tesvir||'').slice(0,250))}</p><div class="ca-actions">${x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv" ${info.canPublish?'':'disabled aria-disabled="true" title="Əvvəl paket sorğusunu yoxla və təsdiqlə"'}>✓ Təsdiqlə</button>`}${x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>'}${x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:''}</div></article>`;}).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
 }
 function drawPayments(){
- el('caPayList').innerHTML=payments.rows.map(x=>`<article class="ca-item"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.paket_adi)}</strong><p>Ödəniş: ${esc(x.odenis_veziyyeti)} · ${esc(x.yaradilib?new Date(x.yaradilib).toLocaleString('az-AZ'):'')}</p>${x.odenis_veziyyeti==='gozlemede'?`<div class="ca-actions"><button class="ca-yes" data-pay-id="${esc(x.id)}" data-pay-action="approve">✓ Ödənişi təsdiqlə</button><button class="ca-no" data-pay-id="${esc(x.id)}" data-pay-action="reject">✕ Ödənişi rədd et</button></div>`:''}</article>`).join('')||'<p>Ödəniş sorğusu yoxdur.</p>';pager(payments,'caPayPager','caPayPage');
+ drawPaymentLink();
+ el('caPayList').innerHTML=payments.rows.map(x=>`<article class="ca-item${payments.linked?.requestId===x.id?' ca-payment-linked':''}" data-pay-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.paket_adi)}</strong><p>Ödəniş: ${esc(x.odenis_veziyyeti)} · ${esc(x.yaradilib?new Date(x.yaradilib).toLocaleString('az-AZ'):'')}</p>${x.odenis_veziyyeti==='gozlemede'?`<div class="ca-actions"><button class="ca-yes" data-pay-id="${esc(x.id)}" data-pay-action="approve">✓ Ödənişi təsdiqlə</button><button class="ca-no" data-pay-id="${esc(x.id)}" data-pay-action="reject">✕ Ödənişi rədd et</button></div>`:''}</article>`).join('')||'<p>Ödəniş sorğusu yoxdur.</p>';pager(payments,'caPayPager','caPayPage');
 }
 function validPage(d){return d&&Array.isArray(d.items)&&['total','pending_total','page','page_size','total_pages'].every(k=>Number.isSafeInteger(d[k])&&d[k]>=0)&&d.page>=1&&d.page_size===24&&d.total_pages===Math.ceil(d.total/24)&&d.page<=Math.max(1,d.total_pages)&&d.items.length===Math.min(24,Math.max(0,d.total-(d.page-1)*24))&&d.items.every(x=>x&&typeof x.id==='string');}
 async function load(kind,page){
@@ -41,14 +61,28 @@ async function load(kind,page){
 window.caAdminLoad=()=>load('ads');window.caAdminPaymentsLoad=()=>load('payments');
 window.caAdminFilter=v=>{ads.status=v;return load('ads',1);};
 window.caAdminSearch=()=>{ads.query=el('caAdminSearch').value.trim();return load('ads',1);};
-window.caPaySearch=()=>{payments.query=el('caPaySearch').value.trim();payments.status=el('caPayFilter').value;return load('payments',1);};
+window.caPaySearch=()=>{payments.query=el('caPaySearch').value.trim();payments.status=el('caPayFilter').value;if(payments.linked?.requestId!==payments.query)payments.linked=null;drawPaymentLink();return load('payments',1);};
+window.caPayClearLinked=()=>{payments.linked=null;payments.query='';payments.status='all';el('caPaySearch').value='';el('caPayFilter').value='all';drawPaymentLink();return load('payments',1);};
+async function jumpToPackage(button){
+ if(!authorized)return;
+ const row=ads.rows.find(x=>x.id===button.dataset.listingId&&x.package_request_id===button.dataset.packageRequestId);
+ if(!row)return;
+ const expected=owner,requestId=row.package_request_id;
+ payments.linked={requestId,listingId:row.id,label:[row.marka,row.model].filter(Boolean).join(' ')};
+ payments.query=requestId;payments.status='all';el('caPaySearch').value=requestId;el('caPayFilter').value='all';drawPaymentLink();
+ const loaded=await load('payments',1);
+ if(!loaded||expected!==owner||currentUser?.id!==expected||payments.linked?.requestId!==requestId)return;
+ const card=[...el('caPayList').querySelectorAll('[data-pay-row-id]')].find(x=>x.dataset.payRowId===requestId);
+ if(card){card.tabIndex=-1;card.focus({preventScroll:true});card.scrollIntoView({behavior:'smooth',block:'center'});}
+ else{el('caPayMsg').textContent='Bu paket sorğusu tapılmadı. Siyahını yeniləyib yenidən yoxla.';el('caPayMsg').scrollIntoView({behavior:'smooth',block:'center'});}
+}
 window.caAdminPage=delta=>ads.loading||ads.page+delta<1||ads.page+delta>ads.pages?false:load('ads',ads.page+delta);
 window.caPayPage=delta=>payments.loading||payments.page+delta<1||payments.page+delta>payments.pages?false:load('payments',payments.page+delta);
 window.caAdminOpen=async()=>{if(!await verify())return alert('Admin girişi təsdiqlənmədi. Hesabına yenidən daxil ol.');el('caAdminPanel').style.display='block';await Promise.all([load('ads'),load('payments')]);};
 window.caAdminClose=()=>{el('caAdminPanel').style.display='none';};
 async function refreshPublic(){const results=await Promise.allSettled([caFetchListings(1),...(currentUser?[caFetchMyListings(),caFetchFavoriteListings()]:[])]);return results.every(r=>r.status==='fulfilled'&&r.value!==false);}
 async function mutate(button,name,body,confirmation){
- if(busy||!authorized||!confirm(confirmation))return;
+ if(busy||button.disabled||!authorized||!confirm(confirmation))return;
  const expected=owner,epoch=sessionEpoch;busy=true;button.disabled=true;el('caAdminActionMsg').textContent='Dəyişiklik saxlanılır...';
  try{await rpc(name,body,expected);}catch(error){if(epoch===sessionEpoch&&expected===owner&&currentUser?.id===expected){el('caAdminActionMsg').textContent='Dəyişiklik saxlanmadı: '+error.message;busy=false;button.disabled=false;}return;}
  // The confirmed mutation succeeded even if refreshing a list later fails.
@@ -57,7 +91,7 @@ async function mutate(button,name,body,confirmation){
  const ok=refreshed.every(r=>r.status==='fulfilled'&&r.value!==false);
  el('caAdminActionMsg').textContent=ok?'Dəyişiklik saxlanıldı. Elanlar və sayğaclar yeniləndi.':'Dəyişiklik saxlanıldı. Bəzi siyahılar yenilənmədi; «Yenilə» düyməsi ilə təkrar yoxla.';busy=false;button.disabled=false;
 }
-el('caAdminList').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(b)mutate(b,'ca_admin_status',{p_id:b.dataset.id,p_status:b.dataset.status},'Bu elanın vəziyyəti dəyişdirilsin?');});
+el('caAdminList').addEventListener('click',e=>{const link=e.target.closest('button[data-package-request-id]');if(link){jumpToPackage(link);return;}const b=e.target.closest('button[data-id]');if(b)mutate(b,'ca_admin_status',{p_id:b.dataset.id,p_status:b.dataset.status},'Bu elanın vəziyyəti dəyişdirilsin?');});
 el('caPayList').addEventListener('click',e=>{const b=e.target.closest('button[data-pay-id]');if(!b)return;const approve=b.dataset.payAction==='approve';mutate(b,approve?'ca_admin_paket_tesdiq':'ca_admin_paket_reddet',{p_sorgu_id:b.dataset.payId},approve?'SINAQ TƏSDİQİ: Real kart ödənişi qoşulmayıb. Yalnız öz sınaq sorğunu təsdiqlə. Davam edilsin?':'Ödəniş sorğusu rədd edilsin?');});
 reset();setInterval(verify,12000);window.addEventListener('load',()=>setTimeout(verify,1200));document.addEventListener('visibilitychange',()=>{if(!document.hidden)verify();});
 })();

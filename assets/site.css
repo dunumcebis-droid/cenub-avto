@@ -755,3 +755,22 @@ body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5f
 
 /* Recovery messages and paged admin controls. */
 #authMessage:empty{display:none}#authMessage{font-size:13px;overflow-wrap:anywhere}#authMessage[role="alert"]{color:#b53636}.auth-overlay{overflow-y:auto}.auth-box{max-height:calc(100dvh - 32px);overflow-y:auto}.auth-actions{flex-wrap:wrap}#caAdminPanel input,#caAdminPanel select{min-width:0;max-width:100%;padding:10px;border:1px solid #536a85;border-radius:9px;background:#12233b;color:#fff}#caAdminPanel input{flex:1 1 180px}#caAdminActionMsg{overflow-wrap:anywhere}
+
+/* Admin package request feedback */
+#caAdminPanel .ca-package-box{margin:14px 0;padding:12px;border:1px solid #36536b;border-radius:12px;background:#0b1d30;overflow-wrap:anywhere}
+#caAdminPanel .ca-package-badge{display:inline-flex;max-width:100%;padding:7px 10px;border:1px solid #526d83;border-radius:9px;color:#e1edf7;font-size:13px;font-weight:800;line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+#caAdminPanel .ca-package-pending{border-color:#bc9449;background:#42351c;color:#ffe0a2}
+#caAdminPanel .ca-package-confirmed{border-color:#399877;background:#133e35;color:#aaf5d6}
+#caAdminPanel .ca-package-rejected{border-color:#b45a65;background:#43232b;color:#ffd0d6}
+#caAdminPanel .ca-package-legacy_unrequested,#caAdminPanel .ca-package-unknown{border-color:#8f829d;background:#322b3e;color:#e4d4f3}
+#caAdminPanel .ca-package-box .ca-package-hint,#caAdminPanel .ca-package-box .ca-package-recorded{margin:9px 0 0;font-size:13px;line-height:1.55}
+#caAdminPanel .ca-package-box .ca-package-link{margin-top:10px;background:#184b66;border-color:#5c9eba}
+#caAdminPanel button:disabled{cursor:not-allowed;opacity:.55}
+#caAdminPanel #caPayLinkedNotice:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0;padding:12px;border:1px solid #5aa9bd;border-radius:12px;background:#12384b}
+#caAdminPanel #caPayLinkedNotice p{margin:0;overflow-wrap:anywhere}
+#caAdminPanel .ca-payment-linked{outline:2px solid #83dfcf;outline-offset:2px}
+@media(max-width:480px){#caAdminPanel .ca-package-box{padding:10px}#caAdminPanel .ca-package-badge{font-size:12px}#caAdminPanel .ca-package-link{width:100%}#caAdminPanel #caPayLinkedNotice button{width:100%}}
+
+/* Keep signed-in header actions inside narrow screens. */
+header .header-actions{min-width:0;max-width:100%;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:600px){header .top{flex-wrap:wrap}header .header-actions{margin-left:auto}}

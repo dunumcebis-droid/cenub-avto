@@ -29,7 +29,7 @@ async function caRequest(path,method='GET',body=null,token=null,extraHeaders={},
  if(!res.ok)throw new Error(data?.msg||data?.error_description||data?.message||data?.error||'Server xətası ('+res.status+')');
  return data;
 }
-async function caPersistSession(session){if(currentUser&&currentUser.id!==session.user.id||caDraftOwner&&caDraftOwner!==session.user.id){caClearPrivateListings();caClearListingDraft();}caSession=session;localStorage.setItem(CA_SESSION_KEY,JSON.stringify(session));currentUser={id:session.user.id,email:session.user.email,phone:session.user.user_metadata?.telefon||''};updateAccountUI()}
+async function caPersistSession(session){if(currentUser?.id!==session.user.id)caDismissListingFeedback(false);if(currentUser&&currentUser.id!==session.user.id||caDraftOwner&&caDraftOwner!==session.user.id){caClearPrivateListings();caClearListingDraft();}caSession=session;localStorage.setItem(CA_SESSION_KEY,JSON.stringify(session));currentUser={id:session.user.id,email:session.user.email,phone:session.user.user_metadata?.telefon||''};updateAccountUI()}
 async function caRefresh(){
  const refreshToken=caSession?.refresh_token;if(!refreshToken)return false;
  if(caRefreshPromise?.token===refreshToken)return caRefreshPromise.promise;
@@ -40,7 +40,7 @@ async function caRefresh(){
    await caPersistSession(session);return true;
   }catch(error){
    if(caSession?.refresh_token!==refreshToken)return false;
-   caSession=null;currentUser=null;localStorage.removeItem(CA_SESSION_KEY);
+   caDismissListingFeedback(false);caSession=null;currentUser=null;localStorage.removeItem(CA_SESSION_KEY);
    caClearPrivateListings();updateAccountUI();return false;
   }
  })();
@@ -338,10 +338,32 @@ let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
 function updateAccountUI(){const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
+let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
+function caShowListingFeedback(message,kind='success'){
+ try{
+  const overlay=document.getElementById('listingFeedback'),text=document.getElementById('listingFeedbackText'),title=document.getElementById('listingFeedbackTitle'),button=document.getElementById('listingFeedbackClose');
+  if(!overlay||!text||!title||!button)return false;
+  if(!overlay.classList.contains('open')){caListingFeedbackFocus=document.activeElement;caListingFeedbackOverflow=document.body.style.overflow;}
+  title.textContent=kind==='error'?'Elan göndərilmədi':kind==='warning'?'Müraciət saxlanıldı':'Müraciət qəbul edildi';
+  text.textContent=String(message);text.setAttribute('role',kind==='error'?'alert':'status');
+  overlay.dataset.kind=kind;overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  button.focus({preventScroll:true});return true;
+ }catch(error){console.warn('Elan bildirişi göstərilmədi.');return false;}
+}
+function caDismissListingFeedback(restoreFocus=true){
+ try{
+  const overlay=document.getElementById('listingFeedback');if(!overlay)return;
+  overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');
+  if(caListingFeedbackOverflow!==null)document.body.style.overflow=caListingFeedbackOverflow;
+  const previous=caListingFeedbackFocus;caListingFeedbackFocus=null;caListingFeedbackOverflow=null;
+  if(restoreFocus&&previous?.isConnected)previous.focus({preventScroll:true});
+ }catch(error){}
+}
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.getElementById('listingFeedback')?.classList.contains('open'))caDismissListingFeedback();});
 async function logout(){
  if(!currentUser)return;
  const token=caSession?.access_token;
- caClearListingDraft();localStorage.removeItem(CA_SESSION_KEY);caSession=null;currentUser=null;
+ caDismissListingFeedback(false);caClearListingDraft();localStorage.removeItem(CA_SESSION_KEY);caSession=null;currentUser=null;
  caClearPrivateListings();updateAccountUI();render();closeCabinet();closeSellPage();
  try{if(token)await caRequest('/auth/v1/logout','POST',{},token);}catch(error){}
  if(!currentUser)alert('Hesabdan çıxış edildi.');
@@ -923,6 +945,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  d.requestedPackage=paidPackage?selectedPackage:'';d.pack='Pulsuz';delete d.package;
  const submission=++caListingSubmissionSequence;
  submitBtn.disabled=true;submitBtn.textContent='Şəkillər yüklənir...';
+ let confirmedSave=false;
  try{
   await caUploadSelectedPhotos(photoInputs,d.photos);
   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
@@ -931,17 +954,20 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
   submitBtn.textContent='Elan saxlanılır...';
   // The listing transaction creates any requested paid package atomically.
   // A second package RPC here would duplicate that request.
-  d._id=await caSaveRemoteCar(d,wasEdit,owner,editId,submission);
+  d._id=await caSaveRemoteCar(d,wasEdit,owner,editId,submission);confirmedSave=true;
   if(currentUser?.id!==owner)return;
   caInvalidatePrivateRequests();d.ownerId=owner;
   d.createdAt=original?.createdAt||new Date().toISOString();
   if(wasEdit){const index=userCars.findIndex(car=>car._id===editId);if(index>=0)userCars[index]=d;else userCars.unshift(d);}
   else userCars.unshift(d);
-  saveUserCars();await Promise.all([caFetchListings(1),caFetchMyListings()]);
+  const localSaved=saveUserCars();
+  const refreshed=await Promise.allSettled([caFetchListings(1),caFetchMyListings()]);
   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
-  alert(wasEdit?'Dəyişikliklər saxlanıldı. Elan yenidən admin təsdiqini gözləyir.':paidPackage?'Elan və '+paidPackage+' paket sorğusu göndərildi. Admin təsdiqi gözlənilir; real ödəniş alınmayıb.':'Elan uğurla göndərildi! Admin təsdiqini gözləyir.');
-  caClearListingDraft();render();renderCabinet();closeSellPage();document.getElementById('elanlar').scrollIntoView({behavior:'smooth'});
- }catch(error){if(currentUser?.id===owner&&submission===caListingSubmissionSequence)alert('Əməliyyat tamamlanmadı: '+error.message);}
+  let viewUpdated=localSaved!==false&&refreshed.every(result=>result.status==='fulfilled'&&result.value!==false);
+  const message=paidPackage?(wasEdit?'Dəyişiklikləriniz və ':'Elanınız və ')+paidPackage+' paket müraciətiniz qəbul edildi. Paket və elan admin təsdiqini gözləyir.':wasEdit?'Dəyişikliklər saxlanıldı. Elan yenidən admin təsdiqini gözləyir.':'Elanınız qəbul edildi. Admin təsdiqindən sonra yayımlanacaq.';
+  try{caClearListingDraft();render();renderCabinet();closeSellPage();document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth'});}catch(error){viewUpdated=false;}
+  if(currentUser?.id===owner)caShowListingFeedback(message+(viewUpdated?'':' Siyahı tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.'),viewUpdated?'success':'warning');
+ }catch(error){if(currentUser?.id===owner&&submission===caListingSubmissionSequence)caShowListingFeedback(confirmedSave?'Müraciətiniz saxlanıldı. Görünüş tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.':'Elanı göndərmək mümkün olmadı: '+error.message,confirmedSave?'warning':'error');}
  finally{if(submission===caListingSubmissionSequence){submitBtn.disabled=false;submitBtn.textContent=editingCarId?'Dəyişiklikləri yadda saxla':'Elanı yerləşdir';}}
 });
 // Elan yerləşdirmə bölməsini ayrıca səhifə görünüşünə keçiririk.

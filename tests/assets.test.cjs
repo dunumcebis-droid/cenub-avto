@@ -46,7 +46,7 @@ test('the initial HTML stays small and classic script execution order is preserv
     assert.doesNotMatch(script.attributes, /\b(?:async|type\s*=\s*["']module["'])\b/);
   }
   assert.doesNotMatch(page.html + page.source, /data:image\/(?:jpeg|png);base64,/);
-  assert.match(page.html, /<link[^>]+href="assets\/site\.css"/);
+  assert.match(page.html, /<link[^>]+href="assets\/site\.css(?:\?[^"<>]*)?"/);
   assert.ok(page.html.indexOf('00-auth-callback.js') < page.html.indexOf('assets/site.css'));
   assert.match(page.html, /<meta name="referrer" content="no-referrer"/);
   const hero = page.html.match(/<img\b[^>]*alt="Premium idman avtomobili"[^>]*>/)?.[0];

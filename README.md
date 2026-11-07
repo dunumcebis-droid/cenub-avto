@@ -5,7 +5,11 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
-## Son bütöv yoxlama
+## Son düzəliş və yoxlama
+
+Admin elan kartında VIP/paket sorğusu və təsdiq vəziyyəti görünür; kartdan dəqiq paket sorğusuna keçmək olur. Paket təsdiqi və elanın yayımı ayrı əməliyyatlardır. Satıcının göndəriş nəticəsi saytın öz bildirişində göstərilir, kartla ödənişin hələ aktiv olmadığı paket seçimindən əvvəl bildirilir. 58 Node, 65 brauzer və bu dəyişikliklərə aid 41 baza yoxlaması keçib. Sübutlar: [PACKAGE_FEEDBACK_VERIFICATION.md](PACKAGE_FEEDBACK_VERIFICATION.md).
+
+## Əvvəlki bütöv yoxlama
 
 Kartlar, admin, parol bərpası, BMW seçimi, nəsil məlumatı və müqayisə axını təkrar yoxlanıb. 58 Node, 54 brauzer və 74 baza sınağı keçib. Əhatə, tapılıb düzəldilmiş hallar və canlı yoxlama sübutları [FULL_RECHECK.md](FULL_RECHECK.md) sənədindədir.
 

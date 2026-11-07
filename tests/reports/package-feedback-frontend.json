@@ -1,0 +1,14 @@
+{
+  "nodeTestsPassed": 58,
+  "browserTestsPassed": 65,
+  "browserDurationSeconds": 126.313,
+  "newPackageFeedbackBrowserCases": 11,
+  "javascriptSyntaxFilesPassed": 10,
+  "diffCheckPassed": true,
+  "browserNetwork": "mocked API responses and synthetic upload image",
+  "realListingWrites": 0,
+  "realPackageApprovals": 0,
+  "realRecoveryEmailsSent": 0,
+  "imageProvenanceVerified": true,
+  "viewportWidthsCovered": [375, 1440]
+}

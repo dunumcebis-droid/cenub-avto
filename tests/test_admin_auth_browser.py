@@ -30,7 +30,8 @@ class AdminAuthBackend(OfflineBackend):
         self.delay_password=False
         self.admin_rows=[dict(id=f'44444444-4444-4444-8444-{n:012d}',marka='Toyota',
             model=f'Admin-{n:04d}',il=2020,qiymet=10000+n,seher='Bakı',tesvir='Admin fixture',
-            veziyyet='gozlemede' if n==1205 else 'aktiv',yaradildi='2026-01-01T00:00:00Z')
+            veziyyet='gozlemede' if n==1205 else 'aktiv',yaradildi='2026-01-01T00:00:00Z',
+            requested_package='Pulsuz',package_status='free',package_request_id=None,approved_package='Pulsuz')
             for n in range(1,1206)]
         self.payments=[dict(id=f'55555555-5555-4555-8555-{n:012d}',elan_id=row['id'],
             marka=row['marka'],model=row['model'],paket_adi='VIP',
@@ -340,7 +341,7 @@ class AdminAuthBrowserTests(unittest.TestCase):
 
     def test_mobile_password_recovery_form_fits_and_shows_inline_message(self):
         self.page.set_viewport_size({'width':375,'height':760});self.recovery()
-        self.assertLessEqual(self.page.locator('.auth-box').bounding_box()['width'],375)
+        self.assertLessEqual(self.page.locator('#authOverlay .auth-box').bounding_box()['width'],375)
         self.page.locator('#authPassword').fill('Fixture-mobile-123');self.page.locator('#authPassword2').fill('Fixture-mobile-123')
         self.page.locator('#authSubmit').click();self.page.wait_for_function('authMode==="login"')
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),375)

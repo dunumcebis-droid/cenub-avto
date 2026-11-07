@@ -1,0 +1,31 @@
+{
+  "passed_count": 26,
+  "passed_tests": [
+    "admin_package_metadata_has_no_private_note_or_photo_payload",
+    "anon_cannot_read_package_feedback",
+    "enrichment_keeps_every_listing_once_across_pages",
+    "enrichment_preserves_existing_newest_then_id_order",
+    "enrichment_preserves_listing_status_filter",
+    "existing_listing_photos_packages_remain_unchanged",
+    "existing_payment_records_remain_unchanged",
+    "full_request_uuid_finds_exact_old_payment_despite_same_vehicle_name",
+    "linked_old_payment_is_outside_initial_queue_page",
+    "listing_uuid_search_preserves_all_related_payment_history",
+    "metadata_does_not_change_filtered_count_or_page_size",
+    "metadata_functions_remain_security_invoker",
+    "metadata_reads_change_no_listing_or_payment_record",
+    "non_admin_cannot_read_package_feedback",
+    "ordinary_edit_keeps_canonical_vip_dates",
+    "package_metadata_canonical_vip",
+    "package_metadata_forged_pack",
+    "package_metadata_free",
+    "package_metadata_latest_rejected",
+    "package_metadata_legacy_missing",
+    "package_metadata_premium_pending",
+    "package_metadata_premium_rejected",
+    "package_metadata_standard_confirmed",
+    "package_metadata_vip_confirmed_edit",
+    "package_metadata_vip_pending",
+    "public_browse_does_not_expose_admin_package_feedback"
+  ]
+}

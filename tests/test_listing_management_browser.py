@@ -274,9 +274,10 @@ class ListingManagementBrowserTests(unittest.TestCase):
         self.assertEqual(self.page.evaluate('editingCarId'),OWNED_ID)
         self.assertEqual(self.page.locator('#listingForm [name="price"]').input_value(),'43000')
         self.assertEqual(self.page.evaluate('myCars()[0].price'),42000)
-        alerts = self.page.evaluate('__alerts')
-        self.assertTrue(alerts,'An update affecting zero rows must be reported')
-        self.assertFalse(any('Dəyişikliklər serverdə saxlanıldı' in text for text in alerts))
+        self.assertTrue(self.page.locator('#listingFeedback').is_visible(),'An update affecting zero rows must be reported')
+        self.assertEqual(self.page.locator('#listingFeedback').get_attribute('data-kind'),'error')
+        self.assertIn('göndərmək mümkün olmadı',self.page.locator('#listingFeedbackText').inner_text())
+        self.assertFalse(self.page.evaluate('__alerts'),'Seller outcomes use site feedback rather than a native alert')
 
     def test_zero_row_archive_keeps_card_and_reports_failure(self):
         self.backend.empty_delete = True

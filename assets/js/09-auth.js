@@ -76,7 +76,7 @@ document.getElementById('authForm').addEventListener('submit',async event=>{
    if(!active()||caRecovery!==recovery)return;
    if(user?.id!==recovery.user.id)throw Error('Hesab təsdiqi alınmadı. Yeni bərpa linki istə.');
    if(currentUser?.id===user.id&&caSession===session){
-    caClearListingDraft();caClearPrivateListings();localStorage.removeItem(CA_SESSION_KEY);caSession=null;currentUser=null;updateAccountUI();render();closeCabinet();closeSellPage();
+    caDismissListingFeedback(false);caClearListingDraft();caClearPrivateListings();localStorage.removeItem(CA_SESSION_KEY);caSession=null;currentUser=null;updateAccountUI();render();closeCabinet();closeSellPage();
    }
    openAuth('login');field('authEmail').value=recovery.user.email;caAuthMessage('Parol yeniləndi. Yeni parolunla daxil ol.');
   }else{
