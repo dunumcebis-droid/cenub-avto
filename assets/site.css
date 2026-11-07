@@ -774,3 +774,6 @@ body{background:linear-gradient(160deg,#101a2b,#15253a 58%,#0c192b);color:#edf5f
 /* Keep signed-in header actions inside narrow screens. */
 header .header-actions{min-width:0;max-width:100%;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:600px){header .top{flex-wrap:wrap}header .header-actions{margin-left:auto}}
+
+/* Submission feedback must cover floating page tools and admin launchers. */
+#listingFeedback{z-index:13000}
