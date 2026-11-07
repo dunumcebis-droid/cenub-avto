@@ -1,0 +1,98 @@
+{
+  "kind": "actual live split frontend + real read-only paginated API",
+  "pageStatus": 200,
+  "expectedCommit": "a3a833339b850ff657435ff0f570bf23650cc2fc",
+  "htmlSha256": "dcc07cfae233a356f765e3a2374174aa87856992e1cfb3b373111d2f12ae3c19",
+  "verifiedStaticFileCount": 13,
+  "allFetchedStaticFilesExact": true,
+  "browseResponses": [
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 1,
+      "total": 1,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    }
+  ],
+  "publicActiveRowsOnly": true,
+  "internalNoteExcluded": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "deployedBMWInitialModelsPassed": true,
+  "deployedBMWGroupedSearchPassed": true,
+  "deployedComparisonRefreshPassed": true,
+  "deployedRecoveryUiPassed": true,
+  "deployedFeedbackUiHelperPassed": true,
+  "feedbackBackdropCoversFloatingTools": true,
+  "deployedPackagePaymentNoticePassed": true,
+  "realSellerSubmissions": 0,
+  "realPackageApprovals": 0,
+  "invalidRecoveryRejectedByRealAuth": true,
+  "callbackCredentialsScrubbed": true,
+  "realRecoveryEmailsSent": 0,
+  "realPasswordWrites": 0,
+  "pageErrors": [],
+  "blockedWrites": []
+}
