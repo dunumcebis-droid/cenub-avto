@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Yeni bərpa məktubları ayrıca [parol bərpası səhifəsini](https://dunumcebis-droid.github.io/cenub-avto/reset-password.html) açır. Etibarlı link yoxlanandan sonra iki parol xanası görünür; səhv və ya köhnə linkdə yeni məktub istəmək olur. 60 Node, 79 brauzer və yeni səhifəyə aid 15 görünüş yoxlaması keçib. Əhatə: [DEDICATED_RECOVERY.md](DEDICATED_RECOVERY.md).
+
+## Əvvəlki bərpa və məlumat səhifələri
+
 Elanlardan sonra ayrıca məlumat menyusu göstərilir. [Dəstək xidməti](https://dunumcebis-droid.github.io/cenub-avto/support.html) və [Haqqımızda](https://dunumcebis-droid.github.io/cenub-avto/about.html) ayrıca səhifələrdir. Açıq brauzer səhifəsinə gələn bərpa keçidi də işlənir; istifadə edilmiş keçid aydın yenidən cəhd ekranını göstərir. 60 Node, 69 brauzer və 35 görünüş yoxlaması keçib; bütün 61 statik fayl canlıda tutuşdurulub. Əhatə və məhdudiyyətlər: [RECOVERY_SUPPORT_PAGES.md](RECOVERY_SUPPORT_PAGES.md).
 
 ## Əvvəlki dəstək və footer düzəlişi

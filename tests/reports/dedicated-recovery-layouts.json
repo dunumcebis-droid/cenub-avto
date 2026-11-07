@@ -1,0 +1,99 @@
+{
+  "kind": "fully mocked dedicated recovery layout; client logic stubbed",
+  "layouts": [
+    {
+      "state": "request",
+      "width": 320,
+      "height": 640,
+      "fits": true
+    },
+    {
+      "state": "request",
+      "width": 375,
+      "height": 812,
+      "fits": true
+    },
+    {
+      "state": "request",
+      "width": 430,
+      "height": 932,
+      "fits": true
+    },
+    {
+      "state": "request",
+      "width": 768,
+      "height": 430,
+      "fits": true
+    },
+    {
+      "state": "request",
+      "width": 1440,
+      "height": 900,
+      "fits": true
+    },
+    {
+      "state": "verified",
+      "width": 320,
+      "height": 640,
+      "fits": true
+    },
+    {
+      "state": "verified",
+      "width": 375,
+      "height": 812,
+      "fits": true
+    },
+    {
+      "state": "verified",
+      "width": 430,
+      "height": 932,
+      "fits": true
+    },
+    {
+      "state": "verified",
+      "width": 768,
+      "height": 430,
+      "fits": true
+    },
+    {
+      "state": "verified",
+      "width": 1440,
+      "height": 900,
+      "fits": true
+    },
+    {
+      "state": "success",
+      "width": 320,
+      "height": 640,
+      "fits": true
+    },
+    {
+      "state": "success",
+      "width": 375,
+      "height": 812,
+      "fits": true
+    },
+    {
+      "state": "success",
+      "width": 430,
+      "height": 932,
+      "fits": true
+    },
+    {
+      "state": "success",
+      "width": 768,
+      "height": 430,
+      "fits": true
+    },
+    {
+      "state": "success",
+      "width": 1440,
+      "height": 900,
+      "fits": true
+    }
+  ],
+  "realNetworkRequests": 0,
+  "realEmailsSent": 0,
+  "realPasswordWrites": 0,
+  "pageErrors": []
+}

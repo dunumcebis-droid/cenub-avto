@@ -1,0 +1,16 @@
+{
+  "nodeTestsPassed": 60,
+  "fullBrowserTestsPassed": 79,
+  "fullBrowserDurationSeconds": 120.953,
+  "newDedicatedRecoveryBrowserCases": 10,
+  "focusedSynchronizedRecoveryCasesPassed": 10,
+  "focusedDurationSeconds": 7.777,
+  "layoutFixtureCasesPassed": 15,
+  "pagehideBfcacheGuardProbePassed": true,
+  "browserNetwork": "fully mocked",
+  "realEmailsSentByAutomatedSuite": 0,
+  "realPasswordWritesByAutomatedSuite": 0,
+  "currentLoginSessionPreserved": true,
+  "imageProvenanceVerified": true,
+  "privateAuthMetadataIncluded": false
+}
