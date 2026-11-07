@@ -1,0 +1,17 @@
+{
+  "nodeTestsPassed": 58,
+  "adminRecoveryBrowserTestsPassed": 16,
+  "adminRecoveryDurationSeconds": 23.462,
+  "comparisonBrowserTestsPassed": 8,
+  "comparisonDurationSeconds": 11.406,
+  "packageFeedbackBrowserTestsPassed": 11,
+  "packageFeedbackDurationSeconds": 22.796,
+  "responsiveLayoutsPassed": 21,
+  "syntaxFilesPassed": 10,
+  "diffCheckPassed": true,
+  "realUserDataWrites": 0,
+  "realPackageApprovals": 0,
+  "emailsSent": 0,
+  "smtpConfigChanged": false,
+  "recoverySenderChangeStatus": "awaiting authenticated Gmail SMTP setup"
+}

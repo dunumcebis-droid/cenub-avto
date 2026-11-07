@@ -777,3 +777,20 @@ header .header-actions{min-width:0;max-width:100%;flex-wrap:wrap;justify-content
 
 /* Submission feedback must cover floating page tools and admin launchers. */
 #listingFeedback{z-index:13000}
+
+/* Keep the footer readable above the complete floating tools group. */
+body{padding-bottom:var(--ca-tools-clearance,calc(170px + env(safe-area-inset-bottom,0px)))}
+#caToolsBar{bottom:calc(18px + env(safe-area-inset-bottom,0px));align-items:center}
+#caAdminLaunch{position:static;max-width:100%;min-width:0;overflow-wrap:anywhere}
+footer{color:#d4e1ef;font-size:14px;line-height:1.65}
+footer p{margin:0 0 8px}
+footer a{color:#6ee7d8;text-decoration:underline;text-underline-offset:3px}
+.ca-support{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,1fr);align-items:start;gap:28px;border-top:1px solid #ffffff18}
+.ca-support .sub{line-height:1.7;max-width:520px}
+.ca-support-links{display:grid;gap:12px;font-style:normal;min-width:0}
+.ca-support-links a{display:grid;gap:6px;padding:18px 20px;background:#111f30;border:1px solid #36536b;border-radius:13px;color:#edf5fb;text-decoration:none;overflow-wrap:anywhere;min-width:0}
+.ca-support-links a span{font-size:12px;color:#9eafc1}
+.ca-support-links a strong{font-size:18px;line-height:1.5}
+.ca-support-links a:hover{border-color:#59d7c6}
+.ca-support-links a:focus-visible,footer a:focus-visible{outline:3px solid #ffcd6c;outline-offset:4px}
+@media(max-width:600px){#caToolsBar{bottom:calc(8px + env(safe-area-inset-bottom,0px))}.ca-support{grid-template-columns:minmax(0,1fr);gap:16px}.ca-support-links a{padding:16px}.ca-support-links a strong{font-size:17px}}

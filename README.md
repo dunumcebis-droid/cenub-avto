@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və `cenubavtoelan@gmail.com` əlavə olunub. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Parol bərpası məktubunun göndərən ünvanının dəyişməsi SMTP girişini gözləyir; [hazır SMTP ayarları](EMAIL_SENDER_SETUP.md).
+
+## Əvvəlki VIP bildirişi düzəlişi
+
 Admin elan kartında VIP/paket sorğusu və təsdiq vəziyyəti görünür; kartdan dəqiq paket sorğusuna keçmək olur. Paket təsdiqi və elanın yayımı ayrı əməliyyatlardır. Satıcının göndəriş nəticəsi saytın öz bildirişində göstərilir, kartla ödənişin hələ aktiv olmadığı paket seçimindən əvvəl bildirilir. 58 Node, 65 brauzer və bu dəyişikliklərə aid 41 baza yoxlaması keçib. Sübutlar: [PACKAGE_FEEDBACK_VERIFICATION.md](PACKAGE_FEEDBACK_VERIFICATION.md).
 
 ## Əvvəlki bütöv yoxlama

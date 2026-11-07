@@ -1,5 +1,18 @@
 /* Additive enhancements. Existing catalog, filtering and listing functions remain intact. */
 (function(){
+const toolsBar=document.getElementById('caToolsBar');
+function syncToolsClearance(){
+ if(!toolsBar)return;
+ const clearance=Math.max(0,window.innerHeight-toolsBar.getBoundingClientRect().top)+16;
+ document.documentElement.style.setProperty('--ca-tools-clearance',Math.ceil(clearance)+'px');
+}
+if(toolsBar){
+ if(typeof ResizeObserver==='function')new ResizeObserver(syncToolsClearance).observe(toolsBar);
+ else if(typeof MutationObserver==='function')new MutationObserver(syncToolsClearance).observe(toolsBar,{attributes:true,subtree:true,attributeFilter:['style','class','hidden']});
+ window.addEventListener('resize',syncToolsClearance);
+ document.fonts?.ready.then(syncToolsClearance);
+ syncToolsClearance();
+}
 let comparison=[],comparisonOpen=false,comparisonOwner=currentUser?.id||null;
 const comparisonRows=new Map();
 const unavailableComparisons=new Set();
