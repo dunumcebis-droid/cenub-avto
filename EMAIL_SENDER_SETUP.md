@@ -1,10 +1,10 @@
 # Bərpa məktubunun göndərən ünvanı
 
-İstənilən göndərən: **Cənub Avto <cenubavtoelan@gmail.com>**. Saytdakı dəstək ünvanı bu ünvandır. Məktubun faktiki `From` sahəsi isə Supabase Auth-un SMTP konfiqurasiyasından gəlir; HTML-də ünvan yazmaq onu dəyişmir.
+Göndərən: **Cənub Avto <cenubavtoelan@gmail.com>**. Saytdakı dəstək ünvanı da bu ünvandır. Məktubun `From` sahəsi Supabase Auth-un SMTP konfiqurasiyasından gəlir; HTML-də ünvan yazmaq onu dəyişmir.
 
-Bu mərhələdə SMTP göndərəninin dəyişdirilməsi **tamamlanmayıb**. Mövcud Supabase alətlərində Auth/SMTP ayarlarını dəyişmək funksiyası yoxdur; icra mühitinə Gmail SMTP və ya Supabase Management API girişi verilməyib. İşləyən parol bərpası saxlanılıb, istifadəçilərin giriş ünvanları və bərpa məktubunun alıcısı dəyişdirilməyib. Heç bir e-poçt göndərilməyib.
+SMTP parolu yalnız Supabase-in məxfi ayarında saxlanmalıdır. İstifadəçilərin hesab ünvanları və bərpa məktublarının alıcısı bu göndərən ünvanından ayrıdır.
 
-## Hazır konfiqurasiya
+## SMTP ayarları
 
 [Layihənin SMTP səhifəsi](https://supabase.com/dashboard/project/iqdtehqxusfiwokrzceo/auth/smtp):
 
@@ -14,12 +14,12 @@ Bu mərhələdə SMTP göndərəninin dəyişdirilməsi **tamamlanmayıb**. Möv
 | Sender email | `cenubavtoelan@gmail.com` |
 | Sender name | `Cənub Avto` |
 | Host | `smtp.gmail.com` |
-| Port | `587` (STARTTLS); alternativ `465` (TLS) |
+| Port | `465` (TLS); alternativ `587` (STARTTLS) |
 | Username | `cenubavtoelan@gmail.com` |
-| Password | Google App Password — birbaşa Supabase-in məxfi sahəsinə daxil edilir |
+| Password | Google App Password — yalnız Supabase-in məxfi sahəsinə daxil edilir |
 
 Gmail hesabında iki mərhələli doğrulama aktiv olduqdan sonra [Google App Password](https://myaccount.google.com/apppasswords) yaradılır. Adi Gmail parolu və tətbiq parolu söhbətə, repozitoriyaya və ya frontend koduna yazılmamalıdır. SMTP yalnız bütün sahələr hazır olanda aktivləşdirilməlidir; yarımçıq konfiqurasiya məktub göndərişini poza bilər. Custom SMTP üçün Supabase Pro planı tələb olunmur.
 
-Quraşdırmadan sonra göndərən adı/ünvanı yenidən oxunmalı, sahibinin ayrıca icazəsi ilə bir sınaq məktubu göndərilməli, məktubun `From` ünvanı, çatdırılması və bərpa ekranının açılması yoxlanmalıdır. Bərpa linkləri və parollar hesabatlara daxil edilməməlidir.
+Yoxlama zamanı faktiki göndərən ünvanı, çatdırılma və bərpa ekranının açılması təsdiqlənməlidir. Məxfi bərpa linkləri, tokenlər, alıcının hesab məlumatları və göndəriş qeydləri açıq repozitoriyada saxlanmamalıdır.
 
 Rəsmi mənbələr: [Supabase SMTP](https://supabase.com/docs/guides/auth/auth-smtp), [Google SMTP ilə Supabase](https://supabase.com/kb/troubleshooting/using-google-smtp-with-supabase-custom-smtp-ZZzU4Y), [Google App Password](https://support.google.com/accounts/answer/185833?hl=en).
