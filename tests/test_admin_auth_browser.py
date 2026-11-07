@@ -188,6 +188,49 @@ class AdminAuthBrowserTests(unittest.TestCase):
         self.assertEqual(self.page.url,ORIGIN)
         self.assertEqual([c['path'] for c in self.backend.auth_calls],['/auth/v1/verify','/auth/v1/user'])
 
+    def test_explicit_query_recovery_token_is_verified_and_never_saved_as_a_session(self):
+        self.go('?auth=recovery&type=recovery&access_token=recovery-token&refresh_token=fixture-secret')
+        self.page.wait_for_function('authMode==="reset"&&!document.getElementById("authSubmit").disabled')
+        self.assertEqual(self.page.url,ORIGIN)
+        self.assertEqual(self.page.locator('#authTitle').inner_text(),'Yeni parol yarat')
+        self.assertIsNone(self.page.evaluate('localStorage.getItem(CA_SESSION_KEY)'))
+        self.assertEqual([c['path'] for c in self.backend.auth_calls],['/auth/v1/user'])
+
+    def test_existing_tab_handles_new_recovery_fragment_without_replacing_signed_in_account(self):
+        self.go()
+        self.page.evaluate('''id=>{currentUser={id,email:'owner@example.invalid',phone:'+994000000000'};
+            caSession={access_token:'owner-token',expires_at:4102444800,user:{id}};
+            localStorage.setItem(CA_SESSION_KEY,JSON.stringify(caSession));updateAccountUI();}''',OWNER)
+        original=self.page.evaluate('localStorage.getItem(CA_SESSION_KEY)')
+        self.page.evaluate("location.hash='type=recovery&access_token=recovery-token&refresh_token=fixture-secret'")
+        self.page.wait_for_function('authMode==="reset"&&!document.getElementById("authSubmit").disabled',timeout=3000)
+        self.assertTrue(self.page.locator('#authOverlay').is_visible())
+        self.assertEqual(self.page.locator('#authTitle').inner_text(),'Yeni parol yarat')
+        self.assertEqual(self.page.url,ORIGIN)
+        self.assertEqual(self.page.evaluate('currentUser.id'),OWNER)
+        self.assertEqual(self.page.evaluate('caSession.access_token'),'owner-token')
+        self.assertEqual(self.page.evaluate('localStorage.getItem(CA_SESSION_KEY)'),original)
+        self.assertIsNone(self.page.evaluate('window.__caAuthCallback'))
+        self.assertEqual([c['path'] for c in self.backend.auth_calls],['/auth/v1/user'])
+
+    def test_recovery_entry_without_credentials_shows_a_visible_retry_instead_of_homepage(self):
+        self.go('?auth=recovery')
+        self.page.wait_for_function('authMode==="recover"&&document.getElementById("authMessage").getAttribute("role")==="alert"',timeout=3000)
+        self.assertTrue(self.page.locator('#authOverlay').is_visible())
+        self.assertIn('link',self.page.locator('#authMessage').inner_text())
+        self.assertEqual(self.page.url,ORIGIN)
+        self.assertFalse(self.backend.auth_calls)
+
+    def test_used_link_error_arriving_in_existing_tab_shows_retry_without_an_auth_write(self):
+        self.go()
+        self.page.evaluate("location.hash='error=access_denied&error_code=otp_expired&error_description=Email+link+invalid+or+expired'")
+        self.page.wait_for_function('authMode==="recover"&&document.getElementById("authMessage").getAttribute("role")==="alert"',timeout=3000)
+        self.assertTrue(self.page.locator('#authOverlay').is_visible())
+        self.assertIn('istifadə olunub',self.page.locator('#authMessage').inner_text())
+        self.assertFalse(self.page.locator('#authPassword').is_visible())
+        self.assertEqual(self.page.url,ORIGIN)
+        self.assertFalse(self.backend.auth_calls)
+
     def test_closing_recovery_ignores_late_user_verification(self):
         self.backend.delay_recovery=True;self.go('#type=recovery&access_token=recovery-token')
         self.assertEqual(len(self.backend.pending_recovery),1)

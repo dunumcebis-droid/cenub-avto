@@ -39,12 +39,13 @@ async function caAfterLogin(owner=currentUser?.id){
 async function caHandleAuthCallback(){
  const callback=window.__caAuthCallback;delete window.__caAuthCallback;if(!callback)return;
  const hash=new URLSearchParams(callback.hash),query=new URLSearchParams(callback.search);
- const recovery=hash.get('type')==='recovery'||query.get('type')==='recovery'||query.get('auth')==='recovery';
+ const recovery=hash.get('type')==='recovery'||query.get('type')==='recovery'||query.get('auth')==='recovery'||hash.get('auth')==='recovery';
  if(!recovery&&!hash.has('error')&&!query.has('error'))return;
- if(hash.has('error')||query.has('error')||!recovery){openAuth('recover');caAuthMessage('Bərpa linki etibarsızdır və ya vaxtı bitib. Yeni link istə.',true);return;}
+ if(hash.has('error')||query.has('error')||!recovery){openAuth('recover');caAuthMessage('Bərpa linki artıq istifadə olunub, etibarsızdır və ya vaxtı bitib. Yeni link istə.',true);return;}
+ if(!hash.get('access_token')&&!query.get('access_token')&&!query.get('token_hash')&&!hash.get('token_hash')){openAuth('recover');caAuthMessage('Bu bərpa linkində təsdiq məlumatı yoxdur. Yeni bərpa linki istə.',true);return;}
  const holder={user:null,token:null,expiresAt:0};caRecovery=holder;openAuth('reset');const epoch=caAuthEpoch;
  try{
-  let token=hash.get('access_token');
+  let token=hash.get('access_token')||query.get('access_token');
   if(!token&&(query.get('token_hash')||hash.get('token_hash'))){const r=await caRequest('/auth/v1/verify','POST',{type:'recovery',token_hash:query.get('token_hash')||hash.get('token_hash')});token=r?.access_token;}
   if(!token)throw Error('Missing recovery token');
   const user=await caRequest('/auth/v1/user','GET',null,token);
