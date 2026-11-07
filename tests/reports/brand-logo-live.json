@@ -1,0 +1,178 @@
+{
+  "expectedCommit": "5e1ea45f1421056e5114ccb26325b723fe6fd336",
+  "pageStatus": 200,
+  "htmlSha256": "301aa271431e68d5c88ea809d09a01e6629db241f8ed442efa54e81bbb7cb9c2",
+  "verifiedStaticFileCount": 18,
+  "allFetchedStaticFilesExact": true,
+  "publicActiveRowsOnly": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 320,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "deployedBMWInitialModelsPassed": true,
+  "deployedComparisonRefreshPassed": true,
+  "standaloneSupportPagePassed": true,
+  "standaloneAboutPagePassed": true,
+  "contactIntentLinksPassed": true,
+  "returnToListingsPassed": true,
+  "dedicatedResetRetryPassed": true,
+  "dedicatedResetInvalidTokenRejected": true,
+  "dedicatedResetNoListingApp": true,
+  "dedicatedResetMobileAndLandscapePassed": true,
+  "existingHeroImageDecoded": true,
+  "brandingChecks": [
+    {
+      "page": "home",
+      "width": 1440,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "home",
+      "width": 375,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "home",
+      "width": 320,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "support",
+      "width": 320,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "support",
+      "width": 375,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "support",
+      "width": 768,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "support",
+      "width": 1440,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "about",
+      "width": 320,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "about",
+      "width": 375,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "about",
+      "width": 1440,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "reset",
+      "width": 320,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "reset",
+      "width": 375,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "reset",
+      "width": 812,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    },
+    {
+      "page": "reset",
+      "width": 1440,
+      "logoLoaded": true,
+      "completeArtworkVisible": true,
+      "headerControlsClear": true,
+      "newSloganVisible": true,
+      "oldSloganAbsent": true
+    }
+  ],
+  "brandedAnchorHeadingVisible": true,
+  "newLogoMatchesSource": true,
+  "pageErrors": [],
+  "blockedWrites": [],
+  "authProbeData": "synthetic invalid tokens only",
+  "realRecoveryEmailsSentByThisProbe": 0,
+  "realPasswordWritesByThisProbe": 0,
+  "privateAuthMetadataIncluded": false
+}
