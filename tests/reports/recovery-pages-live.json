@@ -1,0 +1,49 @@
+{
+  "pageStatus": 200,
+  "expectedCommit": "cbf59a8d76718f145a0be34310f1c8105da729a0",
+  "htmlSha256": "e64b28e7203107fb53226798e33afa061beee39096db4fdfb82ebe2f2c065ea2",
+  "verifiedStaticFileCount": 15,
+  "allFetchedStaticFilesExact": true,
+  "publicActiveRowsOnly": true,
+  "internalNoteExcluded": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 320,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "deployedBMWInitialModelsPassed": true,
+  "deployedComparisonRefreshPassed": true,
+  "standaloneSupportPagePassed": true,
+  "standaloneAboutPagePassed": true,
+  "contactIntentLinksPassed": true,
+  "returnToListingsPassed": true,
+  "separatedMenuPassed": true,
+  "markerOnlyRecoveryShowsRetry": true,
+  "sameTabUsedLinkShowsRetry": true,
+  "authBackdropCoversTools": true,
+  "sameTabInvalidRecoveryRejected": true,
+  "pageErrors": [],
+  "blockedWrites": [],
+  "authProbeData": "synthetic invalid tokens and error markers only",
+  "realRecoveryEmailsSentByThisProbe": 0,
+  "realPasswordWritesByThisProbe": 0,
+  "privateAuthMetadataIncluded": false
+}
