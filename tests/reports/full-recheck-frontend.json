@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-11-07T12:23:36.038395+00:00",
+  "nodePassed": 58,
+  "browserPassed": 54,
+  "browserDurationSeconds": 103.655,
+  "failures": 0,
+  "skipped": 0,
+  "syntaxFilesPassed": 10,
+  "diffCheck": true,
+  "newRegressionCases": {
+    "BMW": 8,
+    "comparison": 8,
+    "generation": 3
+  },
+  "allBrowserNetworkMocked": true,
+  "realEmailsSent": 0,
+  "realPasswordsChanged": 0,
+  "realListingOrAdminMutations": 0
+}

@@ -515,7 +515,14 @@ console.info('VehiclesDB daxili kataloqdan yükləndi (offline).');
 fillDatalist('allMakesList',allMakes);fillDatalist('listingMakesList',allMakes);
   fillDatalist('allMakesList',allMakes);fillDatalist('listingMakesList',allMakes);
 
-function fillModels(makeInput, modelInput, otherInput, listId){const brand=String(makeInput.value||'').trim();const models=modelCatalog[brand]||[];fillDatalist(listId,models);modelInput.disabled=!brand;modelInput.placeholder=brand?'Model axtar və seç (məs. RAV4)':'Əvvəlcə marka seçin';modelInput.value='';if(otherInput){otherInput.style.display='none';otherInput.required=false;otherInput.value='';}}
+function caClearListingGeneration(){
+ const field=document.getElementById('generationInput');if(field)field.value='';
+ for(const id of ['generationManualInput','generationYearsManual']){const input=document.getElementById(id);if(input)input.value='';}
+ const overlay=document.getElementById('generationPicker');
+ if(overlay?.classList.contains('open'))closeGenerationPicker();
+ document.querySelectorAll('#generationGrid [data-generation]').forEach(card=>{card.classList.remove('selected');card.removeAttribute('aria-pressed');});
+}
+function fillModels(makeInput, modelInput, otherInput, listId){if(modelInput.form?.id==='listingForm')caClearListingGeneration();const brand=String(makeInput.value||'').trim();const models=modelCatalog[brand]||[];fillDatalist(listId,models);modelInput.disabled=!brand;modelInput.placeholder=brand?'Model axtar və seç (məs. RAV4)':'Əvvəlcə marka seçin';modelInput.value='';if(otherInput){otherInput.style.display='none';otherInput.required=false;otherInput.value='';}}
 const searchMakeEl=document.getElementById('searchMake');const searchModelEl=document.getElementById('searchModel');
 searchMakeEl.addEventListener('input',()=>{fillModels(searchMakeEl,searchModelEl,null,'searchModelsList')});
 const listingMakeEl=document.querySelector('#listingForm input[name="make"]');const listingModelEl=document.querySelector('#listingForm input[name="model"]');const listingOtherEl=document.querySelector('#listingForm input[name="modelOther"]');
@@ -582,6 +589,7 @@ function selectVehiclePickerValue(value){
   if(!input||!clean)return;
   const selectedKind=activePicker.kind;
   const previous=String(input.value||'').trim();
+  if(selectedKind==='model'&&input===listingModelEl&&previous.toLocaleLowerCase('az')!==clean.toLocaleLowerCase('az'))caClearListingGeneration();
   input.value=clean;
   if(selectedKind==='make'){
     const isSearch=input===searchMakeEl;
@@ -895,6 +903,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  d.equipment=caCollectEquipment(form,original?.equipment);
  d.make=String(d.make||'').trim();d.model=String(d.model||'').trim();
  if(!d.make||!d.model){alert('Marka və modeli axtarışdan seç və ya adını tam yaz.');return;}
+ if(!String(d.generation||'').trim()){alert('Avtomobilin nəslini seç. Model dəyişəndə nəsil yenidən seçilməlidir.');openGenerationPicker();return;}
  const year=caNumber(d.year),price=caNumber(d.price),mileage=caNumber(d.mileage);
  if(!Number.isInteger(year)||year<1950||year>new Date().getFullYear()+1){alert('İstehsal ilini düzgün daxil et.');return;}
  if(price===null){alert('Satış qiymətini sıfır və ya daha böyük rəqəmlə daxil et.');return;}

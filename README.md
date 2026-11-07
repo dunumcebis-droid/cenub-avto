@@ -5,6 +5,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## Son bütöv yoxlama
+
+Kartlar, admin, parol bərpası, BMW seçimi, nəsil məlumatı və müqayisə axını təkrar yoxlanıb. 58 Node, 54 brauzer və 74 baza sınağı keçib. Əhatə, tapılıb düzəldilmiş hallar və canlı yoxlama sübutları [FULL_RECHECK.md](FULL_RECHECK.md) sənədindədir.
+
 ## Cari düzəlişlər
 
 - Marka, model, qiymət, il, yürüş və texniki məlumatlar baza sütunlarından və əvvəlki `ca_data` formatlarından oxunur. Boş yürüş `null`, daxil edilmiş sıfır isə `0 km` olaraq qorunur.

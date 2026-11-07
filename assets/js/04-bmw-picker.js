@@ -12,7 +12,7 @@ function renderPickerItems(){
     pickerList.innerHTML=(popular.length?`<div class="picker-section-title">Məşhur markalar</div>${popular.map(renderBrand).join('')}`:'')+(others.length?`<div class="picker-section-title">Bütün markalar</div>${others.map(renderBrand).join('')}`:'')||'<div class="picker-empty">Uyğun marka tapılmadı. Adı özün də əlavə edə bilərsən.</div>';
     document.getElementById('pickerNote').textContent=`${items.length} marka göstərilir · Məşhur markalar yuxarıda yerləşir.`;
   }else if(String(activePicker.make||'').toLocaleLowerCase('az')==='bmw' && typeof bmwSeriesModels!=='undefined'){
-    const groups=[];
+    const groups=[],grouped=new Set();
     for(let n=1;n<=8;n++){
       const base=bmwSeriesModels[n]||[];
       const catalog=(modelCatalog.BMW||[]);
@@ -27,10 +27,12 @@ function renderPickerItems(){
         8:/^(?:8\s*Series|M8\b|G\d{2}\s+8\d{2}|8\d{2}[a-z]?)/i
       };
       const merged=[...new Set([...base,...catalog.filter(m=>patterns[n].test(m))])];
+      merged.forEach(model=>grouped.add(model));
       const filtered=merged.filter(m=>!q || (`${n} series ${m}`).toLocaleLowerCase('az').includes(q));
       if(filtered.length)groups.push({n,models:filtered});
     }
-    pickerList.innerHTML=groups.map(({n,models})=>{
+    const remaining=items.filter(model=>!grouped.has(model));
+    const series=groups.map(({n,models})=>{
       const open=cenubBMWOpenSeries.has(String(n)) || (!!q && models.some(m=>m.toLocaleLowerCase('az').includes(q)));
       if(open)cenubBMWOpenSeries.add(String(n));
       return `<section class="bmw-picker-series ${open?'open':''}">
@@ -41,16 +43,25 @@ function renderPickerItems(){
         </button>
         ${open?`<div class="bmw-picker-series-models">${models.map(m=>`<button type="button" class="picker-option" data-picker-value="${esc(m)}">${esc(m)}<small>BMW ${n} Series</small></button>`).join('')}</div>`:''}
       </section>`;
-    }).join('')||'<div class="picker-empty">Bu axtarışa uyğun BMW modeli tapılmadı.</div>';
-    document.getElementById('pickerNote').textContent=`BMW · 1–8 seriyaları · ${groups.reduce((a,g)=>a+g.models.length,0)} model`;
+    }).join('');
+    const other=remaining.length?'<div class="picker-section-title">Digər BMW modelləri</div>'+remaining.map(model=>`<button type="button" class="picker-option model-picker-option" data-picker-value="${esc(model)}"><span class="model-option-name">${esc(model)}<small>BMW modeli</small></span></button>`).join(''):'';
+    pickerList.innerHTML=series+other||'<div class="picker-empty">Bu axtarışa uyğun BMW modeli tapılmadı.</div>';
+    document.getElementById('pickerNote').textContent=`BMW · 1–8 seriyaları və digər modellər · ${groups.reduce((a,g)=>a+g.models.length,0)+remaining.length} model`;
   }else{
     pickerList.innerHTML=items.map((x,i)=>`<button type="button" class="picker-option model-picker-option" data-picker-value="${esc(x)}"><span class="model-option-mark">${String(i+1).padStart(2,'0')}</span><span class="model-option-name">${esc(x)}<small>${esc(activePicker.make)} modeli</small></span></button>`).join('')||'<div class="picker-empty">Uyğun model tapılmadı. Axtarış sözünü yoxla və ya öz model adını əlavə et.</div>';
     document.getElementById('pickerNote').textContent=`${activePicker.make} üçün ${items.length} model`;
   }
-  const exact=items.some(x=>x.toLocaleLowerCase('az')===q);
+  const exact=[...pickerList.querySelectorAll('[data-picker-value]')].some(option=>option.dataset.pickerValue.toLocaleLowerCase('az')===q);
   pickerCustom.style.display=q&&!exact?'block':'none';
   pickerCustom.textContent=`“${pickerSearch.value.trim()}” adını istifadə et`;
 }
+// The main script registered its original renderer before this BMW override.
+// Keep typed BMW searches on the same grouped renderer as opening the picker.
+pickerSearch.addEventListener('input',event=>{
+  if(activePicker.kind==='model'&&String(activePicker.make||'').toLocaleLowerCase('az')==='bmw'){
+    event.stopImmediatePropagation();renderPickerItems();
+  }
+},true);
 pickerList.addEventListener('click',e=>{
   const toggle=e.target.closest('[data-bmw-series-toggle]');
   if(!toggle)return;
