@@ -4,6 +4,12 @@ Göndərən: **Cənub Avto <cenubavtoelan@gmail.com>**. Saytdakı dəstək ünva
 
 SMTP parolu yalnız Supabase-in məxfi ayarında saxlanmalıdır. İstifadəçilərin hesab ünvanları və bərpa məktublarının alıcısı bu göndərən ünvanından ayrıdır.
 
+## Sayta yönləndirmə
+
+[Supabase URL Configuration](https://supabase.com/dashboard/project/iqdtehqxusfiwokrzceo/auth/url-configuration) bölməsində `Site URL` ünvanı `https://dunumcebis-droid.github.io/cenub-avto/` olmalıdır. Bərpa sorğusu `https://dunumcebis-droid.github.io/cenub-avto/?auth=recovery` ünvanını istifadə edir. Bu işarə bərpa məqsədini səhifəyə bildirir. Eyni scheme/host/port Supabase tərəfindən qəbul edilir; əlavə callback ünvanları ayrıca `Redirect URLs` siyahısında saxlanıla bilər.
+
+`Site URL` ümumi sayt ünvanıdır; ona bərpa işarəsi əlavə edilmir. SMTP göndərənindən əlavə, yönləndirmə ünvanı da düzgün qurulmalıdır.
+
 ## SMTP ayarları
 
 [Layihənin SMTP səhifəsi](https://supabase.com/dashboard/project/iqdtehqxusfiwokrzceo/auth/smtp):

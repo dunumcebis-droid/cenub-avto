@@ -1,0 +1,14 @@
+{
+  "nodeTestsPassed": 60,
+  "fullBrowserTestsPassed": 69,
+  "fullBrowserDurationSeconds": 133.99,
+  "responsiveLayoutsPassed": 35,
+  "focusedRedirectFollowupTestsPassed": 20,
+  "javascriptSyntaxFilesPassed": 10,
+  "imageProvenanceVerified": true,
+  "networkInAutomatedSuite": "fully mocked",
+  "realEmailsSentByAutomatedSuite": 0,
+  "realPasswordWritesByAutomatedSuite": 0,
+  "privateAuthMetadataIncluded": false,
+  "focusedRedirectFollowupDurationSeconds": 27.787
+}

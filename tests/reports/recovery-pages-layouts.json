@@ -1,0 +1,297 @@
+{
+  "kind": "fully mocked support/about page navigation and responsive layout",
+  "layouts": [
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 320,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 360,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 375,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 390,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 430,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 768,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "guest",
+      "width": 1440,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 320,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 360,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 375,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 390,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 430,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 768,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "admin",
+      "width": 1440,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 320,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 360,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 375,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 390,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 430,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 768,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "home",
+      "mode": "signed-out",
+      "width": 1440,
+      "footerAboveTools": true,
+      "overlap": false,
+      "controlsFit": true,
+      "pageFits": true
+    },
+    {
+      "page": "support.html",
+      "width": 320,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 360,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 375,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 390,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 430,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 768,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "support.html",
+      "width": 1440,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 320,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 360,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 375,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 390,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 430,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 768,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    },
+    {
+      "page": "about.html",
+      "width": 1440,
+      "noHorizontalOverflow": true,
+      "noFloatingTools": true,
+      "backLinkVisible": true
+    }
+  ],
+  "realWrites": 0,
+  "pageErrors": [],
+  "phoneLink": "tel:+994709091997",
+  "emailLink": "mailto:cenubavtoelan@gmail.com",
+  "navigationAndReturnPassed": true
+}

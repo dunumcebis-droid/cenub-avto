@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Elanlardan sonra ayrıca məlumat menyusu göstərilir. [Dəstək xidməti](https://dunumcebis-droid.github.io/cenub-avto/support.html) və [Haqqımızda](https://dunumcebis-droid.github.io/cenub-avto/about.html) ayrıca səhifələrdir. Açıq brauzer səhifəsinə gələn bərpa keçidi də işlənir; istifadə edilmiş keçid aydın yenidən cəhd ekranını göstərir. 60 Node, 69 brauzer və 35 görünüş yoxlaması keçib; bütün 61 statik fayl canlıda tutuşdurulub. Əhatə və məhdudiyyətlər: [RECOVERY_SUPPORT_PAGES.md](RECOVERY_SUPPORT_PAGES.md).
+
+## Əvvəlki dəstək və footer düzəlişi
+
 «Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və `cenubavtoelan@gmail.com` əlavə olunub. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Parol bərpasında Gmail SMTP istifadə olunur; göndərən ünvanı `cenubavtoelan@gmail.com`-dur. Ümumi quraşdırma bələdçisi: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Əvvəlki VIP bildirişi düzəlişi

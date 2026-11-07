@@ -2,7 +2,7 @@
 // A recovery token is verified against Auth and held only in memory; it never
 // replaces an existing account session or enters localStorage.
 let caAuthEpoch=0,caRecovery=null;
-const CA_RECOVERY_REDIRECT='https://dunumcebis-droid.github.io/cenub-avto/';
+const CA_RECOVERY_REDIRECT='https://dunumcebis-droid.github.io/cenub-avto/?auth=recovery';
 function caAuthMessage(message,error=false){const el=document.getElementById('authMessage');el.textContent=message;el.setAttribute('role',error?'alert':'status');}
 function openAuth(mode='register'){
  if(!['register','login','recover','reset'].includes(mode))mode='login';

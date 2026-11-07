@@ -155,7 +155,7 @@ class AdminAuthBrowserTests(unittest.TestCase):
         self.page.wait_for_function('document.getElementById("authMessage").textContent.includes("mümkündürsə")')
         call=next(c for c in self.backend.auth_calls if c['path']=='/auth/v1/recover')
         self.assertEqual(call['body'],{'email':'user@example.invalid'})
-        self.assertEqual(call['query']['redirect_to'],['https://dunumcebis-droid.github.io/cenub-avto/'])
+        self.assertEqual(call['query']['redirect_to'],['https://dunumcebis-droid.github.io/cenub-avto/?auth=recovery'])
         self.assertIsNone(call['authorization'])
 
     def test_recovery_verifies_user_scrubs_url_and_updates_only_recovery_account(self):
