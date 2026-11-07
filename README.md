@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+İstifadəçinin loqosu bütün səhifələrə yerləşdirilib. Yeni şüar: **Xəyal etdiyin avtomobili kəşf et**. Loqo faylı və əvvəlki avtomobil şəkilləri dəyişdirilməyib. 60 Node, 79 brauzer və 48 responsive görünüş yoxlaması keçib. Əhatə və sübutlar: [BRANDING_VERIFICATION.md](BRANDING_VERIFICATION.md).
+
+## Əvvəlki ayrıca parol bərpası səhifəsi
+
 Yeni bərpa məktubları ayrıca [parol bərpası səhifəsini](https://dunumcebis-droid.github.io/cenub-avto/reset-password.html) açır. Etibarlı link yoxlanandan sonra iki parol xanası görünür; səhv və ya köhnə linkdə yeni məktub istəmək olur. 60 Node, 79 brauzer və yeni səhifəyə aid 15 görünüş yoxlaması keçib. Əhatə: [DEDICATED_RECOVERY.md](DEDICATED_RECOVERY.md).
 
 ## Əvvəlki bərpa və məlumat səhifələri

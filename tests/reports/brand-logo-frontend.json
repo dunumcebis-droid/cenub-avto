@@ -1,0 +1,21 @@
+{
+  "nodeTestsPassed": 60,
+  "browserTestsPassed": 79,
+  "browserDurationSeconds": 112.397,
+  "mockedResponsiveLayoutsPassed": 48,
+  "javascriptSyntaxFilesPassed": 11,
+  "originalImagesPreserved": 46,
+  "logoBytes": 42437,
+  "logoDimensions": [
+    1232,
+    1280
+  ],
+  "logoSha256": "34dbfc142c2317412827da3d377f3e1eee732e9d9ca37fb3b7408e0942bef94f",
+  "logoByteExactCopy": true,
+  "newSlogan": "Xəyal etdiyin avtomobili kəşf et",
+  "oldRuntimeSloganAbsent": true,
+  "browserNetwork": "fully mocked",
+  "realEmailsSentByAutomatedSuite": 0,
+  "realPasswordWritesByAutomatedSuite": 0,
+  "privateAuthMetadataIncluded": false
+}

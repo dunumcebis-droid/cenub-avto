@@ -1,14 +1,16 @@
 /* Additive enhancements. Existing catalog, filtering and listing functions remain intact. */
 (function(){
 const toolsBar=document.getElementById('caToolsBar');
+const siteHeader=document.querySelector?.('body > header');
 function syncToolsClearance(){
+ if(siteHeader)document.documentElement.style.setProperty('--ca-header-clearance',Math.ceil(siteHeader.getBoundingClientRect().height+12)+'px');
  if(!toolsBar)return;
  const clearance=Math.max(0,window.innerHeight-toolsBar.getBoundingClientRect().top)+16;
  document.documentElement.style.setProperty('--ca-tools-clearance',Math.ceil(clearance)+'px');
 }
 if(toolsBar){
- if(typeof ResizeObserver==='function')new ResizeObserver(syncToolsClearance).observe(toolsBar);
- else if(typeof MutationObserver==='function')new MutationObserver(syncToolsClearance).observe(toolsBar,{attributes:true,subtree:true,attributeFilter:['style','class','hidden']});
+ if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(syncToolsClearance);observer.observe(toolsBar);if(siteHeader)observer.observe(siteHeader);}
+ else if(typeof MutationObserver==='function'){const observer=new MutationObserver(syncToolsClearance);const options={attributes:true,subtree:true,attributeFilter:['style','class','hidden']};observer.observe(toolsBar,options);if(siteHeader)observer.observe(siteHeader,{...options,childList:true,characterData:true});}
  window.addEventListener('resize',syncToolsClearance);
  document.fonts?.ready.then(syncToolsClearance);
  syncToolsClearance();
