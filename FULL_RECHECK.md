@@ -34,4 +34,12 @@ Yeni təhlükəsizlik məsləhəti yaranmayıb. Bağlı admin/ödəniş cədvəl
 
 ## Canlı yayım
 
-Yoxlanmış düzəlişlərin commit-i və canlı fayl/API/brauzer nəticələri yayımdan sonra qeyd olunur. Əvvəlki mərhələlərin nəticələri [ADMIN_AUTH_VERIFICATION.md](ADMIN_AUTH_VERIFICATION.md) və [VERIFICATION.md](VERIFICATION.md) sənədlərində saxlanılır.
+- Yoxlanmış tətbiq commit-i: [`750bf5ed1c188d44598dbe87fe6911132fd5ac4b`](https://github.com/dunumcebis-droid/cenub-avto/commit/750bf5ed1c188d44598dbe87fe6911132fd5ac4b).
+- [GitHub Pages yayımı 42372286732](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/42372286732) uğurla bitib. Sonrakı hesabat commit-i tətbiq fayllarını dəyişmir.
+- 2 real aktiv elan və 1 VIP elan anonim API-də HTTP 200 ilə yoxlanıb. Gözləyən elan və daxili admin qeydi açılmayıb. Marka filtri və sıfırlama, real kart məlumatları, şəkillərin açılması, detallar, əlaqə linkləri və qalereya 1440/375 px ekranlarda uyğundur.
+- Canlı BMW siyahısında X5/X3/Z4/i3/iX ilkin açılışda mövcuddur; yazılı M3 axtarışı qruplaşdırmanı saxlayır. Real elanlar müqayisəyə əlavə olunub və API yenilənməsindən sonra cədvəl cari məlumatlarla uyğun qalıb.
+- Bərpa ekranı açılıb və etibarsız saxta token real Auth serverində rədd edilib; URL təmizlənib. Əlavə e-poçt və parol dəyişikliyi edilməyib.
+- Bütün **59 statik fayl**, o cümlədən **46 dəyişdirilməmiş şəkil**, yoxlanmış məzmunla bayt səviyyəsində eynidir. Səhifədə JavaScript xətası və gözlənilməz yazı cəhdi yoxdur.
+- Hesabatlar: [canlı brauzer/API](tests/reports/full-recheck-live.json), [bütün statik fayllar](tests/reports/full-recheck-static-live.json).
+
+Əvvəlki mərhələlərin nəticələri [ADMIN_AUTH_VERIFICATION.md](ADMIN_AUTH_VERIFICATION.md) və [VERIFICATION.md](VERIFICATION.md) sənədlərində saxlanılır.

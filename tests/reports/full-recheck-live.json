@@ -1,0 +1,93 @@
+{
+  "kind": "actual live split frontend + real read-only paginated API",
+  "pageStatus": 200,
+  "expectedCommit": "750bf5ed1c188d44598dbe87fe6911132fd5ac4b",
+  "htmlSha256": "0b6165d01dc9b4122d87c582f4de23c33db0ee40a878b98688d368465b9adac5",
+  "verifiedStaticFileCount": 13,
+  "allFetchedStaticFilesExact": true,
+  "browseResponses": [
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 1,
+      "total": 1,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    }
+  ],
+  "publicActiveRowsOnly": true,
+  "internalNoteExcluded": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "deployedBMWInitialModelsPassed": true,
+  "deployedBMWGroupedSearchPassed": true,
+  "deployedComparisonRefreshPassed": true,
+  "deployedRecoveryUiPassed": true,
+  "invalidRecoveryRejectedByRealAuth": true,
+  "callbackCredentialsScrubbed": true,
+  "realRecoveryEmailsSent": 0,
+  "realPasswordWrites": 0,
+  "pageErrors": [],
+  "blockedWrites": []
+}
