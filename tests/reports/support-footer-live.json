@@ -1,0 +1,141 @@
+{
+  "kind": "actual live split frontend + real read-only paginated API",
+  "pageStatus": 200,
+  "expectedCommit": "8e44f65659c020ea0898aab57897d47d0f9f4fe5",
+  "htmlSha256": "deb44f1b18c0021e16351bc34c4affdfb1a53db1d6dca2791d78132929627fad",
+  "verifiedStaticFileCount": 13,
+  "allFetchedStaticFilesExact": true,
+  "browseResponses": [
+    {
+      "status": 200,
+      "items": 3,
+      "total": 3,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    },
+    {
+      "status": 200,
+      "items": 1,
+      "total": 1,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    },
+    {
+      "status": 200,
+      "items": 3,
+      "total": 3,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    },
+    {
+      "status": 200,
+      "items": 3,
+      "total": 3,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    },
+    {
+      "status": 200,
+      "items": 3,
+      "total": 3,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    },
+    {
+      "status": 200,
+      "items": 3,
+      "total": 3,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 2,
+      "today_approved": 1
+    }
+  ],
+  "publicActiveRowsOnly": true,
+  "internalNoteExcluded": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 320,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "deployedBMWInitialModelsPassed": true,
+  "deployedBMWGroupedSearchPassed": true,
+  "deployedComparisonRefreshPassed": true,
+  "deployedRecoveryUiPassed": true,
+  "deployedFeedbackUiHelperPassed": true,
+  "feedbackBackdropCoversFloatingTools": true,
+  "deployedPackagePaymentNoticePassed": true,
+  "realSellerSubmissions": 0,
+  "realPackageApprovals": 0,
+  "invalidRecoveryRejectedByRealAuth": true,
+  "callbackCredentialsScrubbed": true,
+  "realRecoveryEmailsSent": 0,
+  "realPasswordWrites": 0,
+  "supportPhoneLinkPassed": true,
+  "supportEmailLinkPassed": true,
+  "supportAnchorPassed": true,
+  "anonymousAdminLauncherHidden": true,
+  "supportFooterLayouts": [
+    {
+      "width": 320,
+      "footerFullyAboveTools": true,
+      "buttonsDoNotOverlap": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 375,
+      "footerFullyAboveTools": true,
+      "buttonsDoNotOverlap": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 430,
+      "footerFullyAboveTools": true,
+      "buttonsDoNotOverlap": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 768,
+      "footerFullyAboveTools": true,
+      "buttonsDoNotOverlap": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "footerFullyAboveTools": true,
+      "buttonsDoNotOverlap": true,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "smtpConfigChanged": false,
+  "pageErrors": [],
+  "blockedWrites": []
+}

@@ -23,6 +23,12 @@ Hesabatlar: [frontend](tests/reports/support-footer-frontend.json), [21 görün�
 
 ## Canlı yoxlama
 
-Yayım və canlı nəticələr bu hissədə qeyd ediləcək.
+- Tətbiq commit-i: [8e44f65](https://github.com/dunumcebis-droid/cenub-avto/commit/8e44f65659c020ea0898aab57897d47d0f9f4fe5). [Pages yayımı 42396095671](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/42396095671) uğurla bitib.
+- Telefon və e-poçt keçidləri, footer-dən dəstək bölməsinə keçid canlı səhifədə yoxlanıb. Heç bir zəng və məktub göndərilməyib.
+- 320, 375, 430, 768 və 1440 px enlərdə footer-in tamamı alət panelindən yuxarı görünür; düymələr bir-birini örtmür və üfüqi daşma yoxdur. 375 px ekran görüntüsünə ayrıca baxılıb. Qonaq üçün admin düyməsi gizlidir. Adminin responsive vəziyyətləri saxta API cavabları ilə yuxarıdakı 21 görünüşdə yoxlanıb.
+- Canlı serverdən həmin anda oxunan **3 aktiv elan və 2 VIP** 1440/375/320 px görünüşlərdə kartlar, məlumatlar və yüklənmiş foto URL-ləri ilə tutuşdurulub. Detallar, qalereya, əlaqə linkləri, filtr/sıfırlama, BMW seçimi və müqayisə yenilənməsi keçib. Açıq cavabda gözləyən elan və daxili qeyd yoxdur.
+- Yayımlanmış bərpa ekranı, saxta etibarsız tokenin Auth tərəfindən rəddi, URL təmizlənməsi və saytın bildiriş pəncərəsi də işləyir. Yeni bərpa məktubu göndərilməyib, parol və SMTP ayarı dəyişdirilməyib.
+- Bütün **59 statik fayl**, o cümlədən **46 dəyişdirilməmiş şəkil**, yoxlanmış tətbiq commit-i ilə bayt səviyyəsində eynidir. JavaScript xətası və gözlənilməz yazı cəhdi yoxdur.
+- Hesabatlar: [canlı brauzer/API](tests/reports/support-footer-live.json), [bütün statik fayllar](tests/reports/support-footer-static-live.json). Sonrakı hesabat commit-i tətbiq fayllarını dəyişmir.
 
 Sayt başqa telefondan da açıqdır: https://dunumcebis-droid.github.io/cenub-avto/ . Elanlara baxmaq üçün giriş tələb olunmur; şəxsi kabinet və admin əməliyyatları müvafiq hesaba bağlıdır.
