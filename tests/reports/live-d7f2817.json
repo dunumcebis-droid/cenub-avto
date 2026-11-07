@@ -1,0 +1,58 @@
+{
+  "kind": "actual live split frontend + real read-only paginated API",
+  "pageStatus": 200,
+  "expectedCommit": "d7f28170008d122c8b83b2e4a0bf3e78e31a1612",
+  "htmlSha256": "4947c1068698d7d118ac42b15685aab996f9a9fd21ef1100dcf87cba3c55dd28",
+  "verifiedStaticFileCount": 11,
+  "allFetchedStaticFilesExact": true,
+  "browseResponses": [
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 1,
+      "total": 1,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    },
+    {
+      "status": 200,
+      "items": 2,
+      "total": 2,
+      "page": 1,
+      "page_size": 24,
+      "vip_items": 1,
+      "today_approved": 0
+    }
+  ],
+  "publicActiveRowsOnly": true,
+  "internalNoteExcluded": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 2,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "allRealDetailsContactGalleryDescriptionPassed": true,
+  "serverFilterAndResetPassed": true,
+  "pageErrors": [],
+  "blockedWrites": []
+}

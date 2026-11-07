@@ -1,0 +1,31 @@
+{
+  "migration": "20261107060719_fix_listing_management_and_paginated_browse",
+  "rollbackChecks": 59,
+  "existingListingRows": 7,
+  "existingPaymentRows": 2,
+  "existingRowsPhotosPackagesUnchanged": true,
+  "status": {
+    "aktiv": 2,
+    "gozlemede": 5
+  },
+  "publicBrowse": {
+    "page": 1,
+    "items": 2,
+    "total": 2,
+    "page_size": 24,
+    "vip_items": 1,
+    "only_active": true,
+    "total_pages": 1,
+    "today_approved": 0,
+    "public_key_count": 29,
+    "no_internal_notes": true
+  },
+  "privileges": {
+    "browse_invoker": true,
+    "anon_private_note_denied": true,
+    "auth_private_note_denied": true,
+    "auth_package_insert_denied": true,
+    "auth_package_update_denied": true,
+    "event_trigger_client_execute_denied": true
+  }
+}

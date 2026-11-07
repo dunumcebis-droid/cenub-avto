@@ -1,6 +1,6 @@
 # Cənub Avto — dəyişiklik və yoxlama qeydləri
 
-Bu sənəd cari işçi versiyada hazırlanmış düzəlişləri və onların yoxlama nəticələrini təsvir edir. Supabase miqrasiyası tətbiq edilib və aşağıdakı baza yoxlamaları keçib. `main`-ə göndərilmə, GitHub Pages-də yeni versiyanın yoxlanması və son frontend test nəticələrinin qeyd edilməsi **gözləmədədir**.
+Düzəlişlər `main`-ə göndərilib, Supabase miqrasiyası tətbiq edilib və GitHub Pages-də yayımlanmış versiya real elanlarla yoxlanıb. Aşağıdakı nəticələr 7 noyabr 2026-cı il yoxlamasına aiddir.
 
 Əvvəlki açıq elan oxuma icazəsi haqqında [PUBLIC_LISTING_ACCESS.md](PUBLIC_LISTING_ACCESS.md) tarixi qeyd kimi saxlanılır. Oradakı elan sayları və yoxlama nəticələri əvvəlki mərhələyə aiddir.
 
@@ -91,10 +91,17 @@ Sızmış parolların yoxlanması **söndürülmüş qalır**. Mövcud Supabase 
 
 Performans məsləhətlərində yeni yaradılmış **3 istifadə olunmamış indeks üçün INFO** və mövcud admin/açıq oxuma/satıcı siyasətlərinin yaratdığı çoxsaylı icazəverici `SELECT`/`UPDATE` siyasəti qeydləri qalır. İstinadlar: [istifadə olunmamış indeks](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index), [çoxsaylı icazəverici siyasətlər](https://supabase.com/docs/guides/database/database-linter?lint=0006_multiple_permissive_policies).
 
-## Yekun sübutlar — gözləmədə
+## GitHub və canlı yayım sübutları
 
-- GitHub `main` commit-i, GitHub Pages yayımının uğuru, yayımlanmış HTML və aktivlərin həmin commit-lə uyğunluğu.
-- Real anonim API ilə canlı kartlar, şəkillər, detallar, VIP görünüşü, səhifələmə və mobil/masaüstü ekran yoxlaması.
+- Tətbiq kodu commit-i: [`d7f28170008d122c8b83b2e4a0bf3e78e31a1612`](https://github.com/dunumcebis-droid/cenub-avto/commit/d7f28170008d122c8b83b2e4a0bf3e78e31a1612). `main`-ə göndərilib.
+- [GitHub Pages yayımı 42345930118](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/42345930118) uğurla bitib. Sonrakı sənədləşdirmə commit-i tətbiq fayllarını dəyişmir.
+- Canlı HTML, 8 JavaScript, CSS və yüklənmiş yerli şəkil daxil olmaqla 11 statik fayl yoxlanmış işçi fayllarla bayt səviyyəsində eynidir. HTML SHA-256: `4947c1068698d7d118ac42b15685aab996f9a9fd21ef1100dcf87cba3c55dd28`.
+- Həqiqi anonim REST API HTTP 200 qaytarır: 2 aktiv elan, 1 VIP, 24/səhifə və bu gün üçün 0 təsdiq. Marka filtri 1 nəticə qaytarıb, sıfırlama 2 nəticəni bərpa edib.
+- 1440 və 375 px ekranlarda real kartların məlumatları, şəkillərin açılması və çərçivəsi, üfüqi daşmanın olmaması yoxlanıb. Detallar, telefon linkləri, qalereya və təsvirlər real API məlumatları ilə uyğun gəlir.
+- İlkin yüklənmiş şəkil URL-ləri dəyişməyib. Canlı yoxlama yalnız oxuma sorğularına icazə verib; gözlənilməz yazı cəhdi və JavaScript xətası olmayıb. 600 elanlıq bütün səhifələr ayrıca geri qaytarılan DB sınağında, 501-ci elana keçid isə brauzer sınağında yoxlanıb.
+- Hesabatlar: [59 DB yoxlaması](tests/reports/db-regression.json), [miqrasiyadan sonrakı qorunma/icazə nəticələri](tests/reports/postmigration.json), [real canlı yoxlama](tests/reports/live-d7f2817.json).
+
+Mövcud elanlardan birinin yüklənmiş şəkli köhnə `permission denied for table profiller` xəta ekranının şəklidir. Bu, cari saytda açılmış canlı xəta pəncərəsi deyil; istifadəçinin şəkillərinə toxunmamaq tələbinə görə dəyişdirilməyib.
 
 ## Bank ödənişi üçün asılılıq
 

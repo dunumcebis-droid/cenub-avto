@@ -14,7 +14,7 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Elan siyahısı serverdə süzülür və sıralanır, səhifədə 24 elan göstərilir. Ümumi say üçün kodda əvvəlki 500 elan məhdudiyyəti yoxdur. Satıcının elanları ayrıca 100-lük hissələrlə oxunur.
 - «Bu gün təsdiqlənən» göstəricisi server hesabından gəlir; sıfır düzgün göstərilir. Uğursuz sorğu əvvəlki uğurlu məlumatları silmir, köhnə sorğu cavabı yeni səhifəni əvəz etmir.
 
-Serverdə səhifələmə və elan idarəetməsi üçün `20261107060719_fix_listing_management_and_paginated_browse` Supabase miqrasiyası tətbiq edilib; 59 geri qaytarılan SQL yoxlaması keçib. Tətbiq olunan SQL-in istinadı [database/applied-listing-management.sql](database/applied-listing-management.sql) faylındadır. Son kod üzərində 55 Node və 19 Chromium testi keçib. Yeni canlı yayımın yoxlanması gözləmədədir; sübutlar [VERIFICATION.md](VERIFICATION.md) sənədində toplanır.
+Serverdə səhifələmə və elan idarəetməsi üçün `20261107060719_fix_listing_management_and_paginated_browse` Supabase miqrasiyası tətbiq edilib; 59 geri qaytarılan SQL yoxlaması keçib. Tətbiq olunan SQL-in istinadı [database/applied-listing-management.sql](database/applied-listing-management.sql) faylındadır. Son kod üzərində 55 Node və 19 Chromium testi keçib. GitHub Pages yayımı və real elanlarla 1440/375 px canlı yoxlama da uğurludur; sübutlar [VERIFICATION.md](VERIFICATION.md) sənədində toplanır.
 
 ## Fayllar və şəkillərin qorunması
 
@@ -44,7 +44,7 @@ for script in assets/js/*.js; do node --check "$script" || exit; done
 git diff --check
 ```
 
-Node testləri daxili test kitabxanasından istifadə edir. Python testləri üçün `playwright` paketi və Chromium lazımdır; brauzerin yolunu `CHROMIUM_PATH` ilə göstərmək olar. Yoxlama əhatəsi və canlı yayım üçün gözləyən addımlar [VERIFICATION.md](VERIFICATION.md) sənədindədir.
+Node testləri daxili test kitabxanasından istifadə edir. Python testləri üçün `playwright` paketi və Chromium lazımdır; brauzerin yolunu `CHROMIUM_PATH` ilə göstərmək olar. Yoxlama əhatəsi və canlı yayım nəticələri [VERIFICATION.md](VERIFICATION.md) sənədindədir.
 
 ## Ödənişin vəziyyəti
 
