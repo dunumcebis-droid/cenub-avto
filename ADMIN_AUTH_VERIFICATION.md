@@ -49,4 +49,10 @@ Brauzer sınaqları hər şəbəkə sorğusunu əvəz edir. **Həqiqi e-poçt g�
 
 ## Yekun yayım
 
-Yekun 35 brauzer nəticəsi, GitHub commit-i və canlı yoxlama nəticəsi faktiki icradan sonra əlavə edilir.
+- Tətbiq commit-i: [`7f13e4727388aadf0c18170117fe3b36382a1945`](https://github.com/dunumcebis-droid/cenub-avto/commit/7f13e4727388aadf0c18170117fe3b36382a1945).
+- [GitHub Pages yayımı 42369959393](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/42369959393) uğurludur. Sonrakı hesabat commit-i tətbiq fayllarını dəyişmir.
+- Canlı saytda 2 real aktiv elan və 1 VIP elan, marka filtri/sıfırlama, detallar, telefon linkləri, qalereya və təsvirlər 1440/375 px ekranlarda yoxlanıb. JavaScript xətası və gözlənilməz yazı cəhdi yoxdur.
+- Canlı «Şifrəni unutdum» ekranı açılıb. Həqiqi Auth serverinə yalnız etibarsız saxta tokenlə oxuma sorğusu verilib: bərpa rədd edilib, yeni link istəmə ekranı göstərilib, token URL və yaddaşdan təmizlənib, normal sessiya yaradılmayıb.
+- Brauzerdə yüklənən 13 statik fayl, ayrıca tam müqayisədə isə bütün **59 statik fayl və onların daxilindəki 46 şəkil** yoxlanmış məzmunla bayt səviyyəsində eynidir. Canlı HTML SHA-256: `0b6165d01dc9b4122d87c582f4de23c33db0ee40a878b98688d368465b9adac5`.
+- Hesabatlar: [58 Node / 35 brauzer nəticəsi](tests/reports/admin-auth-frontend.json), [real canlı yoxlama](tests/reports/live-admin-auth-7f13e47.json), [bütün statik fayllar](tests/reports/admin-auth-static-live.json).
+- Real bərpa məktubunun göndərilməsi və çatdırılması ayrıca alıcı/icazə gözləyir. Bu sınaq aparılmadığı üçün SMTP və redirect ayarlarının bütün istifadəçilər üçün işlədiyi iddia edilmir. Heç bir real parol dəyişdirilməyib.

@@ -1,0 +1,7 @@
+{
+  "kind": "actual live static-file byte comparison",
+  "applicationCommit": "7f13e4727388aadf0c18170117fe3b36382a1945",
+  "verifiedFiles": 59,
+  "imageFiles": 46,
+  "allExact": true
+}
