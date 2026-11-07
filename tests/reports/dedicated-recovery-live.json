@@ -1,0 +1,43 @@
+{
+  "pageStatus": 200,
+  "expectedCommit": "d622d3a377ac990a6f34568b675cdb1a6d13aef7",
+  "htmlSha256": "de4386698bbb05b62d13b73731a5bddde99a38c1aebb6932611965e47c3d8ca0",
+  "verifiedStaticFileCount": 17,
+  "allFetchedStaticFilesExact": true,
+  "publicActiveRowsOnly": true,
+  "originalPhotoUrlsPreserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 375,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    },
+    {
+      "width": 320,
+      "realCards": 3,
+      "imagesDecoded": true,
+      "metadataAndPhotoFramesValid": true
+    }
+  ],
+  "standaloneSupportPagePassed": true,
+  "standaloneAboutPagePassed": true,
+  "contactIntentLinksPassed": true,
+  "returnToListingsPassed": true,
+  "dedicatedResetRetryPassed": true,
+  "dedicatedResetInvalidTokenRejected": true,
+  "dedicatedResetNoListingApp": true,
+  "dedicatedResetMobileAndLandscapePassed": true,
+  "pageErrors": [],
+  "blockedWrites": [],
+  "authProbeData": "synthetic invalid tokens only",
+  "realEmailsSentByThisProbe": 0,
+  "realPasswordWritesByThisProbe": 0,
+  "privateAuthMetadataIncluded": false
+}

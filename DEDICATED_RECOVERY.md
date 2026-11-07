@@ -17,4 +17,12 @@ Brauzer dəsti tam saxta API cavabları ilə işləyir: etibarlı fragment və t
 
 Yeni səhifə və skriptlə tətbiqin statik fayl sayı 63 olur; 46 ilkin şəkil dəyişdirilmir. Şəxsi Auth/göndəriş qeydləri, tokenlər və bərpa linkləri açıq repozitoriyaya daxil edilmir. Real yeni məktub sınağı ayrıca icazə ilə aparılır.
 
-Canlı yayım nəticəsi əlavə ediləcək. Ümumi SMTP/yönləndirmə ayarları [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md) sənədindədir.
+## Canlı yayım
+
+[d622d3a](https://github.com/dunumcebis-droid/cenub-avto/commit/d622d3a377ac990a6f34568b675cdb1a6d13aef7) tətbiq commit-i [Pages yayımı 42418018077](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/42418018077) ilə uğurla yayımlanıb. Yeni səhifə, etibarsız sintetik token üçün təkrar forma, 320/375 px və üfüqi görünüş, qalan sayt səhifələri canlıda yoxlanıb. JavaScript xətası və gözlənilməz yazı cəhdi yoxdur.
+
+Bütün 63 statik fayl və 46 şəkil yoxlanmış tətbiq commit-i ilə bayt səviyyəsində eynidir. Canlı yoxlama real hesab tokeni və ya parolu istifadə etmir; real məktub sınağının nəticəsi bu hesabatın iddiası deyil. Məktubdakı etibarlı keçid istifadəçi tərəfindən ayrıca yoxlanmalıdır. Səhifəni tokensiz açmaq yalnız yeni link istəmək formasını göstərir.
+
+Hesabatlar: [frontend dəstləri](tests/reports/dedicated-recovery-frontend.json), [görünüşlər](tests/reports/dedicated-recovery-layouts.json), [canlı sintetik keçidlər](tests/reports/dedicated-recovery-live.json), [63 statik fayl](tests/reports/dedicated-recovery-static-live.json). Sonrakı hesabat commit-i tətbiq fayllarını dəyişmir.
+
+Ümumi SMTP/yönləndirmə ayarları [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md) sənədindədir.
