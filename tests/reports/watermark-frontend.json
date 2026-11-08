@@ -1,0 +1,18 @@
+{
+  "nodeTestsPassed": 60,
+  "existingBrowserTestsPassed": 79,
+  "existingBrowserDurationSeconds": 142.176,
+  "newWatermarkBrowserTestsPassed": 5,
+  "newWatermarkBrowserDurationSeconds": 22.961,
+  "totalBrowserTestsPassed": 84,
+  "javascriptSyntaxFilesPassed": 11,
+  "originalImagesPreserved": 46,
+  "originalPhotoUrlsUnchanged": true,
+  "preparedAndUploadedJpegPixelChecksPassed": true,
+  "portraitLandscapePanoramaAt3203751440Passed": true,
+  "mobileGallery48vhPreserved": true,
+  "knownEmbeddedWatermarkNotDuplicated": true,
+  "realUploads": 0,
+  "realDataWrites": 0,
+  "realEmailsSent": 0
+}

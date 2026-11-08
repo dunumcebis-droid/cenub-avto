@@ -275,25 +275,43 @@ function caChangePage(delta){
  if(caBrowseState.loading||page<1||page>caBrowseState.totalPages)return;
  const request=caFetchListings(page);document.getElementById('elanlar').scrollIntoView({behavior:'smooth'});return request;
 }
+// Mark only blobs that were actually stamped; unsupported originals stay intact.
+const caWatermarkedPhotos=new WeakSet();
+function caDrawPhotoWatermark(context,width,height){
+ const label='CƏNUB AVTO';
+ let size=Math.max(.1,Math.min(width*.085,height*.16));
+ context.save();
+ context.font='italic 800 '+size+'px Arial, sans-serif';
+ const measured=context.measureText(label).width;
+ if(measured>width*.65){size*=width*.65/measured;context.font='italic 800 '+size+'px Arial, sans-serif';}
+ context.textAlign='center';context.textBaseline='middle';context.globalAlpha=.24;
+ context.fillStyle='#fff';context.strokeStyle='#071321';context.lineWidth=Math.max(.25,size*.025);
+ context.shadowColor='rgba(0,0,0,.65)';context.shadowBlur=Math.max(.25,size*.07);
+ context.strokeText(label,width/2,height/2);context.fillText(label,width/2,height/2);
+ context.restore();
+}
 async function caPreparePhoto(file){
  if(!file.type.startsWith('image/'))throw Error('Yalnız şəkil faylları seç.');
  if(file.size>25*1024*1024)throw Error('Şəkil 25 MB-dan böyükdür.');
- const bitmap=await createImageBitmap(file).catch(()=>null);
+ const bitmap=typeof createImageBitmap==='function'?await createImageBitmap(file).catch(()=>null):null;
  if(!bitmap){if(file.size>5*1024*1024)throw Error('Bu şəkil sıxıla bilmədi (5 MB limiti).');return file;}
  const scale=Math.min(1,1440/Math.max(bitmap.width,bitmap.height));
  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
- canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+ const context=canvas.getContext('2d');
+ if(!context){bitmap.close();throw Error('Şəkil hazırlanmadı.');}
+ context.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+ caDrawPhotoWatermark(context,canvas.width,canvas.height);
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.72));
- if(!blob)throw Error('Şəkil hazırlanmadı.');return blob;
+ if(!blob)throw Error('Şəkil hazırlanmadı.');caWatermarkedPhotos.add(blob);return blob;
 }
 async function caUploadPhoto(file,token,onProgress,owner=currentUser?.id,submission=caListingSubmissionSequence){
  const blob=await caPreparePhoto(file);
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
- const path=owner+'/'+crypto.randomUUID()+'.jpg';
+ const path=owner+'/'+crypto.randomUUID()+(caWatermarkedPhotos.has(blob)?'-ca-wm1':'')+'.jpg';
  return await new Promise((resolve,reject)=>{
   const xhr=new XMLHttpRequest();xhr.open('POST',CA_URL+'/storage/v1/object/elan-sekilleri/'+path);
   xhr.setRequestHeader('apikey',CA_KEY);xhr.setRequestHeader('Authorization','Bearer '+token);
-  xhr.setRequestHeader('Content-Type','image/jpeg');xhr.setRequestHeader('x-upsert','false');
+  xhr.setRequestHeader('Content-Type',blob.type||'image/jpeg');xhr.setRequestHeader('x-upsert','false');
   xhr.upload.onprogress=e=>{if(e.lengthComputable)onProgress(e.loaded/e.total);};
   xhr.onload=()=>{if(xhr.status>=200&&xhr.status<300){onProgress(1);resolve(CA_URL+'/storage/v1/object/public/elan-sekilleri/'+path);}else reject(Error('Şəkil yüklənmədi: '+(xhr.responseText||xhr.status)));};
   xhr.onerror=()=>reject(Error('İnternet bağlantısı kəsildi.'));xhr.ontimeout=()=>reject(Error('Şəkil yüklənməsi vaxtı bitdi.'));xhr.timeout=90000;xhr.send(blob);
@@ -401,7 +419,7 @@ function renderBuyerFavorites(){
  element.innerHTML=notice+(saved.map(card).join('')||(!caPrivateState.favoritesError?'<div class="empty">'+empty+'</div>':''));
 }
 
-function renderCabinet(){const mine=myCars();const list=document.getElementById('cabinetList');document.getElementById('cabTotal').textContent=mine.length;document.getElementById('cabVip').textContent=mine.filter(c=>c.pack==='VIP').length;if(!mine.length){list.innerHTML=caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':caPrivateState.ownLoading?'<div class="empty">Elanların yüklənir...</div>':'<div class="empty">Hələ şəxsi elan yerləşdirməmisən. İlk elanını əlavə et.</div>';return;}list.innerHTML=(caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. Əvvəlki məlumatlar göstərilir. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':'')+mine.map(c=>{const photo=c.photo||firstCarPhoto(c);const statusLabel=({'gozlemede':'Təsdiq gözləyir','aktiv':'Təsdiqlənib','reddedildi':'Rədd edilib'})[c.veziyyet]||'Status: '+String(c.veziyyet||'naməlum');return `<article class="cabinet-card">${photo?`<img loading="lazy" decoding="async" src="${esc(photo)}" alt="Avtomobil">`:'<div class="photo photo-placeholder" style="height:78px;border-radius:8px">Foto yoxdur</div>'}<div><b>${esc(c.make)} ${esc(c.model)}</b><div class="price" style="font-size:17px">${esc(caFormatPrice(c.price))}</div><div class="meta">${esc(c.year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))} · ${esc(packageName(c.pack))}</div><div class="ca-cab-status">${esc(statusLabel)}</div></div><div class="cab-actions"><button onclick="editCar('${c._id}')">Redaktə et</button><button class="delete" onclick="deleteCar('${c._id}')">Sil</button></div></article>`}).join('')}
+function renderCabinet(){const mine=myCars();const list=document.getElementById('cabinetList');document.getElementById('cabTotal').textContent=mine.length;document.getElementById('cabVip').textContent=mine.filter(c=>c.pack==='VIP').length;if(!mine.length){list.innerHTML=caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':caPrivateState.ownLoading?'<div class="empty">Elanların yüklənir...</div>':'<div class="empty">Hələ şəxsi elan yerləşdirməmisən. İlk elanını əlavə et.</div>';return;}list.innerHTML=(caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. Əvvəlki məlumatlar göstərilir. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':'')+mine.map(c=>{const photo=c.photo||firstCarPhoto(c);const statusLabel=({'gozlemede':'Təsdiq gözləyir','aktiv':'Təsdiqlənib','reddedildi':'Rədd edilib'})[c.veziyyet]||'Status: '+String(c.veziyyet||'naməlum');return `<article class="cabinet-card">${photo?caListingPhotoMarkup(photo,'Avtomobil','cabinet'):'<div class="photo photo-placeholder" style="height:78px;border-radius:8px">Foto yoxdur</div>'}<div><b>${esc(c.make)} ${esc(c.model)}</b><div class="price" style="font-size:17px">${esc(caFormatPrice(c.price))}</div><div class="meta">${esc(c.year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))} · ${esc(packageName(c.pack))}</div><div class="ca-cab-status">${esc(statusLabel)}</div></div><div class="cab-actions"><button onclick="editCar('${c._id}')">Redaktə et</button><button class="delete" onclick="deleteCar('${c._id}')">Sil</button></div></article>`}).join('')}
 async function deleteCar(id){
  const c=myCars().find(x=>x._id===id);if(!c)return;
  const owner=currentUser.id;
@@ -826,6 +844,33 @@ listingModelEl.addEventListener('change',updateEngineSuggestions);
 
 function allCars(){return caRemoteCars.filter(c=>c.veziyyet==='aktiv' || c.status==='aktiv')}
 function packageName(pack){return ({VIP:'Önə çıxarılan',Premium:'Üstün',Standart:'Sərfəli seçim',Pulsuz:'Pulsuz'})[pack]||'Pulsuz';}
+// Existing photo URLs stay intact; only newly stamped uploads omit the display mark.
+function caHasEmbeddedWatermark(src){
+ try{
+  const url=new URL(String(src)),origin=new URL(CA_URL).origin;
+  return url.origin===origin&&/^\/storage\/v1\/object\/public\/elan-sekilleri\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-ca-wm1\.jpg$/i.test(url.pathname);
+ }catch(error){return false;}
+}
+function caListingPhotoMarkup(src,alt,kind='cover'){
+ if(!src)return '';
+ const context=['cover','gallery','thumb','cabinet'].includes(kind)?kind:'cover';
+ return `<span class="ca-watermark-frame ca-watermark-${context}" data-ca-photo-state="loading"><img loading="lazy" decoding="async" src="${esc(src)}" alt="${esc(alt)}" onload="caListingPhotoReady(this)" onerror="caListingPhotoFailed(this)">${caHasEmbeddedWatermark(src)?'':'<span class="ca-photo-watermark" aria-hidden="true">CƏNUB AVTO</span>'}</span>`;
+}
+function caPositionPhotoWatermark(img){
+ const frame=img?.closest('.ca-watermark-frame');if(!frame||!img.naturalWidth||!img.naturalHeight)return;
+ const rect=img.getBoundingClientRect(),fit=getComputedStyle(img).objectFit;
+ const width=fit==='contain'?Math.min(rect.width,rect.height*img.naturalWidth/img.naturalHeight):rect.width;
+ const height=fit==='contain'?Math.min(rect.height,rect.width*img.naturalHeight/img.naturalWidth):rect.height;
+ frame.style.setProperty('--ca-watermark-photo-width',Math.max(0,width)+'px');
+ frame.style.setProperty('--ca-watermark-photo-height',Math.max(0,height)+'px');
+}
+function caListingPhotoReady(img){
+ const frame=img?.closest('.ca-watermark-frame');if(!frame)return;
+ frame.dataset.caPhotoState=img.naturalWidth&&img.naturalHeight?'ready':'error';
+ caPositionPhotoWatermark(img);
+}
+function caListingPhotoFailed(img){const frame=img?.closest('.ca-watermark-frame');if(frame)frame.dataset.caPhotoState='error';}
+window.addEventListener('resize',()=>document.querySelectorAll('.ca-watermark-frame[data-ca-photo-state="ready"] img').forEach(caPositionPhotoWatermark),{passive:true});
 function card(c){
  
  const flag=c.pack==='VIP'||c.pack==='Premium'?`<span class="flag">${packageName(c.pack)}</span>`:'';
@@ -833,7 +878,7 @@ function card(c){
  const carName=caCarName(c);
  const year=caValue(c.year,c.il);
  const price=caFormatPrice(c.price);
- return `<article class="car-card" role="button" tabindex="0" onclick="openCarDetailKey(decodeURIComponent('${encoded}'))" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();openCarDetailKey(decodeURIComponent('${encoded}'))}"><button type="button" class="favorite-btn ${fav?'is-favorite':''}" aria-label="${fav?'Seçilmişlərdən çıxar':'Seçilmişlərə əlavə et'}" onclick="toggleFavorite(decodeURIComponent('${encoded}'),event)">${fav?'♥':'♡'}</button><div class="photo">${flag}<span class="car-cover">${cover?`<img loading="lazy" decoding="async" src="${esc(cover)}" alt="${esc(carName)}" style="width:100%;height:100%;object-fit:cover">`:'<span class="photo-placeholder">Foto yoxdur</span>'}</span></div><div class="details"><div class="ca-visible-car-name">${esc(carName)}${year?` <span class="ca-visible-car-year">· ${esc(year)}</span>`:''}</div><div class="price">${esc(price)}</div><div class="meta">${esc(year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))}</div><div class="meta">${esc([c.fuel,c.gear].filter(Boolean).join(' · ')||'Yanacaq və sürətlər qutusu qeyd edilməyib')}</div><div class="seller">${esc(packageName(c.pack))} elan · Ətraflı bax →</div></div></article>`;
+ return `<article class="car-card" role="button" tabindex="0" onclick="openCarDetailKey(decodeURIComponent('${encoded}'))" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();openCarDetailKey(decodeURIComponent('${encoded}'))}"><button type="button" class="favorite-btn ${fav?'is-favorite':''}" aria-label="${fav?'Seçilmişlərdən çıxar':'Seçilmişlərə əlavə et'}" onclick="toggleFavorite(decodeURIComponent('${encoded}'),event)">${fav?'♥':'♡'}</button><div class="photo">${flag}<span class="car-cover">${cover?caListingPhotoMarkup(cover,carName):'<span class="photo-placeholder">Foto yoxdur</span>'}</span></div><div class="details"><div class="ca-visible-car-name">${esc(carName)}${year?` <span class="ca-visible-car-year">· ${esc(year)}</span>`:''}</div><div class="price">${esc(price)}</div><div class="meta">${esc(year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))}</div><div class="meta">${esc([c.fuel,c.gear].filter(Boolean).join(' · ')||'Yanacaq və sürətlər qutusu qeyd edilməyib')}</div><div class="seller">${esc(packageName(c.pack))} elan · Ətraflı bax →</div></div></article>`;
 }
 function firstCarPhoto(c){let groups=c.photos||{};for(const key of ['front','rear','side','interior','engine','other'])if(Array.isArray(groups[key])&&groups[key].length)return groups[key][0];return null}
 const photoCategoryNames={front:'Ön görünüş',rear:'Arxa görünüş',side:'Yan görünüş',interior:'Salon',engine:'Mühərrik',other:'Digər şəkillər'};
@@ -841,7 +886,7 @@ let activeDetailCar=null,detailPhotos=[],detailPhotoIndex=0,touchStartX=0;
 function getCarPhotos(c){let out=[];const groups=c.photos||{};for(const key of Object.keys(photoCategoryNames)){(groups[key]||[]).forEach(src=>out.push({src,category:photoCategoryNames[key]}));}if(!out.length&&c.photo)out.push({src:c.photo,category:'Avtomobil'});return out}
 function openCarDetailKey(key){const index=allCars().findIndex(car=>listingKey(car)===key);if(index>=0)openCarDetail(index);}
 function openCarDetail(id){const c=allCars()[id];if(!c)return;activeDetailCar=c;detailPhotos=getCarPhotos(c);detailPhotoIndex=0;const fields=[['Buraxılış ili',c.year??'Qeyd edilməyib'],['Şəhər / rayon',c.city],['Yürüş',caFormatMileage(c.mileage)],['Yanacaq',c.fuel||'Qeyd edilməyib'],['Sürətlər qutusu',c.gear||'Qeyd edilməyib'],['Mühərrik',c.engine||'Qeyd edilməyib'],['Ban növü',c.body||'Qeyd edilməyib'],['Rəng',c.color||'Qeyd edilməyib'],['Ötürücü',c.drive||'Qeyd edilməyib'],['Texniki vəziyyət',c.condition||'Qeyd edilməyib'],['Sahib sayı',c.owners||'Qeyd edilməyib'],['Qəza / boya',c.accident||'Qeyd edilməyib'],['Nəqliyyat növü',c.vehicleType||'Qeyd edilməyib'],['Nəsil',c.generation||'Qeyd edilməyib'],['At gücü',caFormatNumber(c.horsepower)],['Oturacaq sayı',c.seats||'Qeyd edilməyib'],['Bazar üçün',c.market||'Qeyd edilməyib'],['Təchizat',c.equipment?.join(', ')||'Qeyd edilməyib'],['Elan növü',packageName(c.pack)],['Telefon',c.phone||'Qeyd edilməyib']];document.getElementById('detailTitle').textContent=caCarName(c);document.getElementById('detailPrice').textContent=caFormatPrice(c.price);document.getElementById('detailSpecs').innerHTML=fields.map(([k,v])=>`<div class="detail-spec"><b>${esc(k)}</b>${esc(v)}</div>`).join('');const description=String(c.description||'').trim();document.getElementById('detailDescription').style.display=description?'block':'none';document.getElementById('detailDescriptionText').textContent=description;const phone=String(c.phone||'').replace(/[^+\d]/g,'');document.getElementById('detailContact').innerHTML=phone?`<a href="tel:${esc(phone)}">☎ Zəng et</a><button type="button" onclick="copyCarPhone()">Nömrəni kopyala</button>`:'<div class="detail-empty">Satıcı telefon nömrəsi qeyd etməyib.</div>';document.getElementById('detailOverlay').classList.add('open');document.body.style.overflow='hidden';renderGallery()}
-function renderGallery(){const img=detailPhotos[detailPhotoIndex];document.getElementById('galleryStage').innerHTML=img?`<img loading="lazy" decoding="async" src="${esc(img.src)}" alt="${esc(img.category)}"><span class="gallery-counter">${detailPhotoIndex+1} / ${detailPhotos.length} · ${esc(img.category)}</span>${detailPhotos.length>1?'<button class="gallery-nav gallery-prev" onclick="changeDetailPhoto(-1)" aria-label="Əvvəlki şəkil">‹</button><button class="gallery-nav gallery-next" onclick="changeDetailPhoto(1)" aria-label="Növbəti şəkil">›</button>':''}`:`<div class="gallery-empty">Şəkil əlavə edilməyib</div><span class="gallery-counter">Şəkil əlavə edilməyib</span>`;document.getElementById('galleryThumbs').innerHTML=detailPhotos.map((p,i)=>`<button class="${i===detailPhotoIndex?'active':''}" onclick="setDetailPhoto(${i})" aria-label="${i+1}-ci şəkil"><img loading="lazy" decoding="async" src="${esc(p.src)}" alt="${esc(p.category)}"></button>`).join('');document.getElementById('galleryThumbs').style.display=detailPhotos.length>1?'flex':'none'}
+function renderGallery(){const img=detailPhotos[detailPhotoIndex];document.getElementById('galleryStage').innerHTML=img?`${caListingPhotoMarkup(img.src,img.category,'gallery')}<span class="gallery-counter">${detailPhotoIndex+1} / ${detailPhotos.length} · ${esc(img.category)}</span>${detailPhotos.length>1?'<button class="gallery-nav gallery-prev" onclick="changeDetailPhoto(-1)" aria-label="Əvvəlki şəkil">‹</button><button class="gallery-nav gallery-next" onclick="changeDetailPhoto(1)" aria-label="Növbəti şəkil">›</button>':''}`:`<div class="gallery-empty">Şəkil əlavə edilməyib</div><span class="gallery-counter">Şəkil əlavə edilməyib</span>`;document.getElementById('galleryThumbs').innerHTML=detailPhotos.map((p,i)=>`<button class="${i===detailPhotoIndex?'active':''}" onclick="setDetailPhoto(${i})" aria-label="${i+1}-ci şəkil">${caListingPhotoMarkup(p.src,p.category,'thumb')}</button>`).join('');document.getElementById('galleryThumbs').style.display=detailPhotos.length>1?'flex':'none'}
 function changeDetailPhoto(step){if(!detailPhotos.length)return;detailPhotoIndex=(detailPhotoIndex+step+detailPhotos.length)%detailPhotos.length;renderGallery()}
 function setDetailPhoto(i){detailPhotoIndex=i;renderGallery()}
 function closeCarDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';activeDetailCar=null}

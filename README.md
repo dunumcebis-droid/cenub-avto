@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Elan şəkillərinə yarımşəffaf **CƏNUB AVTO** su nişanı əlavə olunub. Yeni hazırlanmış JPEG faylları yazını özündə saxlayır; əvvəlki şəkillərin orijinalları və URL-ləri dəyişmədən ekranda yazı göstərilir. 60 Node və 84 brauzer yoxlaması (79 mövcud, 5 yeni) keçib. Əhatə: [WATERMARK_VERIFICATION.md](WATERMARK_VERIFICATION.md).
+
+## Əvvəlki loqo və şüar
+
 İstifadəçinin loqosu bütün səhifələrə yerləşdirilib. Yeni şüar: **Xəyal etdiyin avtomobili kəşf et**. Loqo faylı və əvvəlki avtomobil şəkilləri dəyişdirilməyib. 60 Node, 79 brauzer və 48 responsive görünüş yoxlaması keçib. Əhatə və sübutlar: [BRANDING_VERIFICATION.md](BRANDING_VERIFICATION.md).
 
 ## Əvvəlki ayrıca parol bərpası səhifəsi
