@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Elanın böyük şəklinə toxunanda tam ekran baxışı açılır. Yaxınlaşdırma, iki barmaq, sürüşdürmə, əvvəlki/növbəti şəkil, klaviatura və geri düyməsi işləyir. Elan və tam ekran baxışı açıq olanda üzən alətlər/admin düyməsi gizlənir. Yeni toxunma ssenariləri və əlaqəli şəkil yoxlamaları: [PHOTO_VIEWER_VERIFICATION.md](PHOTO_VIEWER_VERIFICATION.md).
+
+## Əvvəlki su nişanı
+
 Elan şəkillərinə yarımşəffaf **CƏNUB AVTO** su nişanı əlavə olunub. Yeni hazırlanmış JPEG faylları yazını özündə saxlayır; əvvəlki şəkillərin orijinalları və URL-ləri dəyişmədən ekranda yazı göstərilir. 60 Node və 84 brauzer yoxlaması (79 mövcud, 5 yeni) keçib. Əhatə: [WATERMARK_VERIFICATION.md](WATERMARK_VERIFICATION.md).
 
 ## Əvvəlki loqo və şüar

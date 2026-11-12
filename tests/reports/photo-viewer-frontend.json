@@ -1,0 +1,16 @@
+{
+  "nodeTestsPassed": 60,
+  "newTouchAndMouseBrowserTestsPassed": 8,
+  "newBrowserDurationSeconds": 16.327,
+  "relatedWatermarkTestsPassed": 5,
+  "relatedCardsTestsPassed": 7,
+  "relatedComparisonTestsPassed": 8,
+  "totalRelevantBrowserTestsPassed": 28,
+  "integratedResponsiveLayoutsPassed": 8,
+  "javascriptSyntaxFilesPassed": 12,
+  "originalImagesPreserved": 46,
+  "originalPhotoUrlsUnchanged": true,
+  "realUploads": 0,
+  "realDataWrites": 0,
+  "realEmailsSent": 0
+}

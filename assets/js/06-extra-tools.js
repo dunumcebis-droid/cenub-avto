@@ -4,7 +4,7 @@ const toolsBar=document.getElementById('caToolsBar');
 const siteHeader=document.querySelector?.('body > header');
 function syncToolsClearance(){
  if(siteHeader)document.documentElement.style.setProperty('--ca-header-clearance',Math.ceil(siteHeader.getBoundingClientRect().height+12)+'px');
- if(!toolsBar)return;
+ if(!toolsBar||toolsBar.hidden)return;
  const clearance=Math.max(0,window.innerHeight-toolsBar.getBoundingClientRect().top)+16;
  document.documentElement.style.setProperty('--ca-tools-clearance',Math.ceil(clearance)+'px');
 }
@@ -14,6 +14,28 @@ if(toolsBar){
  window.addEventListener('resize',syncToolsClearance);
  document.fonts?.ready.then(syncToolsClearance);
  syncToolsClearance();
+}
+// Floating page tools must not cover or take focus from an open dialog.
+if(toolsBar){
+ const modalIds=['detailOverlay','authOverlay','vehiclePicker','generationPicker','listingFeedback','caOverlay','caAdminPanel','caPhotoViewer'];
+ const observedModals=new WeakSet();
+ let modalObserver;
+ function syncModalTools(){
+  const modals=modalIds.map(id=>document.getElementById(id)).filter(Boolean);
+  for(const modal of modals)if(modalObserver&&!observedModals.has(modal)){
+   modalObserver.observe(modal,{attributes:true,attributeFilter:['class','style','hidden']});observedModals.add(modal);
+  }
+  const blocked=modals.some(modal=>modal.classList.contains('open')||modal.classList.contains('ca-open')||modal.id==='caAdminPanel'&&modal.style.display&&modal.style.display!=='none');
+  if(toolsBar.hidden!==blocked)toolsBar.hidden=blocked;
+  if(toolsBar.inert!==blocked)toolsBar.inert=blocked;
+  const aria=blocked?'true':'false';if(toolsBar.getAttribute('aria-hidden')!==aria)toolsBar.setAttribute('aria-hidden',aria);
+  if(document.body.classList.contains('ca-content-modal-open')!==blocked)document.body.classList.toggle('ca-content-modal-open',blocked);
+  if(!blocked)syncToolsClearance();
+ }
+ if(typeof MutationObserver==='function'){
+  modalObserver=new MutationObserver(syncModalTools);modalObserver.observe(document.body,{childList:true});
+ }
+ window.caSyncToolsModalState=syncModalTools;syncModalTools();
 }
 let comparison=[],comparisonOpen=false,comparisonOwner=currentUser?.id||null;
 const comparisonRows=new Map();

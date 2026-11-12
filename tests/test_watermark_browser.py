@@ -239,6 +239,7 @@ class WatermarkBrowserTests(unittest.TestCase):
         original = copy.deepcopy(self.backend.rows)
         self.sign_in()
         self.page.evaluate('openCabinet()')
+        self.page.wait_for_function('caPrivateState.ownLoaded&&!caPrivateState.ownLoading')
         cabinet = self.page.locator('#cabinetList .cabinet-card').filter(has_text='BMW OldPortrait')
         cabinet.scroll_into_view_if_needed()
         self.assertEqual(cabinet.locator('img').get_attribute('src'), PORTRAIT)
