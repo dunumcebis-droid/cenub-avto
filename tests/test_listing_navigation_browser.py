@@ -68,6 +68,10 @@ class ListingNavigationBrowserTests(unittest.TestCase):
         self.page.add_init_script('window.alert=()=>{};window.confirm=()=>true')
 
     def tearDown(self):
+        for route in self.backend.pending_detail:
+            try:route.abort()
+            except Exception:pass
+        self.page.wait_for_timeout(15)
         self.context.close();self.assertFalse(self.errors)
         self.assertFalse([c for c in self.backend.calls if c['method'] in ('PATCH','DELETE')])
 
@@ -188,3 +192,75 @@ class ListingNavigationBrowserTests(unittest.TestCase):
         self.page.locator('#caDetailShare').wait_for(state='hidden')
         self.page.evaluate("document.getElementById('detailOverlay').dataset.adminPreview='false'")
         self.page.locator('#caShareListingBtn').wait_for(state='visible')
+
+    def ignore_fetch_abort_for_race_test(self):
+        # A response can already be in flight when navigation aborts it. Ignoring
+        # the signal exercises the sequence guard rather than only cancellation.
+        self.page.add_init_script('''(()=>{const original=window.fetch.bind(window);window.fetch=(url,options={})=>original(url,{...options,signal:undefined})})()''')
+
+    def begin_delayed_link(self):
+        self.backend.delay_detail=True
+        target=self.backend.rows[49]
+        self.go('?ad='+target['id'])
+        for _ in range(100):
+            if self.backend.pending_detail:
+                break
+            self.page.wait_for_timeout(10)
+        self.assertTrue(self.backend.pending_detail)
+        return target
+
+    def finish_delayed_link(self,target):
+        self.backend.pending_detail.pop(0).fulfill(content_type='application/json',body=json.dumps([target]))
+        self.page.wait_for_timeout(80)
+
+    def test_user_page_navigation_discards_a_late_shared_link_response(self):
+        self.ignore_fetch_abort_for_race_test()
+        target=self.begin_delayed_link()
+        self.page_number(2).tap();self.wait_page(2)
+        self.finish_delayed_link(target)
+        self.assertFalse(self.page.locator('#detailOverlay').is_visible())
+        self.assertEqual(self.page.evaluate('caBrowseState.page'),2)
+        self.assertTrue(self.page.locator('#caListingLinkNotice').is_hidden())
+
+    def test_new_search_filter_brand_sort_or_account_intent_cancels_old_shared_link(self):
+        self.ignore_fetch_abort_for_race_test()
+        for action in ('search','filter','brand','sort','price-input','cabinet','sell'):
+            with self.subTest(action=action):
+                target=self.begin_delayed_link()
+                if action in ('search','price-input'):self.page.locator('#caFilterLaunch').tap()
+                if action=='search':self.page.locator('button[onclick="searchCars()"]').first.tap()
+                elif action=='filter':self.page.locator('button.pill').filter(has_text='Önə çıxarılan').tap()
+                elif action=='brand':self.page.locator('.mercedes-tile').tap()
+                elif action=='sort':
+                    self.page.locator('#sortListings').focus()
+                    self.page.keyboard.press('ArrowDown');self.page.keyboard.press('Enter')
+                elif action=='price-input':self.page.locator('#searchPrice').fill('50000')
+                elif action=='cabinet':self.page.locator('header .back-btn').tap()
+                elif action=='sell':self.page.locator('header .header-sell').tap()
+                self.finish_delayed_link(target)
+                self.assertFalse(self.page.locator('#detailOverlay').is_visible())
+                self.assertTrue(self.page.locator('#caListingLinkNotice').is_hidden())
+
+    def test_background_render_does_not_cancel_the_initial_shared_link(self):
+        self.ignore_fetch_abort_for_race_test()
+        target=self.begin_delayed_link()
+        self.page.evaluate('render();render()')
+        self.finish_delayed_link(target)
+        self.page.locator('#detailOverlay').wait_for(state='visible')
+        self.assertIn('Listing-0049',self.page.locator('#detailTitle').inner_text())
+
+    def test_manually_opening_the_same_card_keeps_its_photo_viewer_when_old_link_finishes(self):
+        self.ignore_fetch_abort_for_race_test()
+        self.backend.delay_detail=True
+        target=self.backend.rows[0]
+        self.go('?ad='+target['id'])
+        for _ in range(100):
+            if self.backend.pending_detail:break
+            self.page.wait_for_timeout(10)
+        self.assertTrue(self.backend.pending_detail)
+        self.page.locator('#allGrid .car-card .car-cover').first.tap()
+        self.page.locator('#galleryStage .ca-gallery-open').tap()
+        self.page.locator('#caPhotoViewer').wait_for(state='visible')
+        self.finish_delayed_link(target)
+        self.assertTrue(self.page.locator('#caPhotoViewer').is_visible())
+        self.assertEqual(self.page.locator('#caPhotoViewerCanvas img').get_attribute('src'),target['sekiller'][0])

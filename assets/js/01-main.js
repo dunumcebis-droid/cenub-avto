@@ -68,6 +68,14 @@ const caBrowseState={page:1,pageSize:24,total:0,totalPages:0,loaded:false,loadin
 const caPrivateState={ownLoaded:false,ownLoading:false,ownError:false,favoritesLoaded:false,favoritesLoading:false,favoritesError:false};
 let caBrowseSequence=0,caBrowseController=null,caOwnSequence=0,caFavoritesSequence=0;
 let caListingSubmissionSequence=0,caDraftOwner=null;
+let caCreateSubmission=null,caPhotoUploadCache=new WeakMap();
+const caBusyForms=new WeakMap();
+function caSetListingFormBusy(form,busy){
+ if(busy){if(caBusyForms.has(form))return;const controls=[...form.querySelectorAll('input,select,textarea,button')].map(element=>({element,disabled:element.disabled}));caBusyForms.set(form,controls);for(const {element} of controls)element.disabled=true;form.setAttribute('aria-busy','true');}
+ else{for(const {element,disabled} of caBusyForms.get(form)||[])if(element.isConnected)element.disabled=disabled;caBusyForms.delete(form);form.removeAttribute('aria-busy');}
+}
+function caStableListingData(value){if(Array.isArray(value))return '['+value.map(caStableListingData).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+caStableListingData(value[key])).join(',')+'}';return JSON.stringify(value);}
+
 function caListingPayload(d){
  const data={...d};delete data._photoOrder;
  return {satici_id:currentUser.id,marka:d.make,model:d.model,il:d.year,qiymet:d.price,yurus:caNumber(Object.hasOwn(d,'mileage')?d.mileage:d.km),seher:d.city||'',tesvir:d.description||d.desc||'',veziyyet:'gozlemede',neqliyyat_novu:d.vehicleType||d.vehicle||'',nesil:d.generation||'',ban_novu:d.body||d.bodyType||'',yanacaq:d.fuel||'',suretler_qutusu:d.gear||'',muherrik_hecmi:caNumber(d.engine),at_gucu:Number(d.horsepower||d.hp)||null,reng:d.color||'',bazar_ucun:d.market||'',oturacaq_sayi:Number(d.seats)||null,techizat:d.equipment||[],sekiller:Array.isArray(d._photoOrder)?d._photoOrder.slice():Object.values(d.photos||{}).flat(),telefon:d.phone||currentUser.phone||'',ca_data:data};
@@ -182,7 +190,7 @@ function caRemoteToCar(r){
   color:text(r.reng,d.color,d.reng),market:text(r.bazar_ucun,d.market,d.bazar_ucun),seats:text(r.oturacaq_sayi,d.seats,d.oturacaq_sayi),
   vehicleType:text(r.neqliyyat_novu,d.vehicleType,d.vehicle,d.neqliyyat_novu),generation:text(r.nesil,d.generation,d.nesil),equipment:Array.isArray(equipment)?equipment:[],
   description:text(r.tesvir,d.description,d.desc,d.tesvir),phone:text(r.telefon,d.phone,d.telefon),ownerId:r.satici_id,ownerPhone:r.telefon,createdAt:r.yaradildi,
-  photo:storedPhotos.photo,photos:storedPhotos.photos,_photoOrder:Array.isArray(r.sekiller)?r.sekiller.slice():Object.values(storedPhotos.photos).flat(),pack:caEffectivePackage(r),packageStarts:r.paket_baslayir||null,packageEnds:r.paket_bitir||null,veziyyet:r.veziyyet,status:r.veziyyet,approvedAt:r.tesdiq_tarixi||null};
+  photo:storedPhotos.photo,photos:storedPhotos.photos,_submission_id:typeof d._submission_id==='string'?d._submission_id:null,_photoOrder:Array.isArray(r.sekiller)?r.sekiller.slice():Object.values(storedPhotos.photos).flat(),pack:caEffectivePackage(r),packageStarts:r.paket_baslayir||null,packageEnds:r.paket_bitir||null,veziyyet:r.veziyyet,status:r.veziyyet,approvedAt:r.tesdiq_tarixi||null};
 }
 function caRebuildListingCache(){
  const keys=new Set([...caPageCars,...caVipCars,...caOwnCars,...caFavoriteCars].map(listingKey));
@@ -275,7 +283,7 @@ function caChangePage(delta){
  if(caBrowseState.loading||page<1||page>caBrowseState.totalPages)return;
  const request=caFetchListings(page);document.getElementById('elanlar').scrollIntoView({behavior:'smooth'});return request;
 }
-// Mark only blobs that were actually stamped; unsupported originals stay intact.
+// Only decoded images are uploaded; both decoders feed the same stamped JPEG path.
 const caWatermarkedPhotos=new WeakSet();
 function caDrawPhotoWatermark(context,width,height){
  const label='CƏNUB AVTO';
@@ -290,19 +298,32 @@ function caDrawPhotoWatermark(context,width,height){
  context.strokeText(label,width/2,height/2);context.fillText(label,width/2,height/2);
  context.restore();
 }
+async function caDecodePhoto(file){
+ const bitmap=typeof createImageBitmap==='function'?await createImageBitmap(file).catch(()=>null):null;
+ if(bitmap){
+  if(bitmap.width>0&&bitmap.height>0)return {source:bitmap,width:bitmap.width,height:bitmap.height,close:()=>bitmap.close()};
+  bitmap.close();
+ }
+ const url=URL.createObjectURL(file),image=new Image();
+ try{
+  await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url;});
+  if(!image.naturalWidth||!image.naturalHeight)throw Error('Empty image');
+  return {source:image,width:image.naturalWidth,height:image.naturalHeight,close:()=>URL.revokeObjectURL(url)};
+ }catch(error){URL.revokeObjectURL(url);throw Error('Şəkil açıla bilmədi. Zədələnməmiş şəkil faylı seç.');}
+}
 async function caPreparePhoto(file){
  if(!file.type.startsWith('image/'))throw Error('Yalnız şəkil faylları seç.');
  if(file.size>25*1024*1024)throw Error('Şəkil 25 MB-dan böyükdür.');
- const bitmap=typeof createImageBitmap==='function'?await createImageBitmap(file).catch(()=>null):null;
- if(!bitmap){if(file.size>5*1024*1024)throw Error('Bu şəkil sıxıla bilmədi (5 MB limiti).');return file;}
- const scale=Math.min(1,1440/Math.max(bitmap.width,bitmap.height));
- const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
- const context=canvas.getContext('2d');
- if(!context){bitmap.close();throw Error('Şəkil hazırlanmadı.');}
- context.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
- caDrawPhotoWatermark(context,canvas.width,canvas.height);
- const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.72));
- if(!blob)throw Error('Şəkil hazırlanmadı.');caWatermarkedPhotos.add(blob);return blob;
+ const decoded=await caDecodePhoto(file);
+ try{
+  const scale=Math.min(1,1440/Math.max(decoded.width,decoded.height));
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(decoded.width*scale));canvas.height=Math.max(1,Math.round(decoded.height*scale));
+  const context=canvas.getContext('2d');if(!context)throw Error('Şəkil hazırlanmadı.');
+  context.drawImage(decoded.source,0,0,canvas.width,canvas.height);
+  caDrawPhotoWatermark(context,canvas.width,canvas.height);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.72));
+  if(!blob)throw Error('Şəkil hazırlanmadı.');caWatermarkedPhotos.add(blob);return blob;
+ }finally{decoded.close();}
 }
 async function caUploadPhoto(file,token,onProgress,owner=currentUser?.id,submission=caListingSubmissionSequence){
  const blob=await caPreparePhoto(file);
@@ -325,23 +346,65 @@ async function caUploadSelectedPhotos(inputs,photos){
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
  const progress=Array(tasks.length).fill(0),status=document.getElementById('caUploadStatus'),bar=document.getElementById('caUploadBar'),label=document.getElementById('caUploadLabel');
  status.hidden=false;const update=()=>{if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;const pct=Math.round(progress.reduce((a,b)=>a+b,0)/tasks.length*100);bar.value=pct;label.textContent='Şəkillər yüklənir: '+pct+'% ('+progress.filter(x=>x===1).length+'/'+tasks.length+')';};update();
- let cursor=0;async function worker(){while(cursor<tasks.length){if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');const i=cursor++,t=tasks[i];const url=await caUploadPhoto(t.file,token,v=>{progress[i]=v;update();},owner,submission);photos[t.category][t.index]=url;}}
- await Promise.all(Array.from({length:Math.min(4,tasks.length)},()=>worker()));if(currentUser?.id===owner&&submission===caListingSubmissionSequence){bar.value=100;label.textContent='Bütün şəkillər yükləndi — 100%';}
+ let cursor=0,firstError=null;
+ async function worker(){
+  try{while(!firstError&&cursor<tasks.length){
+   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
+   const i=cursor++,t=tasks[i],cached=caPhotoUploadCache.get(t.file);
+   const url=cached?.owner===owner?cached.url:await caUploadPhoto(t.file,token,v=>{progress[i]=v;update();},owner,submission);
+   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');
+   caPhotoUploadCache.set(t.file,{owner,url});progress[i]=1;update();photos[t.category][t.index]=url;
+  }}catch(error){if(!firstError)firstError=error;throw error;}
+ }
+ // Drain in-flight uploads before unlocking the form, preserving every success for retry.
+ await Promise.allSettled(Array.from({length:Math.min(4,tasks.length)},()=>worker()));
+ if(firstError)throw firstError;
+ if(currentUser?.id===owner&&submission===caListingSubmissionSequence){bar.value=100;label.textContent='Bütün şəkillər yükləndi — 100%';}
 }
 
+async function caFindListingSubmission(key,owner,token){
+ const rows=await caRequest('/rest/v1/elanlar?select='+CA_LISTING_COLUMNS+'&satici_id=eq.'+encodeURIComponent(owner)+'&ca_data->>_submission_id=eq.'+encodeURIComponent(key)+'&limit=2','GET',null,token);
+ if(!Array.isArray(rows))throw Error('Əvvəlki müraciətin nəticəsi yoxlanmadı.');
+ const found=rows.filter(row=>row&&row.satici_id===owner&&row.ca_data?._submission_id===key);
+ if(found.length>1)throw Error('Müraciətin nəticəsi birmənalı deyil. Dəstək xidməti ilə əlaqə saxla.');
+ return found[0]||null;
+}
+function caRecoveredSubmissionId(row,payload){
+ if(caStableListingData(row.ca_data)!==caStableListingData(payload.ca_data)){
+  const error=Error('Əvvəlki müraciət artıq saxlanıb. Yeni dəyişikliklər hələ göndərilməyib.');error.code='CA_SAVED_DRAFT_CHANGED';error.savedRow=row;throw error;
+ }
+ return caRequireAffectedRow([{id:row.id}],row.id,'Əvvəlki müraciət');
+}
 async function caSaveRemoteCar(d,isEdit,owner=currentUser?.id,id=editingCarId,submission=null){
  const token=await caToken();if(!token)throw Error('Sessiya bitib. Yenidən daxil ol.');
- if(!owner||currentUser?.id!==owner)throw Error('Hesab dəyişib. Elanı öz hesabından yenidən yoxla.');
- if(submission!==null&&submission!==caListingSubmissionSequence||isEdit&&editingCarId!==id)throw Error('Elan forması dəyişib. Məlumatları yenidən yoxla.');
+ const guard=()=>{if(!owner||currentUser?.id!==owner)throw Error('Hesab dəyişib. Elanı öz hesabından yenidən yoxla.');if(submission!==null&&submission!==caListingSubmissionSequence||isEdit&&editingCarId!==id)throw Error('Elan forması dəyişib. Məlumatları yenidən yoxla.');};guard();
  const payload=caListingPayload(d),headers={'Prefer':'return=representation'};
  if(isEdit){
   delete payload.satici_id;
   const result=await caRequest('/rest/v1/elanlar?select=id&id=eq.'+encodeURIComponent(id)+'&satici_id=eq.'+encodeURIComponent(owner),'PATCH',payload,token,headers);
   return caRequireAffectedRow(result,id,'Dəyişiklik');
  }
- const result=await caRequest('/rest/v1/elanlar?select=id','POST',payload,token,headers);
- return caRequireAffectedRow(result,null,'Elanın saxlanması');
+ const key=typeof d._submission_id==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(d._submission_id)?d._submission_id:null;
+ if(key){const existing=await caFindListingSubmission(key,owner,token);guard();if(existing)return caRecoveredSubmissionId(existing,payload);}
+ try{
+  const result=await caRequest('/rest/v1/elanlar?select=id','POST',payload,token,headers);
+  return caRequireAffectedRow(result,null,'Elanın saxlanması');
+ }catch(error){
+  guard();if(!key)throw error;
+  let existing;
+  try{existing=await caFindListingSubmission(key,owner,token);}catch(lookupError){throw error;}
+  guard();if(existing)return caRecoveredSubmissionId(existing,payload);throw error;
+ }
 }
+function caResumeSavedListingDraft(row,draft){
+ const car=caRemoteToCar(row);editingCarId=car._id;editingOriginalPhotos=JSON.parse(JSON.stringify(car.photos||{}));
+ caOwnCars=[car,...caOwnCars.filter(item=>item._id!==car._id)];caRememberListings([car]);
+ const banner=document.getElementById('editBanner');banner.textContent='Əvvəlki müraciət saxlanıb. Yeni dəyişiklikləri həmin elana əlavə edə bilərsən.';banner.style.display='block';document.getElementById('cancelEditBtn').style.display='block';
+ if(String(draft.requestedPackage||'')===String(row.ca_data?.requestedPackage||'')){
+  const field=document.getElementById('listingForm').elements.namedItem('package');if(field){let keep=field.querySelector('option[data-keep-package]');if(!keep){keep=document.createElement('option');keep.value='';keep.dataset.keepPackage='true';field.prepend(keep);}keep.textContent='Cari paketi saxla — yeni paket sifariş etmə';field.value='';}
+ }
+}
+
 async function caDeleteRemoteCar(id,owner=currentUser?.id){
  const token=await caToken();if(!token)throw Error('Yenidən daxil ol.');
  if(!owner||currentUser?.id!==owner)throw Error('Hesab dəyişib. Elanı öz hesabından yenidən yoxla.');
@@ -354,7 +417,7 @@ window.addEventListener('load',()=>caFetchListings());
 let editingCarId=null,editingOriginalPhotos=null;
 let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
-function updateAccountUI(){window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
+function updateAccountUI(){window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
 let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
 function caShowListingFeedback(message,kind='success'){
@@ -468,7 +531,7 @@ function editCar(id){
 }
 function caClearListingDraft(){
  caListingSubmissionSequence++;caDraftOwner=null;editingCarId=null;editingOriginalPhotos=null;
- const form=document.getElementById('listingForm');form.reset();form.querySelector('option[data-keep-package]')?.remove();
+ const form=document.getElementById('listingForm');caSetListingFormBusy(form,false);caCreateSubmission=null;caPhotoUploadCache=new WeakMap();form.reset();form.querySelector('option[data-keep-package]')?.remove();
  document.getElementById('editBanner').style.display='none';document.getElementById('cancelEditBtn').style.display='none';
  const button=document.getElementById('submitListingBtn');button.disabled=false;button.textContent='Elanı yerləşdir';
  document.getElementById('caUploadStatus').hidden=true;descriptionCounter.textContent='0 / 10 000 simvol';
@@ -1029,8 +1092,9 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  const selectedPackage=String(d.package||'');
  const paidPackage=selectedPackage.includes('15 AZN')?'VIP':selectedPackage.includes('5 AZN')?'Premium':selectedPackage.includes('3 AZN')?'Standart':null;
  d.requestedPackage=paidPackage?selectedPackage:'';d.pack='Pulsuz';delete d.package;
+ if(wasEdit){if(original?._submission_id)d._submission_id=original._submission_id;}else{if(!caCreateSubmission||caCreateSubmission.owner!==owner)caCreateSubmission={owner,key:crypto.randomUUID()};d._submission_id=caCreateSubmission.key;}
  const submission=++caListingSubmissionSequence;
- submitBtn.disabled=true;submitBtn.textContent='Şəkillər yüklənir...';
+ submitBtn.disabled=true;submitBtn.textContent='Şəkillər yüklənir...';caSetListingFormBusy(form,true);
  let confirmedSave=false;
  try{
   await caUploadSelectedPhotos(photoInputs,d.photos);
@@ -1041,7 +1105,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
   // The listing transaction creates any requested paid package atomically.
   // A second package RPC here would duplicate that request.
   d._id=await caSaveRemoteCar(d,wasEdit,owner,editId,submission);confirmedSave=true;
-  if(currentUser?.id!==owner)return;
+  if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
   caInvalidatePrivateRequests();d.ownerId=owner;
   d.createdAt=original?.createdAt||new Date().toISOString();
   if(wasEdit){const index=userCars.findIndex(car=>car._id===editId);if(index>=0)userCars[index]=d;else userCars.unshift(d);}
@@ -1053,8 +1117,8 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
   const message=paidPackage?(wasEdit?'Dəyişiklikləriniz və ':'Elanınız və ')+paidPackage+' paket müraciətiniz qəbul edildi. Paket və elan admin təsdiqini gözləyir.':wasEdit?'Dəyişikliklər saxlanıldı. Elan yenidən admin təsdiqini gözləyir.':'Elanınız qəbul edildi. Admin təsdiqindən sonra yayımlanacaq.';
   try{caClearListingDraft();render();renderCabinet();closeSellPage();document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth'});}catch(error){viewUpdated=false;}
   if(currentUser?.id===owner)caShowListingFeedback(message+(viewUpdated?'':' Siyahı tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.'),viewUpdated?'success':'warning');
- }catch(error){if(currentUser?.id===owner&&submission===caListingSubmissionSequence)caShowListingFeedback(confirmedSave?'Müraciətiniz saxlanıldı. Görünüş tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.':'Elanı göndərmək mümkün olmadı: '+error.message,confirmedSave?'warning':'error');}
- finally{if(submission===caListingSubmissionSequence){submitBtn.disabled=false;submitBtn.textContent=editingCarId?'Dəyişiklikləri yadda saxla':'Elanı yerləşdir';}}
+ }catch(error){if(currentUser?.id===owner&&submission===caListingSubmissionSequence){if(error.code==='CA_SAVED_DRAFT_CHANGED'&&error.savedRow){caResumeSavedListingDraft(error.savedRow,d);caShowListingFeedback('Əvvəlki elan saxlanıb. Yeni dəyişikliklərin formadadır; onları həmin elana əlavə etmək üçün yenidən yadda saxla.','warning');}else caShowListingFeedback(confirmedSave?'Müraciətiniz saxlanıldı. Görünüş tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.':'Elanı göndərmək mümkün olmadı: '+error.message,confirmedSave?'warning':'error');}}
+ finally{if(submission===caListingSubmissionSequence){caSetListingFormBusy(form,false);submitBtn.disabled=false;submitBtn.textContent=editingCarId?'Dəyişiklikləri yadda saxla':'Elanı yerləşdir';}}
 });
 // Elan yerləşdirmə bölməsini ayrıca səhifə görünüşünə keçiririk.
 const sellSection=document.getElementById('elan-elave');

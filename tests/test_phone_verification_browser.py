@@ -57,12 +57,12 @@ class PhoneVerificationBrowserTests(unittest.TestCase):
   self.page.evaluate("document.getElementById('caPhoneNumber').value='0701234567';document.getElementById('caPhoneForm').dispatchEvent(new Event('submit',{cancelable:true}))")
   self.assertFalse([c for c in self.backend.phone_calls if c['method']!='GET'])
  def test_sms_verified_only_by_trusted_server_proof_and_existing_session_is_preserved(self):
-  self.backend.provider=True;self.open();self.page.evaluate("localStorage.setItem('cenubFavorites_+994501234567','[\"owned-favorite\"]')");self.send()
+  self.backend.provider=True;self.open();self.page.evaluate("localStorage.setItem(caFavoriteStorageKey(),'[\"owned-favorite\"]')");self.send()
   self.assertTrue(self.page.locator('#caPhoneResend').is_disabled());self.assertTrue(self.page.locator('#caPhoneSend').is_disabled())
   call=[c for c in self.backend.phone_calls if c['method']=='PUT'][0];self.assertEqual(call['body'],{'phone':NEW})
   self.page.locator('#caPhoneOtp').fill('123456');self.page.locator('#caPhoneVerify').click();self.page.wait_for_function("document.getElementById('caPhoneVerificationStatus').textContent.includes('SMS ilə təsdiqləndi')")
   self.assertEqual(self.page.evaluate('currentUser.phone'),NEW);self.assertEqual(self.page.evaluate('caSession.access_token'),'phone-token')
-  self.assertEqual(self.backend.profile_calls[-1]['telefon'],NEW);self.assertIn('owned-favorite',self.page.evaluate("localStorage.getItem('cenubFavorites_+994701234567')"))
+  self.assertEqual(self.backend.profile_calls[-1]['telefon'],NEW);self.assertIn('owned-favorite',self.page.evaluate('localStorage.getItem(caFavoriteStorageKey())'))
   self.assertEqual([c['body'] for c in self.backend.phone_calls if c['path'].endswith('/verify')],[{'phone':NEW,'token':'123456','type':'phone_change'}])
  def test_editable_metadata_is_not_a_verified_phone_badge(self):
   self.backend.provider=True;self.backend.user['user_metadata'].update(phone_confirmed_at='2026-11-12T12:00:00Z',verified=True);self.open()

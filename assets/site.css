@@ -981,3 +981,9 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 #caPhoneVerificationStatus:empty{display:none}
 #caPhoneVerificationStatus[role="alert"]{color:#ffc1c9}
 @media(max-width:360px){.ca-phone-verification{padding:15px}.ca-phone-form{gap:8px}.ca-phone-form input,.ca-phone-form button{flex-basis:100%;width:100%}}
+
+/* Keep touch gestures within authentication and explain device-only legacy saves. */
+.auth-overlay,.auth-box{overscroll-behavior:contain}
+.ca-legacy-favorites{margin:16px 0;padding:14px 16px;border:1px solid #3f697f;border-radius:12px;background:#102b3c;color:#dcebf5}
+.ca-legacy-favorites p{margin:0 0 10px;line-height:1.6;overflow-wrap:anywhere}
+.ca-legacy-favorites button{min-height:44px;max-width:100%;white-space:normal}

@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Domen alınmazdan əvvəl təkrar elan göndərişi, yarımçıq şəkil yükləməsinin təkrarı, göndəriş zamanı formanın qorunması, giriş/bərpa pəncərəsinin fokus və sürüşməsi, hesab üzrə seçilmişlər və gecikmiş paylaşım keçidinin yeni seçimi pozması düzəldilib. Yeni ssenarilər və əhatə: [PRELAUNCH_FIXES_VERIFICATION.md](PRELAUNCH_FIXES_VERIFICATION.md).
+
+## Əvvəlki tamamlanma yoxlaması
+
 Adminin tam elan/şəkil baxışı, ayrıca açıq elan linki/paylaşımı, 24 nəticədən sonra nömrəli səhifələr, qaydalar/məxfilik səhifələri və adminin serverdən ZIP ehtiyat nüsxəsi əlavə olunub. Telefon təsdiqi provayderə hazırdır; SMS xidməti və real bank ödənişi üçün xarici hesablar gözlənilir. 60 Node və 117 brauzer sınağı keçib; real baza icazələri və səhifə hash-ləri ayrıca yoxlanıb. Əhatə: [COMPLETION_VERIFICATION.md](COMPLETION_VERIFICATION.md).
 
 ## Əvvəlki tam ekran şəkil baxışı

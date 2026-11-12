@@ -152,7 +152,7 @@ class WatermarkBrowserTests(unittest.TestCase):
                 self.assertLessEqual(pixels['edgeMaxDifference'], 5)
         self.assertFalse(self.backend.uploads)
 
-    def test_upload_bytes_are_stamped_but_decode_fallback_is_not_falsely_labelled(self):
+    def test_upload_bytes_are_stamped_with_bitmap_or_image_decoder(self):
         self.sign_in()
         urls = self.page.evaluate('''async()=>{
             const canvas=document.createElement('canvas');canvas.width=800;canvas.height=600;
@@ -168,11 +168,13 @@ class WatermarkBrowserTests(unittest.TestCase):
         self.assertEqual(len(self.backend.uploads), 2)
         stamped, fallback = self.backend.uploads
         self.assertRegex(urls[0], r'/[0-9a-f-]+-ca-wm1\.jpg$')
-        self.assertNotIn('-ca-wm1', urls[1])
+        self.assertRegex(urls[1], r'/[0-9a-f-]+-ca-wm1\.jpg$')
         self.assertEqual(stamped['body'][:2], b'\xff\xd8')
-        self.assertEqual(fallback['body'][:8], b'\x89PNG\r\n\x1a\n')
+        self.assertEqual(fallback['body'][:2], b'\xff\xd8')
         pixels = self.pixel_summary(base64.b64encode(stamped['body']).decode())
         self.assertGreater(pixels['centerChanged'], 150)
+        fallback_pixels = self.pixel_summary(base64.b64encode(fallback['body']).decode())
+        self.assertGreater(fallback_pixels['centerChanged'], 150)
         for upload in self.backend.uploads:
             self.assertEqual(upload['headers'].get('authorization'), 'Bearer watermark-token')
             self.assertEqual(upload['headers'].get('x-upsert'), 'false')

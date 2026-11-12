@@ -85,13 +85,6 @@ async function send(resend){
  }catch(error){if(current(expected,sequence)&&error.name!=='AbortError'){if(error.status===429)cooldown(error.retryAfter);tell(error.status===429?'Çox tez sorğu göndərildi. Bir qədər gözlə və yenidən yoxla.':error.message,true);}}
  finally{if(current(expected,sequence)){busy=false;controls();}}
 }
-function migrateFavorites(oldPhone,newPhone){
- if(!oldPhone||oldPhone===newPhone)return;
- try{
-  const old=JSON.parse(localStorage.getItem('cenubFavorites_'+oldPhone)||'[]'),saved=JSON.parse(localStorage.getItem('cenubFavorites_'+newPhone)||'[]');
-  if(Array.isArray(old)&&Array.isArray(saved))localStorage.setItem('cenubFavorites_'+newPhone,JSON.stringify([...new Set([...saved,...old].filter(key=>typeof key==='string'))]));
- }catch(error){}
-}
 async function verify(){
  if(!owner||!provider||!pendingPhone||busy)return;
  const code=otpInput.value.trim();if(!/^\d{6}$/.test(code)){tell('SMS kodu 6 rəqəmdən ibarət olmalıdır.',true);return;}
@@ -106,13 +99,12 @@ async function verify(){
   if(!current(expected,sequence))return;
   if(trustedPhone(user,expected)!==number)throw Error('Nömrənin təsdiqi serverdə tamamlanmayıb. Kodu yenidən yoxla.');
   verifiedPhone=number;pendingPhone='';otpInput.value='';phoneInput.value=number;
-  const oldPhone=currentUser.phone;
   let updatedUser;
   try{
    const response=await request('/auth/v1/user','PUT',{data:{telefon:number}},token,signal);updatedUser=response?.user||response;
    if(!current(expected,sequence))return;
    if(trustedPhone(updatedUser,expected)!==number)throw Error('Hesab məlumatları yenilənmədi.');
-   migrateFavorites(oldPhone,number);
+   // UUID-scoped favorites stay with the account when its phone changes.
    await caPersistSession({...caSession,user:updatedUser});
    if(!current(expected,sequence))return;
    await caSaveProfile();

@@ -25,6 +25,7 @@ window.caRenderPagination=drawPages;
 window.caGoToPage=function(number){
  const page=Number(number),state=caBrowseState;
  if(!Number.isSafeInteger(page)||state.loading||page<1||page>state.totalPages||page===state.page)return false;
+ cancelPendingLink();
  const pending=caFetchListings(page);document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth',block:'start'});return pending;
 };
 const previousRender=window.render;
@@ -77,6 +78,27 @@ function setLinkNotice(text,error=false,retry=false){
  if(retry){const button=document.createElement('button');button.type='button';button.textContent='Yenidən yoxla';button.onclick=resolveLink;notice.append(button);}
  return notice;
 }
+// A shared link is an initial intent, not permission to override later actions.
+// Cancel only explicit navigation functions/user input, never background renders.
+function cancelPendingLink(){
+ if(!linkLoading)return false;
+ linkSequence++;linkController?.abort();linkController=null;linkLoading=false;requestedId=null;setLinkNotice('');return true;
+}
+window.caCancelListingLink=cancelPendingLink;
+for(const name of ['searchCars','clearCarSearch','setFilter','caToggleFilters','quickBrand','showBMWSeries','openVehiclePicker','openSellPage','openCabinet','showBuyerFavorites','showSellerCabinet','openAuth','openCarDetailKey','openCarDetail','caAdminOpen','caShowCompare','caShowBackup','caShowPolicy']){
+ const original=window[name];
+ if(typeof original==='function')window[name]=function(...args){cancelPendingLink();return original.apply(this,args);};
+}
+const sort=document.getElementById('sortListings');
+if(sort)sort.addEventListener('change',cancelPendingLink,true);
+function cancelForSearchInput(event){
+ if(!event.isTrusted)return;
+ const target=event.target;
+ if(target?.closest?.('.search,#caAdvanced')||target?.matches?.('#searchMake,#searchModel,#searchPrice,#searchCity'))cancelPendingLink();
+}
+document.addEventListener('input',cancelForSearchInput,true);
+document.addEventListener('change',cancelForSearchInput,true);
+document.addEventListener('click',event=>{if(event.target?.closest?.('a[href="#elanlar"]'))cancelPendingLink();},true);
 async function resolveLink(){
  const ids=new URL(location.href).searchParams.getAll('ad');if(!ids.length)return false;
  if(document.getElementById('authOverlay')?.classList.contains('open')&&['recover','reset'].includes(authMode))return false;
