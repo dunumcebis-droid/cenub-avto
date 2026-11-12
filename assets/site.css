@@ -924,3 +924,60 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 @media(max-height:500px){.ca-photo-viewer-header{padding-top:max(5px,env(safe-area-inset-top,0px));padding-bottom:5px}#caPhotoViewerTitle{font-size:14px}.ca-photo-viewer-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 12px;padding-top:5px;padding-bottom:max(5px,env(safe-area-inset-bottom,0px))}#caPhotoViewerCaption{margin:0;text-align:left;font-size:12px}#caPhotoViewerHint{grid-column:1/-1;margin:0;font-size:10px}.ca-photo-viewer-toolbar{gap:6px}}
 @media(max-width:280px){.ca-gallery-open-hint{top:9px;bottom:auto;max-width:calc(100% - 18px)}}
 @media(max-width:500px) and (max-height:500px){.ca-photo-viewer-footer{grid-template-columns:minmax(0,1fr)}#caPhotoViewerCaption{text-align:center}}
+
+/* Listing navigation, sharing and private administrator review. */
+#caPagination{max-width:100%;gap:8px!important;min-width:0}
+#caPagination button{min-width:42px;min-height:44px;max-width:100%;padding:10px 13px;border:1px solid #45637c;border-radius:10px;background:#142d44;color:#e8f3fc;font-size:14px;font-weight:750;line-height:1.4;cursor:pointer}
+#caPagination button:hover{background:#204762;border-color:#68dbce}
+#caPagination button[aria-current="page"]{background:#b9f34b;border-color:#b9f34b;color:#071321}
+#caPagination button:focus-visible,#caShareListingBtn:focus-visible{outline:3px solid #71e7d6;outline-offset:3px}
+#caPagination button:disabled{opacity:.5;cursor:default}
+#caPagePrev,#caPageNext{white-space:nowrap}
+#caPagination .ca-page-ellipsis{padding:8px 3px;color:#9fb5c9;user-select:none}
+#caPagination .ca-page-summary{flex-basis:100%;order:3;text-align:center;color:#a5bbce;font-size:12px;line-height:1.6}
+#caShareListingBtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;padding:12px 16px;border:1px solid #52bfb3;border-radius:11px;background:#153d51;color:#e4fcf8;font-size:14px;line-height:1.5;font-weight:800;cursor:pointer;overflow-wrap:anywhere}
+#caShareListingBtn:disabled{opacity:.55;cursor:default}
+#caShareListingStatus{flex-basis:100%;max-width:100%;min-width:0;margin:12px 0 0;color:#a9e4db;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+#caShareListingStatus:empty{display:none}
+#caShareListingStatus input,#caListingLinkManual{display:block;width:100%;min-width:0;margin-top:9px;padding:12px;border:1px solid #4a6d86;border-radius:9px;background:#071b2d;color:#e7f5ff;font-size:16px;line-height:1.5}
+.ca-link-notice{max-width:100%;min-width:0;margin:0 0 22px;padding:16px 18px;border:1px solid #40667f;border-radius:13px;background:#10283d;color:#d6e7f5;line-height:1.7;overflow-wrap:anywhere}
+.ca-link-notice:empty{display:none}
+.ca-link-notice a{color:#70e7d7;text-underline-offset:3px}
+#detailOverlay{z-index:14500}
+#caAdminPreviewBadge{display:block;max-width:100%;margin:0 0 18px;padding:11px 14px;border:1px solid #a78a4c;border-radius:11px;background:#3a311d;color:#ffe2a3;font-size:13px;line-height:1.7;font-weight:750;overflow-wrap:anywhere}
+#caAdminPreviewBadge[hidden],#caShareListingBtn[hidden],#caShareListingStatus[hidden]{display:none!important}
+#caAdminPanel .ca-preview-button,#caAdminPanel .ca-admin-preview{min-height:44px;background:#16465b;border-color:#61bcb7}
+#caServerBackupStatus{max-width:100%;min-width:0;color:#bddbd5;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+#caServerBackupStatus:empty{display:none}
+#caServerBackupStatus progress{display:block;width:100%;max-width:100%;height:15px;margin:12px 0;accent-color:#58dbc8}
+#caServerBackupStatus a{color:#6ee7d8;overflow-wrap:anywhere;text-underline-offset:3px}
+
+/* Terms and privacy pages share the site's regular information layout. */
+.ca-policy-copy{min-width:0;overflow-wrap:anywhere}
+.ca-policy-copy p+p{margin-top:13px}
+.ca-policy-copy ul,.ca-policy-copy ol{margin:12px 0 0;padding-left:23px;color:#b3c7d8;font-size:15px;line-height:1.85}
+.ca-policy-copy li+li{margin-top:7px}
+.ca-policy-copy h2{line-height:1.5;overflow-wrap:anywhere}
+.ca-policy-date{margin:0!important;color:#90a9bd!important;font-size:13px!important}
+.ca-policy-table{max-width:100%;margin:18px 0;overflow-x:auto;border:1px solid #36536b;border-radius:10px;-webkit-overflow-scrolling:touch}
+.ca-policy-table table{width:100%;min-width:320px;border-collapse:collapse;color:#c6d8e8;font-size:14px;line-height:1.6}
+.ca-policy-table th,.ca-policy-table td{padding:11px 13px;text-align:left;border-bottom:1px solid #36536b;vertical-align:top}
+.ca-policy-table th{background:#183149;color:#eff7ff;font-weight:800}
+.ca-policy-table tr:last-child td{border-bottom:0}
+@media(max-width:360px){#caPagination{gap:6px!important}#caPagination button{min-width:40px;padding:9px 10px;font-size:13px}.ca-link-notice{padding:14px}#caAdminPreviewBadge{padding:10px 12px;font-size:12px}.ca-policy-copy ul,.ca-policy-copy ol{padding-left:20px;font-size:14px}.ca-policy-table th,.ca-policy-table td{padding:9px 11px}}
+
+/* Account phone verification keeps provider availability and status readable. */
+.ca-phone-verification{max-width:100%;min-width:0;margin:22px 0;padding:20px;border:1px solid #365b73;border-radius:15px;background:#10263a;color:#dfedf7;overflow-wrap:anywhere}
+.ca-phone-verification [hidden]{display:none!important}
+.ca-phone-verification h2,.ca-phone-verification h3{margin:0 0 10px;color:#eff7ff;font-size:20px;line-height:1.5}
+.ca-phone-verification p{margin:10px 0;color:#b8cddd;font-size:14px;line-height:1.8}
+.ca-phone-verification label{display:block;width:100%;margin:6px 0 0;color:#dbeaf6;font-size:13px;line-height:1.6;font-weight:750}
+.ca-phone-form{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:15px 0;min-width:0}
+.ca-phone-form input{flex:1 1 200px;width:auto;min-width:0;max-width:100%;min-height:46px;padding:11px 12px;border:1px solid #53758f;border-radius:9px;background:#071b2d;color:#f0f7ff;font-size:16px;line-height:1.5}
+.ca-phone-form button{flex:0 1 auto;max-width:100%;min-height:46px;padding:11px 15px;border:1px solid #59bfb4;border-radius:9px;background:#164556;color:#eafffc;font-size:14px;line-height:1.5;font-weight:800;cursor:pointer;overflow-wrap:anywhere}
+.ca-phone-form button:disabled,.ca-phone-form input:disabled{opacity:.55;cursor:not-allowed}
+.ca-phone-form input:focus-visible,.ca-phone-form button:focus-visible{outline:3px solid #71e7d6;outline-offset:3px}
+#caPhoneVerificationStatus{min-width:0;max-width:100%;margin:13px 0 0;color:#b9e7dc;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+#caPhoneVerificationStatus:empty{display:none}
+#caPhoneVerificationStatus[role="alert"]{color:#ffc1c9}
+@media(max-width:360px){.ca-phone-verification{padding:15px}.ca-phone-form{gap:8px}.ca-phone-form input,.ca-phone-form button{flex-basis:100%;width:100%}}

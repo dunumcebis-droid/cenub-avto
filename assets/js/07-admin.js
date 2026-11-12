@@ -2,9 +2,10 @@
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let owner=null,authorized=false,verifySequence=0,busy=false,sessionEpoch=0;
+let previewSequence=0,previewActive=false;
 const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false,linked:null});
 let ads=state(),payments=state();
-function reset(){sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();if(el('caPayLinkedNotice')){el('caPayLinkedNotice').replaceChildren();el('caPayLinkedNotice').hidden=true;}el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
+function reset(){closePreview();sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();if(el('caPayLinkedNotice')){el('caPayLinkedNotice').replaceChildren();el('caPayLinkedNotice').hidden=true;}el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
 window.caAdminSessionChanged=()=>{if(owner!==(currentUser?.id||null))reset();};
 async function rpc(name,body,expected=owner){
  const t=await caToken();
@@ -14,8 +15,40 @@ async function rpc(name,body,expected=owner){
 async function verify(){
  window.caAdminSessionChanged();if(!owner)return false;
  const expected=owner,seq=++verifySequence;
- try{const ok=await rpc('cenub_admin_yoxla',{},expected);if(seq!==verifySequence||owner!==expected||currentUser?.id!==expected)return false;authorized=ok===true;el('caAdminLaunch').style.display=authorized?'block':'none';if(!authorized)el('caAdminPanel').style.display='none';return authorized;}
- catch(error){if(seq===verifySequence&&owner===expected){authorized=false;el('caAdminLaunch').style.display='none';el('caAdminPanel').style.display='none';}return false;}
+ try{const ok=await rpc('cenub_admin_yoxla',{},expected);if(seq!==verifySequence||owner!==expected||currentUser?.id!==expected)return false;authorized=ok===true;el('caAdminLaunch').style.display=authorized?'block':'none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display=authorized?'block':'none';if(!authorized){closePreview();el('caAdminPanel').style.display='none';}return authorized;}
+ catch(error){if(seq===verifySequence&&owner===expected){authorized=false;closePreview();el('caAdminLaunch').style.display='none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display='none';el('caAdminPanel').style.display='none';}return false;}
+}
+// Preview records stay out of public listing collections and are discarded on close.
+function closePreview(closeDetail=true){
+ previewSequence++;
+ if(el('caAdminActionMsg')?.textContent==='Elanın tam məlumatları yüklənir...')el('caAdminActionMsg').textContent='';
+ const wasActive=previewActive;previewActive=false;
+ if(closeDetail&&wasActive&&el('detailOverlay')?.dataset.adminPreview==='true')closeCarDetail();
+}
+window.caCloseAdminPreview=()=>closePreview();
+window.caAdminPreviewClosed=()=>closePreview(false);
+async function previewListing(button){
+ if(!authorized||!owner||el('caAdminPanel').style.display==='none')return false;
+ const id=button.dataset.previewId;
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'')||!ads.rows.some(row=>row.id===id))return false;
+ const expected=owner,epoch=sessionEpoch,sequence=++previewSequence,listSequence=ads.sequence;
+ button.disabled=true;el('caAdminActionMsg').textContent='Elanın tam məlumatları yüklənir...';
+ try{
+  const row=await rpc('ca_admin_listing_detail',{p_id:id},expected);
+  if(sequence!==previewSequence||epoch!==sessionEpoch||expected!==owner||currentUser?.id!==expected||!authorized||listSequence!==ads.sequence||el('caAdminPanel').style.display==='none')return false;
+  if(!row){el('caAdminActionMsg').textContent='Elan tapılmadı və ya artıq baxış üçün əlçatan deyil.';return false;}
+  if(Array.isArray(row)||row.id!==id||typeof window.caOpenCarRecord!=='function')throw Error('Elanın tam məlumatları düzgün gəlmədi.');
+  const car=caRemoteToCar(row);
+  button.disabled=false;if(button.isConnected)button.focus({preventScroll:true});
+  window.caOpenCarRecord(car,{adminPreview:true});
+  previewActive=true;
+  el('caAdminActionMsg').textContent='';return true;
+ }catch(error){
+  if(sequence===previewSequence&&epoch===sessionEpoch&&expected===owner&&currentUser?.id===expected){
+   previewActive=false;el('caAdminActionMsg').textContent='Elan açılmadı: '+error.message;
+  }
+  return false;
+ }finally{if(button.isConnected)button.disabled=false;}
 }
 function pager(s,id,handler){el(id).innerHTML=s.pages>1?`<div class="ca-actions"><button type="button" onclick="${handler}(-1)" ${s.loading||s.page<=1?'disabled':''}>← Əvvəlki</button><span>${s.page} / ${s.pages}</span><button type="button" onclick="${handler}(1)" ${s.loading||s.page>=s.pages?'disabled':''}>Növbəti →</button></div>`:'';}
 function packageInfo(x){
@@ -38,7 +71,7 @@ function drawPaymentLink(){
  notice.hidden=!payments.linked;
 }
 function drawAds(){
- el('caAdminList').innerHTML=ads.rows.map(x=>{const info=packageInfo(x);return `<article class="ca-item" data-ad-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p>${packageMarkup(x)}<p>${esc(String(x.tesvir||'').slice(0,250))}</p><div class="ca-actions">${x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv" ${info.canPublish?'':'disabled aria-disabled="true" title="Əvvəl paket sorğusunu yoxla və təsdiqlə"'}>✓ Təsdiqlə</button>`}${x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>'}${x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:''}</div></article>`;}).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
+ el('caAdminList').innerHTML=ads.rows.map(x=>{const info=packageInfo(x);return `<article class="ca-item" data-ad-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p>${packageMarkup(x)}<p>${esc(String(x.tesvir||'').slice(0,250))}</p><button type="button" class="ca-admin-preview" data-preview-id="${esc(x.id)}">Şəkillər və tam məlumat</button><div class="ca-actions">${x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv" ${info.canPublish?'':'disabled aria-disabled="true" title="Əvvəl paket sorğusunu yoxla və təsdiqlə"'}>✓ Təsdiqlə</button>`}${x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>'}${x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:''}</div></article>`;}).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
 }
 function drawPayments(){
  drawPaymentLink();
@@ -79,7 +112,7 @@ async function jumpToPackage(button){
 window.caAdminPage=delta=>ads.loading||ads.page+delta<1||ads.page+delta>ads.pages?false:load('ads',ads.page+delta);
 window.caPayPage=delta=>payments.loading||payments.page+delta<1||payments.page+delta>payments.pages?false:load('payments',payments.page+delta);
 window.caAdminOpen=async()=>{if(!await verify())return alert('Admin girişi təsdiqlənmədi. Hesabına yenidən daxil ol.');el('caAdminPanel').style.display='block';await Promise.all([load('ads'),load('payments')]);};
-window.caAdminClose=()=>{el('caAdminPanel').style.display='none';};
+window.caAdminClose=()=>{closePreview();el('caAdminPanel').style.display='none';};
 async function refreshPublic(){const results=await Promise.allSettled([caFetchListings(1),...(currentUser?[caFetchMyListings(),caFetchFavoriteListings()]:[])]);return results.every(r=>r.status==='fulfilled'&&r.value!==false);}
 async function mutate(button,name,body,confirmation){
  if(busy||button.disabled||!authorized||!confirm(confirmation))return;
@@ -91,7 +124,7 @@ async function mutate(button,name,body,confirmation){
  const ok=refreshed.every(r=>r.status==='fulfilled'&&r.value!==false);
  el('caAdminActionMsg').textContent=ok?'Dəyişiklik saxlanıldı. Elanlar və sayğaclar yeniləndi.':'Dəyişiklik saxlanıldı. Bəzi siyahılar yenilənmədi; «Yenilə» düyməsi ilə təkrar yoxla.';busy=false;button.disabled=false;
 }
-el('caAdminList').addEventListener('click',e=>{const link=e.target.closest('button[data-package-request-id]');if(link){jumpToPackage(link);return;}const b=e.target.closest('button[data-id]');if(b)mutate(b,'ca_admin_status',{p_id:b.dataset.id,p_status:b.dataset.status},'Bu elanın vəziyyəti dəyişdirilsin?');});
+el('caAdminList').addEventListener('click',e=>{const preview=e.target.closest('button[data-preview-id]');if(preview){previewListing(preview);return;}const link=e.target.closest('button[data-package-request-id]');if(link){jumpToPackage(link);return;}const b=e.target.closest('button[data-id]');if(b)mutate(b,'ca_admin_status',{p_id:b.dataset.id,p_status:b.dataset.status},'Bu elanın vəziyyəti dəyişdirilsin?');});
 el('caPayList').addEventListener('click',e=>{const b=e.target.closest('button[data-pay-id]');if(!b)return;const approve=b.dataset.payAction==='approve';mutate(b,approve?'ca_admin_paket_tesdiq':'ca_admin_paket_reddet',{p_sorgu_id:b.dataset.payId},approve?'SINAQ TƏSDİQİ: Real kart ödənişi qoşulmayıb. Yalnız öz sınaq sorğunu təsdiqlə. Davam edilsin?':'Ödəniş sorğusu rədd edilsin?');});
 reset();setInterval(verify,12000);window.addEventListener('load',()=>setTimeout(verify,1200));document.addEventListener('visibilitychange',()=>{if(!document.hidden)verify();});
 })();

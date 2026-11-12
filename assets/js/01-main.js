@@ -354,7 +354,7 @@ window.addEventListener('load',()=>caFetchListings());
 let editingCarId=null,editingOriginalPhotos=null;
 let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
-function updateAccountUI(){const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
+function updateAccountUI(){window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
 let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
 function caShowListingFeedback(message,kind='success'){
@@ -885,7 +885,18 @@ const photoCategoryNames={front:'Ön görünüş',rear:'Arxa görünüş',side:'
 let activeDetailCar=null,detailPhotos=[],detailPhotoIndex=0,touchStartX=0,detailReturnFocus=null;
 function getCarPhotos(c){let out=[];const groups=c.photos||{};for(const key of Object.keys(photoCategoryNames)){(groups[key]||[]).forEach(src=>out.push({src,category:photoCategoryNames[key]}));}if(!out.length&&c.photo)out.push({src:c.photo,category:'Avtomobil'});return out}
 function openCarDetailKey(key){const index=allCars().findIndex(car=>listingKey(car)===key);if(index>=0)openCarDetail(index);}
-function openCarDetail(id){const c=allCars()[id];if(!c)return;detailReturnFocus=document.activeElement;activeDetailCar=c;detailPhotos=getCarPhotos(c);detailPhotoIndex=0;const fields=[['Buraxılış ili',c.year??'Qeyd edilməyib'],['Şəhər / rayon',c.city],['Yürüş',caFormatMileage(c.mileage)],['Yanacaq',c.fuel||'Qeyd edilməyib'],['Sürətlər qutusu',c.gear||'Qeyd edilməyib'],['Mühərrik',c.engine||'Qeyd edilməyib'],['Ban növü',c.body||'Qeyd edilməyib'],['Rəng',c.color||'Qeyd edilməyib'],['Ötürücü',c.drive||'Qeyd edilməyib'],['Texniki vəziyyət',c.condition||'Qeyd edilməyib'],['Sahib sayı',c.owners||'Qeyd edilməyib'],['Qəza / boya',c.accident||'Qeyd edilməyib'],['Nəqliyyat növü',c.vehicleType||'Qeyd edilməyib'],['Nəsil',c.generation||'Qeyd edilməyib'],['At gücü',caFormatNumber(c.horsepower)],['Oturacaq sayı',c.seats||'Qeyd edilməyib'],['Bazar üçün',c.market||'Qeyd edilməyib'],['Təchizat',c.equipment?.join(', ')||'Qeyd edilməyib'],['Elan növü',packageName(c.pack)],['Telefon',c.phone||'Qeyd edilməyib']];document.getElementById('detailTitle').textContent=caCarName(c);document.getElementById('detailPrice').textContent=caFormatPrice(c.price);document.getElementById('detailSpecs').innerHTML=fields.map(([k,v])=>`<div class="detail-spec"><b>${esc(k)}</b>${esc(v)}</div>`).join('');const description=String(c.description||'').trim();document.getElementById('detailDescription').style.display=description?'block':'none';document.getElementById('detailDescriptionText').textContent=description;const phone=String(c.phone||'').replace(/[^+\d]/g,'');document.getElementById('detailContact').innerHTML=phone?`<a href="tel:${esc(phone)}">☎ Zəng et</a><button type="button" onclick="copyCarPhone()">Nömrəni kopyala</button>`:'<div class="detail-empty">Satıcı telefon nömrəsi qeyd etməyib.</div>';document.getElementById('detailOverlay').classList.add('open');document.getElementById('detailOverlay').scrollTop=0;document.body.style.overflow='hidden';renderGallery();document.querySelector('#detailOverlay .detail-close').focus({preventScroll:true})}
+function openCarDetail(id){const c=allCars()[id];if(c)return caOpenCarRecord(c);}
+function caOpenCarRecord(c,options={}){
+ if(!c)return false;
+ const privatePreview=options.adminPreview===true||options.privatePreview===true;
+ if(!privatePreview&&(c.veziyyet||c.status)!=='aktiv')return false;
+ if(window.caPhotoViewerIsOpen?.())window.caClosePhotoViewer({returnToDetail:false});
+ const overlay=document.getElementById('detailOverlay');
+ overlay.dataset.adminPreview=String(privatePreview);overlay.dataset.privatePreview=String(privatePreview);
+ let badge=document.getElementById('caAdminPreviewBadge');
+ if(!badge){badge=document.createElement('p');badge.id='caAdminPreviewBadge';badge.setAttribute('role','status');document.getElementById('detailTitle').before(badge);}
+ badge.hidden=!privatePreview;badge.textContent=privatePreview?'Admin baxışı · Elanın bütün məlumatları və şəkilləri':'';
+ detailReturnFocus=document.activeElement;activeDetailCar=c;detailPhotos=getCarPhotos(c);detailPhotoIndex=0;const fields=[['Buraxılış ili',c.year??'Qeyd edilməyib'],['Şəhər / rayon',c.city],['Yürüş',caFormatMileage(c.mileage)],['Yanacaq',c.fuel||'Qeyd edilməyib'],['Sürətlər qutusu',c.gear||'Qeyd edilməyib'],['Mühərrik',c.engine||'Qeyd edilməyib'],['Ban növü',c.body||'Qeyd edilməyib'],['Rəng',c.color||'Qeyd edilməyib'],['Ötürücü',c.drive||'Qeyd edilməyib'],['Texniki vəziyyət',c.condition||'Qeyd edilməyib'],['Sahib sayı',c.owners||'Qeyd edilməyib'],['Qəza / boya',c.accident||'Qeyd edilməyib'],['Nəqliyyat növü',c.vehicleType||'Qeyd edilməyib'],['Nəsil',c.generation||'Qeyd edilməyib'],['At gücü',caFormatNumber(c.horsepower)],['Oturacaq sayı',c.seats||'Qeyd edilməyib'],['Bazar üçün',c.market||'Qeyd edilməyib'],['Təchizat',c.equipment?.join(', ')||'Qeyd edilməyib'],['Elan növü',packageName(c.pack)],['Telefon',c.phone||'Qeyd edilməyib']];document.getElementById('detailTitle').textContent=caCarName(c);document.getElementById('detailPrice').textContent=caFormatPrice(c.price);document.getElementById('detailSpecs').innerHTML=fields.map(([k,v])=>`<div class="detail-spec"><b>${esc(k)}</b>${esc(v)}</div>`).join('');const description=String(c.description||'').trim();document.getElementById('detailDescription').style.display=description?'block':'none';document.getElementById('detailDescriptionText').textContent=description;const phone=String(c.phone||'').replace(/[^+\d]/g,'');document.getElementById('detailContact').innerHTML=phone?`<a href="tel:${esc(phone)}">☎ Zəng et</a><button type="button" onclick="copyCarPhone()">Nömrəni kopyala</button>`:'<div class="detail-empty">Satıcı telefon nömrəsi qeyd etməyib.</div>';document.getElementById('detailOverlay').classList.add('open');document.getElementById('detailOverlay').scrollTop=0;document.body.style.overflow='hidden';renderGallery();document.querySelector('#detailOverlay .detail-close').focus({preventScroll:true})}
 function renderGallery(){
  const photo=detailPhotos[detailPhotoIndex],stage=document.getElementById('galleryStage');
  stage.innerHTML=photo?`<button type="button" class="ca-gallery-open" onclick="caOpenPhotoViewer()" aria-label="Şəkli tam ekranda aç" aria-haspopup="dialog">${caListingPhotoMarkup(photo.src,photo.category,'gallery')}<span class="ca-gallery-open-hint" aria-hidden="true">⛶ Böyüt</span></button><span class="gallery-counter">${detailPhotoIndex+1} / ${detailPhotos.length} · ${esc(photo.category)}</span>${detailPhotos.length>1?'<button type="button" class="gallery-nav gallery-prev" onclick="changeDetailPhoto(-1)" aria-label="Əvvəlki şəkil">‹</button><button type="button" class="gallery-nav gallery-next" onclick="changeDetailPhoto(1)" aria-label="Növbəti şəkil">›</button>':''}`:'<div class="gallery-empty">Şəkil əlavə edilməyib</div><span class="gallery-counter">Şəkil əlavə edilməyib</span>';
@@ -896,8 +907,17 @@ function renderGallery(){
 function changeDetailPhoto(step){if(!detailPhotos.length)return;detailPhotoIndex=(detailPhotoIndex+step+detailPhotos.length)%detailPhotos.length;renderGallery()}
 function setDetailPhoto(i){detailPhotoIndex=i;renderGallery()}
 function closeCarDetail(){
+ const overlay=document.getElementById('detailOverlay'),privatePreview=overlay.dataset.adminPreview==='true';
  if(window.caPhotoViewerIsOpen?.())window.caClosePhotoViewer({returnToDetail:false});
- document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';activeDetailCar=null;
+ overlay.classList.remove('open');delete overlay.dataset.adminPreview;delete overlay.dataset.privatePreview;
+ document.body.style.overflow='';activeDetailCar=null;
+ if(privatePreview){
+  detailPhotos=[];detailPhotoIndex=0;
+  for(const id of ['galleryStage','galleryThumbs','detailDescriptionText','detailSpecs','detailContact','detailTitle','detailPrice'])document.getElementById(id).replaceChildren();
+  document.getElementById('detailDescription').style.display='none';
+  const badge=document.getElementById('caAdminPreviewBadge');if(badge){badge.textContent='';badge.hidden=true;}
+  window.caAdminPreviewClosed?.();
+ }
  if(detailReturnFocus?.isConnected)detailReturnFocus.focus({preventScroll:true});detailReturnFocus=null;
 }
 function copyCarPhone(){if(!activeDetailCar||!activeDetailCar.phone)return;const value=activeDetailCar.phone;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(value).then(()=>alert('Telefon nömrəsi kopyalandı.')).catch(()=>alert('Nömrə: '+value));else alert('Nömrə: '+value)}

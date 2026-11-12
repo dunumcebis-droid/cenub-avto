@@ -1,0 +1,19 @@
+{
+  "nodeTestsPassed": 60,
+  "browserTestsPassed": 117,
+  "browserDurationSeconds": 173.025,
+  "newNavigationTestsPassed": 7,
+  "newAdminPreviewTestsPassed": 6,
+  "newBackupTestsPassed": 6,
+  "newPhoneVerificationTestsPassed": 6,
+  "policyActualLayoutsPassed": 12,
+  "representativeResponsiveLayoutsPassed": 12,
+  "databaseRoleAndExactExportTestsPassed": true,
+  "existingDatabaseAndPhotoFingerprintsPreserved": true,
+  "newSecurityAdvisories": 0,
+  "realListingChanges": 0,
+  "realUploads": 0,
+  "realEmailsSent": 0,
+  "realSmsSent": 0,
+  "realCardPayments": 0
+}
