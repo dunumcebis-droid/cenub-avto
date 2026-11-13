@@ -44,6 +44,12 @@ Yeni məlumatlara giriş əvvəlki admin yoxlamasından keçir; təxmin edilən 
 
 ZIP şəxsi axtarış, şikayət və daxili qeydləri, eləcə də o anda qalan günlük izləri daşıyır. Onu məxfi saxlamaq lazımdır; server təmizləməsi əvvəl yüklənmiş faylı silmir. Yeni klik/baxış ixrac zamanı cəm və manifesti dəyişərsə yoxlama uğursuz ola bilər. Bu halda sakit vaxtda yenidən cəhd edilməlidir; alət uyğunsuz nüsxəni uğurlu kimi göstərməməlidir. İxrac atomik baza snapshot-u deyil.
 
+### Canlı yoxlama
+
+Kod `bcb997fa096a3bc07c86ff53cb58c8ddc61e548a` olaraq `main` budağına yerləşdirilib. [Pages yerləşdirməsi 43470298224](https://github.com/dunumcebis-droid/cenub-avto/actions/runs/43470298224) uğurludur. Canlıdan gətirilən **49 statik faylın** baytları yerli fayllarla eynidir; həmin fayllarla **29/29** yeni brauzer ssenarisi keçib. Bu ikinci mərhələdə Auth, REST, Storage və model cavabları yalnız imitasiya olunub, real məlumat yazılmayıb.
+
+Ayrıca təzə anonim brauzer ilə canlı başlanğıc səhifə və real `ca_browse_listings` oxuma sorğusu yoxlanıb: 320, 375, 768 və 1440 px görünüşlərdə üfüqi daşma və JavaScript xətası yoxdur; yeni «Qəzalı» seçimi və axtarışı saxlama düyməsi mövcuddur. Həmin anda bazada aktiv elan **0** olub; səhifə də **0** göstərib. Bu yoxlama mövcud real aktiv elanın vizual məzmununu yoxlamaq iddiası deyil. Gözləyən, rədd edilmiş və silinmiş elanlar avtomatik yayımlanmayıb. Yeni funksiyaların dolu siyahı/hadisə axınları yuxarıdakı sınaq məlumatları və geri qaytarılan SQL yoxlamaları ilə əhatə olunub.
+
 ## Əvvəlki tamamlanma mərhələsi
 
 ## Yekun davranış
