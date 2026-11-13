@@ -24,7 +24,7 @@ function productionFunction(name) {
 }
 
 const helperNames = [
-  'caValue', 'caNumber', 'caFormatNumber', 'caFormatPrice',
+  'caNormalizeSaleOptions', 'caValue', 'caNumber', 'caFormatNumber', 'caFormatPrice',
   'caFormatMileage', 'caCarName', 'caEffectivePackage', 'caStoredPhotoGroups', 'caRemoteToCar',
   'caComparePackages', 'caComparePrices', 'caNum',
 ];
@@ -280,4 +280,13 @@ test('the reviewed listing projection includes sold state and approval timestamp
   assert.deepEqual(declared.slice().sort(), expected.slice().sort());
   assert.ok(!declared.includes('paket_tesdiq_qeydi'));
   assert.ok(!declared.includes('*'));
+});
+
+test('sale methods read saved arrays and legacy JSON without trusting unrelated credit claims', () => {
+  for (const ca_data of [{ saleOptions: ['barter', 'credit', 'credit'] }, JSON.stringify({ saleOptions: ['credit', 'barter'] })]) {
+    assert.deepEqual(plain(caRemoteToCar({ca_data}).saleOptions), ['credit', 'barter']);
+  }
+  for (const ca_data of [undefined, null, {}, { credit: true, barter: true }, { saleOptions: '<script>credit</script>' }, { saleOptions: [] }]) {
+    assert.deepEqual(plain(caRemoteToCar({ca_data}).saleOptions), ['cash']);
+  }
 });

@@ -132,3 +132,11 @@ Qəzalı avtomobillər də qəbul edilir: formada «Vəziyyəti → Qəzalı» v
 Admin şikayət kartındakı «Elana bax» düyməsi həmin elanı ayrıca məxfi baxışda açır; elan hazırkı siyahı səhifəsində olmasa da işləyir. 16 yeni və 21 mövcud brauzer ssenarisi keçib.
 
 `database/browse-performance.sql` əvvəlki sxem miqrasiyalarından sonra tətbiq olunan sürət düzəlişidir. Elanın bütün geniş məlumatları əvvəlcədən hesablanmır; filtr və səhifə seçildikdən sonra açıq sütunlar qaytarılır. [10 000 sintetik elan və 20 paralel sessiyanın ölçmələri](docs/performance/populated-browse.md), [canlı məhdud oxuma yoxlaması](docs/performance/README.md) və [həqiqi elan/şəkil nüsxəsinin yerli bərpası](RESTORE_DRILL.md) ayrıca sənədləşdirilib. Real sınaq elanları ictimai sayta yerləşdirilməyib.
+
+## Nağd, kredit və barter
+
+Elan formasında bir və ya bir neçə satış şərti seçilir; yeni formada Nağd seçilidir və ən azı bir seçim tələb olunur. Şərtlər `ca_data.saleOptions` daxilində `cash`, `credit`, `barter` massivində saxlanılır. Köhnə məlumatlar yazılmadan Nağd kimi göstərilir.
+
+Əsas ekrandakı ayrıca düymələr və əlavə filtr eyni `saleType` seçimini idarə edir. Seçim nəticələri birinci səhifədən açır, digər tətbiq edilmiş filtrlər/sıralama ilə birlikdə işləyir və VIP elanları da uyğun süzür. Kartlarda və tam məlumatda satış şərtləri görünür. Saxlanılan axtarışlar və yeni elan bildirişləri bu seçimi saxlayır. Kredit nişanı satıcının bəyan etdiyi imkandır; bank təsdiqi və ya ödəniş əməliyyatı deyil.
+
+`database/sale-options.sql` əvvəlki miqrasiyalardan sonra tətbiq olunur: oxuma köməkçisi, yalnız dəyişən/açıq seçimlər üçün yazma yoxlaması, siyahı/VIP filtri və saxlanılan axtarış uyğunluğu. Şəkillər, VIP tarixçəsi və əvvəlki elanlar dəyişdirilmir.

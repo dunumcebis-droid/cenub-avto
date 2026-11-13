@@ -1027,3 +1027,30 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-market-open #caServerNotice{display:none!important;visibility:hidden;pointer-events:none}
 @media(max-width:600px){header .header-actions{flex-wrap:wrap;justify-content:flex-end;max-width:100%}.ca-market-box{padding:17px}.ca-market-box h2{font-size:21px}.ca-market-section{padding:15px}.ca-market-item{padding:13px}.ca-notification-launch{font-size:12px}.ca-market-box .ca-actions>button,.ca-market-section .ca-actions>button{flex:1 1 auto}#caReportsAdmin{width:calc(100% - 24px)}}
 @media(max-width:360px){.ca-market-overlay{padding:10px}.ca-market-box{padding:14px;max-height:calc(100dvh - 20px)}.ca-market-box h2{font-size:20px}.ca-market-section h3{font-size:19px}.ca-market-item .ca-actions{gap:7px}.ca-market-item .ca-actions>button{flex:1 1 100%}.ca-notification-launch{padding:9px 10px;font-size:11px}.ca-managed-photo{width:124px}}
+
+/* Seller terms and the independent cash/credit/barter browse control. */
+.ca-sale-options{min-width:0;margin:2px 0 0;padding:16px;border:1px solid #42677c;border-radius:15px;background:#10293d;color:#eff8ff}
+.ca-sale-options legend{padding:0 7px;color:#eef8ff;font-size:15px;font-weight:800;line-height:1.5}
+.ca-sale-options #caSaleOptionsHelp{margin:0 0 12px;color:#bdd2e2;font-size:13px;line-height:1.6}
+.ca-sale-option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-width:0}
+.ca-sale-option-grid label{display:flex;align-items:center;gap:9px;min-width:0;min-height:48px;box-sizing:border-box;margin:0;padding:11px 13px;border:1px solid #56788b;border-radius:11px;background:#142f44;color:#eef9ff;cursor:pointer;font-size:14px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.ca-sale-option-grid label:has(input:checked){border-color:#56dfca;background:#164b4c;color:#f4fffd}
+.ca-sale-option-grid input[type="checkbox"]{appearance:auto!important;width:19px!important;height:19px!important;min-width:19px!important;min-height:19px!important;flex:0 0 19px;margin:0!important;padding:0!important;accent-color:#44d9c3;box-shadow:none!important;cursor:pointer}
+.ca-sale-option-grid label:has(input:disabled){opacity:.55;cursor:not-allowed}
+.ca-sale-options:has(input:invalid){border-color:#eea2a2}
+.ca-sale-browse{display:flex;align-items:center;justify-content:space-between;gap:22px;min-width:0;max-width:100%;box-sizing:border-box;margin:0 0 30px;padding:21px 23px;border:1px solid #416577;border-radius:18px;background:linear-gradient(110deg,#102c40,#123c42);color:#f0f9ff}
+.ca-sale-browse h2{margin:0;color:#f2faff;font-size:clamp(19px,2.3vw,25px);line-height:1.4;letter-spacing:-.45px}
+.ca-sale-browse p{margin:6px 0 0;color:#c2d9e2;font-size:13px;line-height:1.6}
+.ca-sale-type-tabs{display:flex;flex-wrap:wrap;align-items:center;gap:9px;min-width:0;max-width:100%}
+.ca-sale-type-button{flex:0 1 auto;min-height:46px;max-width:100%;box-sizing:border-box;padding:11px 17px;border:1px solid #648b9b;border-radius:12px;background:#142f43;color:#eef9ff;font-family:inherit;font-size:14px;font-weight:800;line-height:1.4;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+.ca-sale-type-button.active,.ca-sale-type-button[aria-pressed="true"]{background:#b8f33e;border-color:#c8ff62;color:#112d20}
+.ca-sale-type-button:disabled{opacity:.55;cursor:not-allowed}
+.ca-sale-badges{display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%;margin:10px 0;color:#e3f6fc;font-size:12px;font-weight:800;line-height:1.45}
+.ca-sale-badges [data-sale-option]{display:inline-block;max-width:100%;box-sizing:border-box;padding:4px 8px;border:1px solid #527e92;border-radius:8px;background:#17394b;color:#e3f6fc;overflow-wrap:anywhere}
+.ca-sale-badges [data-sale-option="cash"]{background:#143e35;border-color:#4c9c81;color:#d4ffea}
+.ca-sale-badges [data-sale-option="credit"]{background:#123b55;border-color:#5394b5;color:#d5f1ff}
+.ca-sale-badges [data-sale-option="barter"]{background:#3e3320;border-color:#af9150;color:#fff0bf}
+
+.ca-sale-type-button:focus-visible,.ca-sale-option-grid input:focus-visible{outline:3px solid #80e8dc;outline-offset:3px}
+@media(max-width:760px){.ca-sale-browse{align-items:stretch;flex-direction:column;gap:16px;padding:18px}.ca-sale-type-tabs{width:100%}.ca-sale-type-button{flex:1 1 calc(25% - 9px);padding:11px 12px}}
+@media(max-width:480px){.ca-sale-options{padding:13px}.ca-sale-option-grid{grid-template-columns:1fr;gap:8px}.ca-sale-browse{padding:16px;margin-bottom:24px}.ca-sale-type-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ca-sale-type-button{width:100%;min-height:46px}}

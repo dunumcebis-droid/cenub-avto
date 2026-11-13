@@ -1,5 +1,12 @@
 # Qalan elan platforması funksiyaları
 
+## 14 noyabr 2026 — Nağd, Kredit, Barter
+
+- Elan formasında üç çoxseçimli satış şərti, geniş axtarışda ayrıca filtr və əsas ekranda ayrıca seçim düymələri əlavə edilib. Kart/detail nişanları, redaktə, sıfırlama və hesab dəyişməsi yoxlanıb.
+- Satış şərti digər filtrlərlə/sıralama ilə birləşir; səhifələmə birinci səhifədən başlayır. VIP bölməsində seçim limitdən əvvəl tətbiq olunur. Saxlanılan axtarış və bildirişlər eyni uyğunluq qaydasından istifadə edir.
+- 108 Node, 17 yeni və 42 mövcud brauzer ssenarisi keçib. 320/375/768/1440 px statik görünüş və 44 px toxunma hədəfləri ayrıca yoxlanıb. Brauzer API-ləri sınaq məlumatları ilə əvəz olunur; real elan və bank əməliyyatı yaradılmır.
+- Canlı bazada 126 SQL yoxlaması keçib və sınaq məlumatları geri qaytarılıb. Mövcud elan/paket sətirləri, şəkil yoxlama ayarları və məxfilik qorunub. Yeni təhlükəsizlik məsləhəti yaranmayıb; əvvəlki məsləhətlər dəyişməyib.
+
 ## 13 noyabr 2026 — reklamdan əvvəl əlavə yoxlamalar
 
 - Şikayət kartından «Elana bax» əlavə edilib. Səhifədən kənar elanın məxfi admin baxışı, xəta/təkrar cəhd, hesabdan çıxış, filtr dəyişikliyi, eyni vaxtlı baxışlar və 320 px idarəetmə üzrə 16 yeni və 21 mövcud ssenari keçib.

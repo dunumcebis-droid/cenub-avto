@@ -197,7 +197,7 @@ function openReport(id) {
  content.append(field('Səbəb','caReportReason',reason),field('Əlavə məlumat (istəyə görə, 1000 simvoladək)','caReportDetails',details));
  reason.focus();
 }
-const searchFields = {make:'searchMake',model:'searchModel',price:'searchPrice',city:'searchCity',priceMin:'caPriceMin',priceMax:'caPriceMax',yearMin:'caYearMin',yearMax:'caYearMax',kmMin:'caKmMin',kmMax:'caKmMax',engineMin:'caEngineMin',engineMax:'caEngineMax',hpMin:'caHpMin',hpMax:'caHpMax',vehicle:'caVehicle',state:'caState',body:'caBody',color:'caColor',market:'caMarket',seats:'caSeats'};
+const searchFields = {make:'searchMake',model:'searchModel',price:'searchPrice',city:'searchCity',priceMin:'caPriceMin',priceMax:'caPriceMax',yearMin:'caYearMin',yearMax:'caYearMax',kmMin:'caKmMin',kmMax:'caKmMax',engineMin:'caEngineMin',engineMax:'caEngineMax',hpMin:'caHpMin',hpMax:'caHpMax',vehicle:'caVehicle',state:'caState',body:'caBody',color:'caColor',market:'caMarket',seats:'caSeats',saleType:'caSaleType'};
 const numericFields = new Set(['price','priceMin','priceMax','yearMin','yearMax','kmMin','kmMax','engineMin','engineMax','hpMin','hpMax']);
 function selectedFilters() {
  const filters = {};
@@ -279,6 +279,7 @@ function applySearch(id) {
  document.querySelectorAll('.pill').forEach(p => {
   const match = (p.getAttribute('onclick') || '').match(/setFilter\(['"]([^'"]+)['"]/); if (match) p.classList.toggle('active',match[1] === currentFilter);
  });
+ caSyncSaleTypeUI();
  closeModal(false); closeCabinet(); closeSellPage(); caFetchListings(1); $('elanlar')?.scrollIntoView({behavior:'smooth'});
 }
 function updateNotificationBadge() {

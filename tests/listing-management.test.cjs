@@ -25,6 +25,7 @@ function production(names, globals = {}) {
     },
     ...globals,
   });
+  productionFunction(context, 'caNormalizeSaleOptions');
   for (const name of names) productionFunction(context, name);
   return context;
 }
@@ -296,12 +297,12 @@ function listingHarness({ respond = async () => browseReply(), filters = null, p
   };
   const context = production([
     'listingKey', 'caRebuildListingCache', 'caRememberListings', 'caCurrentListings',
-    'caInvalidatePrivateRequests', 'caClearPrivateListings', 'caUpdatePublicStats', 'caFetchListings',
+    'caInvalidatePrivateRequests', 'caClearPrivateListings', 'caUpdatePublicStats', 'caSyncSaleTypeUI', 'caFetchListings',
     'caFetchScopedListings', 'caFetchMyListings', 'caFetchFavoriteListings', 'caChangePage',
   ], {
     AbortController,
     console: { warn() {} },
-    document: { getElementById: id => elements[id] || null },
+    document: { getElementById: id => elements[id] || null, querySelectorAll: () => [] },
     caToken: async () => 'fixture-token',
     caRequest: async (pathname, method, body, token, headers, signal) => {
       const call = { pathname, method, body: body == null ? body : plain(body), token, headers, signal };
@@ -740,4 +741,17 @@ test('a stale refresh failure cannot sign out or remove the newer account sessio
   assert.deepEqual(h.removed, []);
   assert.equal(h.clears, 0);
   assert.equal(h.updates, 0);
+});
+
+test('seller sale choices are explicit canonical snapshot data without changing payment columns or the input', () => {
+  const { caListingPayload } = payloadContext();
+  const draft = {saleOptions:['barter', 'credit', 'barter'], equipment:['ABS'], photos:{front:['https://fixture.invalid/front.jpg']}};
+  const baseline = plain(draft);
+  const payload = caListingPayload(draft);
+  assert.deepEqual(plain(payload.ca_data.saleOptions), ['credit', 'barter']);
+  assert.deepEqual(plain(payload.sekiller), draft.photos.front);
+  assert.deepEqual(draft, baseline);
+  assert.equal(Object.hasOwn(payload, 'paket_adi'), false);
+  assert.equal(Object.hasOwn(payload, 'saleOptions'), false);
+  assert.equal(payload.veziyyet, 'gozlemede');
 });
