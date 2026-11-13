@@ -7,6 +7,10 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## Son düzəliş və yoxlama
 
+Şəkillərin avtomobilə və seçilən bölməyə uyğunluğunu yoxlayan server/forma inteqrasiyası hazırlanıb. **API açarı qoşulmadığından avtomatik tanıma sönülüdür; indiki şəkillər admin tərəfindən yoxlanır.** Aktivləşdirmə və real dəqiqlik sınağı üçün [PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md), proqram/baza sınaqları üçün [PHOTO_REVIEW_VERIFICATION.md](PHOTO_REVIEW_VERIFICATION.md).
+
+## Əvvəlki domenə hazırlıq düzəlişləri
+
 Domen alınmazdan əvvəl təkrar elan göndərişi, yarımçıq şəkil yükləməsinin təkrarı, göndəriş zamanı formanın qorunması, giriş/bərpa pəncərəsinin fokus və sürüşməsi, hesab üzrə seçilmişlər və gecikmiş paylaşım keçidinin yeni seçimi pozması düzəldilib. Yeni ssenarilər və əhatə: [PRELAUNCH_FIXES_VERIFICATION.md](PRELAUNCH_FIXES_VERIFICATION.md).
 
 ## Əvvəlki tamamlanma yoxlaması

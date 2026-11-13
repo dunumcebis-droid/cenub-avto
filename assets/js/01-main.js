@@ -69,6 +69,7 @@ const caPrivateState={ownLoaded:false,ownLoading:false,ownError:false,favoritesL
 let caBrowseSequence=0,caBrowseController=null,caOwnSequence=0,caFavoritesSequence=0;
 let caListingSubmissionSequence=0,caDraftOwner=null;
 let caCreateSubmission=null,caPhotoUploadCache=new WeakMap();
+window.caPhotoReviewModeChanged=()=>{caPhotoUploadCache=new WeakMap();};
 const caBusyForms=new WeakMap();
 function caSetListingFormBusy(form,busy){
  if(busy){if(caBusyForms.has(form))return;const controls=[...form.querySelectorAll('input,select,textarea,button')].map(element=>({element,disabled:element.disabled}));caBusyForms.set(form,controls);for(const {element} of controls)element.disabled=true;form.setAttribute('aria-busy','true');}
@@ -325,9 +326,12 @@ async function caPreparePhoto(file){
   if(!blob)throw Error('Şəkil hazırlanmadı.');caWatermarkedPhotos.add(blob);return blob;
  }finally{decoded.close();}
 }
-async function caUploadPhoto(file,token,onProgress,owner=currentUser?.id,submission=caListingSubmissionSequence){
+async function caUploadPhoto(file,token,onProgress,owner=currentUser?.id,submission=caListingSubmissionSequence,category='other'){
  const blob=await caPreparePhoto(file);
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
+ const reviewed=await window.caReviewPreparedPhoto?.(blob,{category,owner,submission,token,onProgress,fileName:file.name});
+ if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');
+ if(reviewed)return reviewed;
  const path=owner+'/'+crypto.randomUUID()+(caWatermarkedPhotos.has(blob)?'-ca-wm1':'')+'.jpg';
  return await new Promise((resolve,reject)=>{
   const xhr=new XMLHttpRequest();xhr.open('POST',CA_URL+'/storage/v1/object/elan-sekilleri/'+path);
@@ -343,6 +347,7 @@ async function caUploadSelectedPhotos(inputs,photos){
  const tasks=[];for(const input of inputs){const files=[...input.files];if(files.length>6)throw Error('Hər bölməyə maksimum 6 şəkil seçilə bilər.');if(files.length){photos[input.dataset.category]=new Array(files.length);files.forEach((file,i)=>tasks.push({file,category:input.dataset.category,index:i}));}}
  if(!tasks.length)return;
  const token=await caToken();if(!token)throw Error('Şəkil yükləmək üçün daxil ol.');
+ await window.caPhotoReviewBeforeBatch?.({owner,submission,token});
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
  const progress=Array(tasks.length).fill(0),status=document.getElementById('caUploadStatus'),bar=document.getElementById('caUploadBar'),label=document.getElementById('caUploadLabel');
  status.hidden=false;const update=()=>{if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;const pct=Math.round(progress.reduce((a,b)=>a+b,0)/tasks.length*100);bar.value=pct;label.textContent='Şəkillər yüklənir: '+pct+'% ('+progress.filter(x=>x===1).length+'/'+tasks.length+')';};update();
@@ -351,9 +356,9 @@ async function caUploadSelectedPhotos(inputs,photos){
   try{while(!firstError&&cursor<tasks.length){
    if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
    const i=cursor++,t=tasks[i],cached=caPhotoUploadCache.get(t.file);
-   const url=cached?.owner===owner?cached.url:await caUploadPhoto(t.file,token,v=>{progress[i]=v;update();},owner,submission);
+   const url=cached?.owner===owner&&cached.category===t.category?cached.url:await caUploadPhoto(t.file,token,v=>{progress[i]=v;update();},owner,submission,t.category);
    if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');
-   caPhotoUploadCache.set(t.file,{owner,url});progress[i]=1;update();photos[t.category][t.index]=url;
+   caPhotoUploadCache.set(t.file,{owner,category:t.category,url});progress[i]=1;update();photos[t.category][t.index]=url;
   }}catch(error){if(!firstError)firstError=error;throw error;}
  }
  // Drain in-flight uploads before unlocking the form, preserving every success for retry.
@@ -405,6 +410,16 @@ function caResumeSavedListingDraft(row,draft){
  }
 }
 
+// A completed edit may update its cached row without disturbing a newer form/page.
+async function caRefreshConfirmedEdit(id,owner){
+ try{
+  const token=await caToken();if(!token||currentUser?.id!==owner)return;
+  const rows=await caRequest('/rest/v1/elanlar?select='+CA_LISTING_COLUMNS+'&id=eq.'+encodeURIComponent(id)+'&satici_id=eq.'+encodeURIComponent(owner)+'&limit=1','GET',null,token);
+  if(currentUser?.id!==owner||!Array.isArray(rows)||rows.length!==1||rows[0].id!==id||rows[0].satici_id!==owner)return;
+  caRememberListings([caRemoteToCar(rows[0])]);
+ }catch(error){console.warn('Saxlanmış elanın keş məlumatı yenilənmədi.');}
+}
+
 async function caDeleteRemoteCar(id,owner=currentUser?.id){
  const token=await caToken();if(!token)throw Error('Yenidən daxil ol.');
  if(!owner||currentUser?.id!==owner)throw Error('Hesab dəyişib. Elanı öz hesabından yenidən yoxla.');
@@ -417,7 +432,7 @@ window.addEventListener('load',()=>caFetchListings());
 let editingCarId=null,editingOriginalPhotos=null;
 let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
-function updateAccountUI(){window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
+function updateAccountUI(){window.caPhotoReviewSessionChanged?.();window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
 let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
 function caShowListingFeedback(message,kind='success'){
@@ -1105,7 +1120,8 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
   // The listing transaction creates any requested paid package atomically.
   // A second package RPC here would duplicate that request.
   d._id=await caSaveRemoteCar(d,wasEdit,owner,editId,submission);confirmedSave=true;
-  if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
+  if(currentUser?.id!==owner)return;
+  if(submission!==caListingSubmissionSequence){if(wasEdit)await caRefreshConfirmedEdit(d._id,owner);return;}
   caInvalidatePrivateRequests();d.ownerId=owner;
   d.createdAt=original?.createdAt||new Date().toISOString();
   if(wasEdit){const index=userCars.findIndex(car=>car._id===editId);if(index>=0)userCars[index]=d;else userCars.unshift(d);}

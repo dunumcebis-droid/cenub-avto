@@ -987,3 +987,6 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 .ca-legacy-favorites{margin:16px 0;padding:14px 16px;border:1px solid #3f697f;border-radius:12px;background:#102b3c;color:#dcebf5}
 .ca-legacy-favorites p{margin:0 0 10px;line-height:1.6;overflow-wrap:anywhere}
 .ca-legacy-favorites button{min-height:44px;max-width:100%;white-space:normal}
+
+/* Vehicle photograph category guidance and review outcomes. */
+.ca-photo-review-note{padding:14px 16px;border:1px solid #558b96;border-radius:12px;background:#112b3c;color:#dcecf2;line-height:1.6;margin:14px 0}.ca-photo-review-guide{font-size:.85rem;line-height:1.5;color:#c0d3e0;margin:8px 0}.ca-photo-review-status{font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}.ca-photo-review-status[data-review-state="error"]{color:#ffd0cf}.ca-photo-review-status[data-review-state="approved"]{color:#bfeecb}.photo-input[aria-invalid="true"]{outline:2px solid #e68e89;outline-offset:4px}

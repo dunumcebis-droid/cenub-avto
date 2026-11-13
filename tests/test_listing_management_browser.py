@@ -102,6 +102,9 @@ class OfflineBackend:
         return [call for call in self.calls if call['method'] in ('POST','PATCH','DELETE')]
 
     def route(self, route):
+        if urlsplit(route.request.url).path == '/functions/v1/ca-photo-review/status':
+            route.fulfill(content_type='application/json', body='{"enabled":false,"configured":false}')
+            return
         req = route.request
         local = safe_local_asset(req.url)
         if local is not None:
