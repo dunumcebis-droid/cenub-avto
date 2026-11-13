@@ -63,7 +63,8 @@ async function statusFor(owner,token){
   const value=await jsonRequest(endpoint+'/status',{method:'GET',headers:{apikey:CA_KEY,Authorization:'Bearer '+token}},12000);
   assertCurrent(owner);if(generation!==epoch)throw Error('Hesab sessiyası dəyişib. Yenidən yoxla.');
   if(typeof value?.enabled!=='boolean'||typeof value.configured!=='boolean'){const error=Error('Şəkil yoxlamasının vəziyyəti təsdiqlənmədi. Yenidən yoxla.');error.code='invalid_review_response';throw error;}
-  const clean={enabled:value.enabled,configured:value.configured};cached={owner,value:clean,until:Date.now()+10000};setMode(clean);return clean;
+  if(Object.hasOwn(value,'batch_supported')&&typeof value.batch_supported!=='boolean'||value.batch_supported===true&&(!Number.isInteger(value.batch_max)||value.batch_max<1||value.batch_max>6)){const error=Error('Şəkil yoxlamasının vəziyyəti təsdiqlənmədi.');error.code='invalid_review_response';throw error;}
+  const clean={enabled:value.enabled,configured:value.configured,batchSupported:value.batch_supported===true,batchMax:value.batch_supported===true?value.batch_max:0};cached={owner,value:clean,until:Date.now()+10000};setMode(clean);return clean;
  })();
  const holder={owner,promise};pending=holder;
  try{return await promise;}finally{if(pending===holder)pending=null;}
@@ -98,7 +99,7 @@ window.caReviewPreparedPhoto=async function(blob,{category,owner,submission,toke
  const state=groupStates.get(category)||{checking:0,approved:0,error:''};groupStates.set(category,state);if(!state.checking)state.error='';state.checking++;drawGroup(category);
  try{
   onProgress?.(0);const body=new FormData();body.append('file',blob,'photo.jpg');body.append('category',category);
-  const result=await jsonRequest(endpoint,{method:'POST',headers:{apikey:CA_KEY,Authorization:'Bearer '+token},body},60000);
+  const result=await jsonRequest(endpoint,{method:'POST',headers:{apikey:CA_KEY,Authorization:'Bearer '+token},body},30000);
   assertCurrent(owner,submission);
   const id=result?.review_id,validId=typeof id==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   const expected=CA_URL.replace(/\/$/,'')+'/storage/v1/object/public/elan-sekilleri/'+owner+'/checked/'+id+'-ca-wm1.jpg';
@@ -108,6 +109,50 @@ window.caReviewPreparedPhoto=async function(blob,{category,owner,submission,toke
   if(stale(owner,submission))throw error;
   const message=humanError(error,category,fileName);state.error=message;const failure=Error(message);failure.code=error.code||'photo_review_failed';throw failure;
  }finally{if(!stale(owner,submission)&&groupStates.get(category)===state){state.checking--;drawGroup(category);}}
+};
+// Each approved batch item remains bound to its original position, owner and group.
+function invalidBatchResponse(){const error=Error('Şəkil yoxlamasının nəticəsi təsdiqlənmədi.');error.code='invalid_review_response';return error;}
+function checkedPhotoUrl(result,category,owner){
+ const id=result?.review_id;
+ if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||result.category!==category)throw invalidBatchResponse();
+ const expected=CA_URL.replace(/\/$/,'')+'/storage/v1/object/public/elan-sekilleri/'+owner+'/checked/'+id+'-ca-wm1.jpg';
+ if(result.url!==expected)throw invalidBatchResponse();return expected;
+}
+window.caReviewPreparedPhotoBatch=async function(items,{owner,submission,token,reviewStatus}={}){
+ assertCurrent(owner,submission);
+ if(!Array.isArray(items)||items.length<1||items.length>6||items.some(item=>!item||!Object.hasOwn(categories,item.category)||!(item.blob instanceof Blob)||item.blob.type!=='image/jpeg'||item.blob.size<1||item.blob.size>5*1024*1024)||items.reduce((sum,item)=>sum+item.blob.size,0)>8*1024*1024){const error=Error('Şəkillər üçün uyğun bölmə və ölçü seç.');error.code='invalid_image';throw error;}
+ const status=reviewStatus??await window.caPhotoReviewBeforeBatch({owner,submission,token});assertCurrent(owner,submission);
+ if(status?.enabled!==true||status.configured!==true||status.batchSupported!==true||!Number.isInteger(status.batchMax)||status.batchMax<items.length||status.batchMax>6){const error=Error('Şəkillərin qrup yoxlaması hazırda mümkün deyil.');error.code='provider_unavailable';throw error;}
+ const states=items.map(item=>{
+  const state=groupStates.get(item.category)||{checking:0,approved:0,error:''};groupStates.set(item.category,state);
+  if(!state.checking)state.error='';state.checking++;drawGroup(item.category);return state;
+ });
+ try{
+  const body=new FormData();body.append('categories',JSON.stringify(items.map(item=>item.category)));
+  items.forEach((item,index)=>body.append('file_'+index,item.blob,'photo.jpg'));
+  const response=await jsonRequest(endpoint+'/batch',{method:'POST',headers:{apikey:CA_KEY,Authorization:'Bearer '+token},body},35000);
+  assertCurrent(owner,submission);
+  if(!response||typeof response!=='object'||Array.isArray(response)||!Array.isArray(response.results)||response.results.length!==items.length)throw invalidBatchResponse();
+  const normalized=new Array(items.length),seen=new Set();
+  for(const result of response.results){
+   const index=result?.index;
+   if(!Number.isInteger(index)||index<0||index>=items.length||seen.has(index)||result.category!==items[index].category)throw invalidBatchResponse();seen.add(index);
+   if(result.ok===true){normalized[index]={index,url:checkedPhotoUrl(result,items[index].category,owner)};}
+   else if(result.ok===false&&typeof result.code==='string'&&result.code.length>0&&result.code.length<=80&&!Object.hasOwn(result,'url')&&!Object.hasOwn(result,'review_id')){
+    const code=Object.hasOwn({screenshot:1,not_vehicle:1,category_mismatch:1,uncertain:1,rate_limited:1,provider_quota:1,provider_denied:1,auth_required:1,invalid_image:1,provider_unavailable:1},result.code)?result.code:'provider_unavailable';
+    const error=Error(humanError({code},items[index].category,items[index].fileName));error.code=code;normalized[index]={index,error};
+   }else throw invalidBatchResponse();
+  }
+  // Validate every index and URL before marking any item approved.
+  normalized.forEach((result,index)=>{if(result.error)states[index].error=result.error.message;else states[index].approved++;});
+  return normalized;
+ }catch(error){
+  if(stale(owner,submission))throw error;
+  items.forEach((item,index)=>{states[index].error=humanError(error,item.category,item.fileName);});
+  const failure=Error(states[0].error);failure.code=error.code||'photo_review_failed';throw failure;
+ }finally{
+  if(!stale(owner,submission))items.forEach((item,index)=>{if(groupStates.get(item.category)===states[index]){states[index].checking--;drawGroup(item.category);}});
+ }
 };
 // Review selected new photos without creating or editing an advertisement.
 async function precheckPhotos(){

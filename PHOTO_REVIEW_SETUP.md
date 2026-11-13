@@ -1,8 +1,8 @@
 # Şəkillərin avtomatik yoxlanması
 
-**Ümumi avtomatik tanıma hələ aktiv deyil; admin sınaq rejimi açılıb.** İstifadəçi `GEMINI_API_KEY` dəyərini Supabase Secrets-ə əlavə etdiyini təsdiqləyib. Server real sorğu zamanı açardan istifadə edir; açar söhbətə və repozitoriyaya alınmır. Real provayder nəticəsi adminin öz hesabından yoxlanmalıdır.
+**Real Gemini tanıması qoşulub və normal hesab girişi ilə yoxlanıb.** Açar Supabase Secrets-də qalır; brauzerə və repozitoriyaya alınmır. Standart model `gemini-3.5-flash-lite`-dır. Aktiv rejimi özəl baza konfiqurasiyası müəyyən edir: `enabled:true` bütün hesablar üçün yoxlamanı açır; `enabled:false, admin_preview:true` yalnız admin sınağıdır.
 
-Gemini üçün standart model `gemini-3.5-flash-lite`-dır. Ayrı model adı yalnız standartı dəyişmək üçün lazımdır. Keyfiyyət və hesab limiti real sınaqda təsdiqlənmədən bütün istifadəçilər üçün bayraq açılmır.
+Yeni şəkillər ən çox 6 ayrıca görüntü ilə bir model sorğusunda yoxlanır. Brauzer iki qrup sorğusunu paralel göndərir; hər şəklin öz sahibi, bölməsi, SHA-256 izi, saxlanılan yolu və təsdiqi var. Eyni şəkil başqa bölməyə köçürüləndə yenidən yoxlanır.
 
 ## Qoşulma
 
@@ -21,7 +21,7 @@ Gemini standartı üçün `GEMINI_API_KEY` kifayətdir; `PHOTO_REVIEW_PROVIDER` 
 
 3. `ca-photo-review` Edge Function-ın server konfiqurasiyası yoxlanır. Hesaba daxil olmuş istifadəçinin `/functions/v1/ca-photo-review/status` sorğusunda `configured: true` görünməsi yalnız konfiqurasiyanın mövcudluğunu bildirir; modelin uğurla şəkil tanıdığını sübut etmir.
 4. Nəzarətli sınaqda real ön, arxa, yan, salon, mühərrik və detal fotoları, yanlış bölməyə qoyulmuş fotolar, ekran görüntüləri və avtomobilə aid olmayan şəkillər yoxlanır. Şübhəli görünüşlər üçün də nəticə qiymətləndirilir.
-5. Bu sınaqdan sonra avtomatik yoxlama bazadakı xidmət bayrağı ilə ayrıca aktivləşdirilir. `enabled` bayrağı hazırda sönülüdür, `admin_preview` açıqdır. Bu rejim yalnız mövcud `adminler` icazəsi olan hesablarda işləyir; digər istifadəçilər əvvəlki admin yoxlaması axınında qalır. Aktivləşdirmə kod/baza üzrə işi aparan şəxs tərəfindən edilir. Hazırlıq tamamlanmadan bayrağı açmaq yeni şəkillərin göndərilməsini dayandıra bilər.
+5. Bu sınaqdan sonra avtomatik yoxlama bazadakı xidmət bayrağı ilə ayrıca aktivləşdirilir. Admin sınağı `enabled:false, admin_preview:true`, ümumi rejim isə `enabled:true, admin_preview:false` ilə seçilir. Aktivləşdirmə kod/baza üzrə işi aparan şəxs tərəfindən edilir. Hazırlıq tamamlanmadan bayrağı açmaq yeni şəkillərin göndərilməsini dayandıra bilər.
 
 ## Aktiv olanda davranış
 

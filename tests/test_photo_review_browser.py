@@ -28,6 +28,13 @@ class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
         self.bad_category = False
         self.hold_review = False
         self.pending_reviews = []
+        self.batch_supported = False
+        self.batch_max = 6
+        self.batch_calls = []
+        self.batch_errors = {}
+        self.batch_reverse = False
+        self.batch_bad_kind = None
+        self.bad_batch_cap = False
 
     def approved(self, req, category):
         owner = OTHER_OWNER if req.headers.get('authorization') == 'Bearer second-token' else OWNER
@@ -48,7 +55,55 @@ class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
                 route.abort('connectionreset')
                 return
             value = dict(enabled='yes', configured=True) if self.bad_status else dict(enabled=self.enabled, configured=self.configured)
+            if self.batch_supported or self.bad_batch_cap:
+                value.update(batch_supported='yes' if self.bad_batch_cap else True, batch_max=self.batch_max)
             route.fulfill(content_type='application/json', body=json.dumps(value))
+            return
+        if path == '/functions/v1/ca-photo-review/batch':
+            assert req.method == 'POST'
+            assert req.headers.get('authorization') in ('Bearer seller-token', 'Bearer second-token')
+            message = BytesParser(policy=policy.default).parsebytes(
+                ('Content-Type: '+req.headers['content-type']+'\r\n\r\n').encode()+req.post_data_buffer)
+            parts = {part.get_param('name', header='content-disposition'): part for part in message.iter_parts()}
+            categories = json.loads(parts['categories'].get_content())
+            assert 1 <= len(categories) <= 6
+            assert set(parts) == {'categories', *(f'file_{i}' for i in range(len(categories)))}
+            self.batch_calls.append(dict(categories=categories, headers=dict(req.headers)))
+            for i in range(len(categories)):
+                part = parts[f'file_{i}']
+                assert part.get_filename() == 'photo.jpg'
+                assert part.get_content_type() == 'image/jpeg'
+                assert part.get_payload(decode=True).startswith(b'\xff\xd8')
+            if self.error_code:
+                route.fulfill(status=self.error_status, content_type='application/json',
+                              body=json.dumps(dict(code=self.error_code, message='Synthetic batch rejection')))
+                return
+            results = []
+            for i, category in enumerate(categories):
+                self.reviews.append(dict(category=category, batch=True))
+                if i in self.batch_errors:
+                    results.append(dict(index=i, ok=False, category=category, code=self.batch_errors[i]))
+                else:
+                    results.append(dict(index=i, ok=True, **self.approved(req, category)))
+            if self.batch_bad_kind == 'duplicate_index':
+                results[1]['index'] = results[0]['index']
+            elif self.batch_bad_kind == 'missing_result':
+                results.pop()
+            elif self.batch_bad_kind == 'wrong_category':
+                results[0]['category'] = 'rear'
+            elif self.batch_bad_kind == 'untrusted_url':
+                results[-1]['url'] = 'https://untrusted.invalid/other-owner.jpg'
+            elif self.batch_bad_kind == 'failed_url':
+                results[1] = dict(index=1, ok=False, category=categories[1], code='screenshot', url=results[0]['url'])
+            elif self.batch_bad_kind == 'bad_ok':
+                results[0]['ok'] = 'true'
+            if self.batch_reverse:
+                results.reverse()
+            body = dict(results=results)
+            if self.hold_review:
+                self.pending_reviews.append((route, body))
+                return
+            route.fulfill(content_type='application/json', body=json.dumps(body))
             return
         if path == '/functions/v1/ca-photo-review':
             assert req.method == 'POST'
@@ -463,5 +518,130 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertTrue(self.page.locator('#listingFeedback').is_hidden())
         self.assertEqual(self.page.locator('#caPhotoPrecheckResult').inner_text(), '')
         self.assertEqual(self.page.locator('#caPhotoReview-front').inner_text(), '')
+        self.assertFalse(self.backend.saves)
+        self.assertFalse(self.backend.uploads)
+
+    def batch_review(self, categories=('front', 'rear'), snapshot=False):
+        return self.page.evaluate("""async({categories,snapshot})=>{
+            const file=document.getElementById('photos-front').files[0];
+            const items=await Promise.all(categories.map(async(category,index)=>({category,fileName:'sample-'+index+'.jpg',blob:await caPreparePhoto(file)})));
+            try{
+                const results=await caReviewPreparedPhotoBatch(items,{owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token,...(snapshot?{reviewStatus:window.__batchStatus}:{})});
+                return results.map(result=>({index:result.index,url:result.url,code:result.error?.code,message:result.error?.message}));
+            }catch(error){return {code:error.code,message:error.message};}
+        }""", dict(categories=list(categories),snapshot=snapshot))
+
+    def test_batch_capability_is_optional_and_malformed_caps_fail_closed(self):
+        self.new_listing()
+        result = self.page.evaluate('''async()=>{const status=await caPhotoReviewBeforeBatch({owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token});return {batchSupported:status.batchSupported,batchMax:status.batchMax};}''')
+        self.assertEqual(result, dict(batchSupported=False, batchMax=0))
+        for kind in ('boolean', 'size'):
+            with self.subTest(kind=kind):
+                self.backend.bad_batch_cap = kind == 'boolean'
+                self.backend.batch_supported = True
+                self.backend.batch_max = 7 if kind == 'size' else 6
+                self.page.evaluate('''()=>{const before=Date.now;Date.now=()=>before()+11000;}''')
+                result = self.page.evaluate('''async()=>{try{return await caPhotoReviewBeforeBatch({owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token});}catch(error){return {code:error.code};}}''')
+                self.assertEqual(result, dict(code='invalid_review_response'))
+        self.assertFalse(self.backend.batch_calls)
+        self.assertFalse(self.backend.uploads)
+
+    def test_batch_reorders_results_to_original_positions_and_shares_prepared_status(self):
+        self.backend.batch_supported = True
+        self.backend.batch_reverse = True
+        self.new_listing()
+        self.page.evaluate('''async()=>{window.__batchStatus=await caPhotoReviewBeforeBatch({owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token});const before=Date.now;Date.now=()=>before()+11000;}''')
+        status_calls = len(self.backend.status_calls)
+        result = self.batch_review(('front', 'rear', 'side'), snapshot=True)
+        self.assertEqual([item['index'] for item in result], [0, 1, 2])
+        self.assertTrue(all(f'/{OWNER}/checked/' in item['url'] for item in result))
+        self.assertEqual(len({item['url'] for item in result}), 3)
+        self.assertEqual(self.backend.batch_calls[0]['categories'], ['front', 'rear', 'side'])
+        self.assertEqual(len(self.backend.status_calls), status_calls, 'Long batches must use the initial status snapshot')
+        self.assertFalse(self.backend.saves)
+        self.assertFalse(self.backend.uploads)
+        self.assertIn('1 şəkil yoxlamadan keçdi', self.page.locator('#caPhotoReview-rear').inner_text())
+
+    def test_batch_partial_rejection_keeps_verified_successes_and_per_group_warning(self):
+        self.backend.batch_supported = True
+        self.backend.batch_errors = {1: 'screenshot'}
+        self.new_listing()
+        result = self.batch_review()
+        self.assertIn(f'/{OWNER}/checked/', result[0]['url'])
+        self.assertEqual(result[1]['code'], 'screenshot')
+        self.assertIsNone(result[1].get('url'))
+        self.assertIn('Arxa görünüş', result[1]['message'])
+        self.assertIn('sample-1.jpg', result[1]['message'])
+        self.assertIn('Ekran görüntüsü', self.page.locator('#caPhotoReview-rear').inner_text())
+        self.assertEqual(self.page.locator('#photos-rear').get_attribute('aria-invalid'), 'true')
+        self.assertIsNone(self.page.locator('#photos-front').get_attribute('aria-invalid'))
+        self.assertFalse(self.backend.uploads)
+        self.assertFalse(self.backend.saves)
+
+    def test_batch_rejects_all_malformed_results_before_any_false_approval(self):
+        self.backend.batch_supported = True
+        self.new_listing()
+        for kind in ('duplicate_index', 'missing_result', 'wrong_category', 'untrusted_url', 'failed_url', 'bad_ok'):
+            with self.subTest(kind=kind):
+                self.backend.batch_bad_kind = kind
+                result = self.batch_review()
+                self.assertEqual(result['code'], 'invalid_review_response')
+                self.assertNotIn('yoxlamadan keçdi', self.page.locator('#caPhotoReview-front').inner_text())
+                self.assertNotIn('yoxlamadan keçdi', self.page.locator('#caPhotoReview-rear').inner_text())
+                self.assertFalse(self.backend.saves)
+                self.assertFalse(self.backend.uploads)
+
+    def test_batch_quota_error_preserves_files_and_cannot_fall_back_to_unchecked_upload(self):
+        self.backend.batch_supported = True
+        self.backend.error_code = 'provider_quota'
+        self.backend.error_status = 429
+        self.new_listing()
+        result = self.batch_review()
+        self.assertEqual(result['code'], 'provider_quota')
+        self.assertIn('xidmətinin limiti dolub', result['message'])
+        self.assertEqual(self.page.locator('#photos-front').evaluate('input=>input.files.length'), 1)
+        self.assertEqual(self.page.locator('#listingForm [name=price]').input_value(), '42000')
+        self.assertFalse(self.backend.saves)
+        self.assertFalse(self.backend.uploads)
+
+    def test_batch_input_limits_are_enforced_before_review_http(self):
+        self.backend.batch_supported = True
+        self.new_listing()
+        result = self.page.evaluate('''async()=>{
+            const blob=new Blob([new Uint8Array(5*1024*1024)],{type:'image/jpeg'});
+            const options={owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token};
+            const outcomes=[];
+            for(const items of [Array(7).fill({category:'front',blob}),[{category:'front',blob},{category:'rear',blob}],[{category:'unknown',blob}]]){
+                try{await caReviewPreparedPhotoBatch(items,options);outcomes.push('accepted');}catch(error){outcomes.push(error.code);}
+            }
+            return outcomes;
+        }''')
+        self.assertEqual(result, ['invalid_image']*3)
+        self.assertFalse(self.backend.batch_calls)
+        self.assertFalse(self.backend.saves)
+        self.assertFalse(self.backend.uploads)
+
+    def test_late_batch_response_cannot_mark_new_account_photos_approved(self):
+        self.backend.batch_supported = True
+        self.backend.hold_review = True
+        self.new_listing()
+        self.page.evaluate("""()=>{window.__batchOutcome=null;(async()=>{
+            const file=document.getElementById('photos-front').files[0],blob=await caPreparePhoto(file);
+            try{await caReviewPreparedPhotoBatch([{category:'front',blob},{category:'rear',blob}],{owner:currentUser.id,submission:caListingSubmissionSequence,token:caSession.access_token});window.__batchOutcome='accepted';}
+            catch(error){window.__batchOutcome=error.code;}
+        })();}""")
+        for _ in range(100):
+            if self.backend.pending_reviews:
+                break
+            self.page.wait_for_timeout(20)
+        self.assertTrue(self.backend.pending_reviews)
+        self.page.evaluate('''async id=>{await caPersistSession({access_token:'second-token',expires_at:4102444800,user:{id,email:'second@example.invalid',user_metadata:{telefon:'+994000000002'}}});openSellPage();document.querySelector('#listingForm [name=price]').value='55555';}''', OTHER_OWNER)
+        route, response = self.backend.pending_reviews.pop()
+        route.fulfill(content_type='application/json', body=json.dumps(response))
+        self.page.wait_for_function('window.__batchOutcome!==null')
+        self.assertEqual(self.page.evaluate('__batchOutcome'), 'photo_review_stale')
+        self.assertEqual(self.page.locator('#listingForm [name=price]').input_value(), '55555')
+        self.assertEqual(self.page.locator('#caPhotoReview-front').inner_text(), '')
+        self.assertEqual(self.page.locator('#caPhotoReview-rear').inner_text(), '')
         self.assertFalse(self.backend.saves)
         self.assertFalse(self.backend.uploads)

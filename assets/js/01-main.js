@@ -68,8 +68,10 @@ const caBrowseState={page:1,pageSize:24,total:0,totalPages:0,loaded:false,loadin
 const caPrivateState={ownLoaded:false,ownLoading:false,ownError:false,favoritesLoaded:false,favoritesLoading:false,favoritesError:false};
 let caBrowseSequence=0,caBrowseController=null,caOwnSequence=0,caFavoritesSequence=0;
 let caListingSubmissionSequence=0,caDraftOwner=null;
-let caCreateSubmission=null,caPhotoUploadCache=new WeakMap();
-window.caPhotoReviewModeChanged=()=>{caPhotoUploadCache=new WeakMap();};
+let caCreateSubmission=null,caPhotoUploadCache=new WeakMap(),caPreparedPhotoCache=new WeakMap();
+let caPhotoDecoders=0;const caPhotoDecodeQueue=[];
+let caReviewedPhotoCache=new Map();const caPhotoBlobDigests=new WeakMap();
+window.caPhotoReviewModeChanged=()=>{caPhotoUploadCache=new WeakMap();caReviewedPhotoCache=new Map();};
 const caBusyForms=new WeakMap();
 function caSetListingFormBusy(form,busy){
  if(busy){if(caBusyForms.has(form))return;const controls=[...form.querySelectorAll('input,select,textarea,button')].map(element=>({element,disabled:element.disabled}));caBusyForms.set(form,controls);for(const {element} of controls)element.disabled=true;form.setAttribute('aria-busy','true');}
@@ -326,12 +328,37 @@ async function caPreparePhoto(file){
   if(!blob)throw Error('Şəkil hazırlanmadı.');caWatermarkedPhotos.add(blob);return blob;
  }finally{decoded.close();}
 }
+async function caPhotoApprovalKey(blob,owner,category){
+ if(!crypto.subtle)return null;
+ let digest=caPhotoBlobDigests.get(blob);if(!digest){digest=blob.arrayBuffer().then(bytes=>crypto.subtle.digest('SHA-256',bytes)).then(bytes=>Array.from(new Uint8Array(bytes),v=>v.toString(16).padStart(2,'0')).join(''));caPhotoBlobDigests.set(blob,digest);}
+ return owner+'|'+category+'|'+await digest;
+}
+function caCacheReviewedPhoto(key,url){if(!key)return;caReviewedPhotoCache.set(key,url);if(caReviewedPhotoCache.size>72)caReviewedPhotoCache.delete(caReviewedPhotoCache.keys().next().value);}
+function caDrainPhotoDecodeQueue(){while(caPhotoDecoders<2&&caPhotoDecodeQueue.length){caPhotoDecoders++;caPhotoDecodeQueue.shift()();}}
+async function caPrepareListingPhoto(file,owner,submission){
+ const guard=()=>{if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');};guard();
+ let entry=caPreparedPhotoCache.get(file);
+ if(!entry||entry.owner!==owner){
+  entry={owner,promise:null};
+  entry.promise=(async()=>{
+   await new Promise(resolve=>{caPhotoDecodeQueue.push(resolve);caDrainPhotoDecodeQueue();});
+   try{guard();const blob=await caPreparePhoto(file);guard();return blob;}
+   finally{caPhotoDecoders--;caDrainPhotoDecodeQueue();}
+  })();
+  caPreparedPhotoCache.set(file,entry);
+ }
+ try{const blob=await entry.promise;guard();return blob;}
+ catch(error){if(caPreparedPhotoCache.get(file)===entry)caPreparedPhotoCache.delete(file);throw error;}
+}
 async function caUploadPhoto(file,token,onProgress,owner=currentUser?.id,submission=caListingSubmissionSequence,category='other'){
- const blob=await caPreparePhoto(file);
+ const blob=await caPrepareListingPhoto(file,owner,submission);
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
+ const approvalKey=await caPhotoApprovalKey(blob,owner,category);
+ if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');
+ if(approvalKey&&caReviewedPhotoCache.has(approvalKey)){onProgress?.(1);return caReviewedPhotoCache.get(approvalKey);}
  const reviewed=await window.caReviewPreparedPhoto?.(blob,{category,owner,submission,token,onProgress,fileName:file.name});
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');
- if(reviewed)return reviewed;
+ if(reviewed){caCacheReviewedPhoto(approvalKey,reviewed);return reviewed;}
  const path=owner+'/'+crypto.randomUUID()+(caWatermarkedPhotos.has(blob)?'-ca-wm1':'')+'.jpg';
  return await new Promise((resolve,reject)=>{
   const xhr=new XMLHttpRequest();xhr.open('POST',CA_URL+'/storage/v1/object/elan-sekilleri/'+path);
@@ -347,10 +374,46 @@ async function caUploadSelectedPhotos(inputs,photos){
  const tasks=[];for(const input of inputs){const files=[...input.files];if(files.length>6)throw Error('Hər bölməyə maksimum 6 şəkil seçilə bilər.');if(files.length){photos[input.dataset.category]=new Array(files.length);files.forEach((file,i)=>tasks.push({file,category:input.dataset.category,index:i}));}}
  if(!tasks.length)return;
  const token=await caToken();if(!token)throw Error('Şəkil yükləmək üçün daxil ol.');
- await window.caPhotoReviewBeforeBatch?.({owner,submission,token});
+ const reviewStatus=await window.caPhotoReviewBeforeBatch?.({owner,submission,token});
  if(!owner||currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab dəyişib. Şəkil yüklənməsi dayandırıldı.');
  const progress=Array(tasks.length).fill(0),status=document.getElementById('caUploadStatus'),bar=document.getElementById('caUploadBar'),label=document.getElementById('caUploadLabel');
  status.hidden=false;const update=()=>{if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;const pct=Math.round(progress.reduce((a,b)=>a+b,0)/tasks.length*100);bar.value=pct;label.textContent='Şəkillər yüklənir: '+pct+'% ('+progress.filter(x=>x===1).length+'/'+tasks.length+')';};update();
+ if(reviewStatus?.batchSupported&&typeof window.caReviewPreparedPhotoBatch==='function'){
+  let cursor=0,firstError=null;
+  const pending=[];
+  for(let i=0;i<tasks.length;i++){
+   const t=tasks[i],cached=caPhotoUploadCache.get(t.file);
+   if(cached?.owner===owner&&cached.category===t.category){photos[t.category][t.index]=cached.url;progress[i]=1;}else pending.push({...t,progressIndex:i});
+  }
+  update();
+  const guard=()=>{if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)throw Error('Hesab və ya elan forması dəyişib.');};
+  async function batchWorker(){
+   try{while(!firstError&&cursor<pending.length){
+    guard();const chunk=pending.slice(cursor,cursor+Math.min(6,reviewStatus.batchMax||6));cursor+=chunk.length;
+    const prepared=await Promise.allSettled(chunk.map(async t=>({...t,blob:await caPrepareListingPhoto(t.file,owner,submission)})));
+    guard();const failed=prepared.find(result=>result.status==='rejected');if(failed)throw failed.reason;
+    const ready=await Promise.all(prepared.map(async result=>{const item=result.value;item.approvalKey=await caPhotoApprovalKey(item.blob,owner,item.category);return item;}));guard();
+    const groups=[];let group=[],bytes=0;
+    for(const item of ready){
+     const known=item.approvalKey&&caReviewedPhotoCache.get(item.approvalKey);
+     if(known){caPhotoUploadCache.set(item.file,{owner,category:item.category,url:known});photos[item.category][item.index]=known;progress[item.progressIndex]=1;continue;}
+if(item.blob.size>5*1024*1024)throw Error('Hazırlanmış şəkil 5 MB-dan böyükdür. Başqa şəkil seç.');if(group.length&&bytes+item.blob.size>7.5*1024*1024){groups.push(group);group=[];bytes=0;}group.push(item);bytes+=item.blob.size;}
+    if(group.length)groups.push(group);
+    for(const items of groups){
+     if(firstError)return;guard();
+     const results=await window.caReviewPreparedPhotoBatch(items.map(t=>({blob:t.blob,category:t.category,fileName:t.file.name})),{owner,submission,token,reviewStatus});guard();
+     for(let i=0;i<items.length;i++){
+      const item=items[i],result=results[i];
+      if(result?.url){caCacheReviewedPhoto(item.approvalKey,result.url);caPhotoUploadCache.set(item.file,{owner,category:item.category,url:result.url});photos[item.category][item.index]=result.url;progress[item.progressIndex]=1;}
+      else if(!firstError)firstError=result?.error||Error('Şəkil yoxlamasının nəticəsi alınmadı.');
+     }
+     update();
+    }
+   }}catch(error){if(!firstError)firstError=error;}
+  }
+  await Promise.allSettled(Array.from({length:Math.min(2,pending.length)},()=>batchWorker()));
+  if(firstError)throw firstError;guard();bar.value=100;label.textContent='Bütün şəkillər yoxlanıb yükləndi — 100%';return;
+ }
  let cursor=0,firstError=null;
  async function worker(){
   try{while(!firstError&&cursor<tasks.length){
@@ -546,7 +609,7 @@ function editCar(id){
 }
 function caClearListingDraft(){
  caListingSubmissionSequence++;caDraftOwner=null;editingCarId=null;editingOriginalPhotos=null;
- const form=document.getElementById('listingForm');caSetListingFormBusy(form,false);caCreateSubmission=null;caPhotoUploadCache=new WeakMap();form.reset();form.querySelector('option[data-keep-package]')?.remove();
+ const form=document.getElementById('listingForm');caSetListingFormBusy(form,false);caCreateSubmission=null;caPhotoUploadCache=new WeakMap();caPreparedPhotoCache=new WeakMap();caReviewedPhotoCache=new Map();form.reset();form.querySelector('option[data-keep-package]')?.remove();
  document.getElementById('editBanner').style.display='none';document.getElementById('cancelEditBtn').style.display='none';
  const button=document.getElementById('submitListingBtn');button.disabled=false;button.textContent='Elanı yerləşdir';
  document.getElementById('caUploadStatus').hidden=true;descriptionCounter.textContent='0 / 10 000 simvol';
