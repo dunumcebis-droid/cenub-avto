@@ -1,6 +1,8 @@
 # Avtomobil şəkillərinin bölmə və məzmun yoxlaması
 
-**Avtomatik tanıma hazırda aktiv deyil.** API hesabı/açarı qoşulmayıb və real modelin dəqiqliyi sınaqdan keçirilməyib. Hazırkı sayt şəkilləri admin yoxlamasına göndərir. Aşağıdakı kod, xəbərdarlıqlar və qoruma mexanizmləri xidmətin təhlükəsiz qoşulması üçün hazırlanıb; avtomatik tanımanın indi işlədiyini göstərmir.
+**Ümumi tanıma hələ sönülüdür; real admin sınağına hazırlıq tamamlanıb.** `enabled:false, admin_preview:true` rejimi yalnız mövcud admin hesablarında şəkil yoxlamasını açır. İstifadəçi API açarını Supabase-ə əlavə etdiyini bildirib. Real model dəqiqliyi və hesab kvotası hələ normal hesab girişi ilə yoxlanmalıdır.
+
+Cari əlavə sınaqlar: **85 Node**, **20 brauzer** (14 əvvəlki + 6 precheck) və admin kohortuna aid **8 SQL yoxlama qrupu** keçib. Əvvəlki 9 SQL qrupu da yenilənmiş sxemdə keçib. Proqram sınaqlarında provider cavabları əvəz edilib; bu nəticələr real Google çağırışının uğurlu olduğunu göstərmir.
 
 ## Hazırlanan davranış
 
@@ -14,12 +16,16 @@ Qəbul edilmiş şəkli server özü saxlayır. Baza təsdiqi hesab, bölmə, yo
 - Yeni 14 brauzer sınağı: ön/arxa xəbərdarlığı, ekran/əlaqəsiz şəkil, qeyri-müəyyən nəticə, forma və faylların qorunması, uğurlu yoxlamadan gələn URL-in istifadə olunması, etibarsız cavabların rəddi, hesab dəyişikliyi və eyni faylın başqa bölməyə köçürüləndə təkrar yoxlanması. HTTP tam əvəz edilib.
 - `tests/photo-review-db.sql`: mövcud giriş rolları ilə 9 yoxlama qrupu, o cümlədən icazə, təsdiqin düzgünlüyü, şəkil yolu, hesab/bölmə, qalereya, köhnə şəkil istisnası və 121-ci sorğunun limitə düşməsi. Sintetik sətirlər və xidmətin müvəqqəti bayrağı `ROLLBACK` edilib. Real şəkil baytları yaradılmayıb.
 - Mövcud elanların, paket sorğularının və şəkil obyektlərinin izləri əvvəlki təsdiqlənmiş izlərlə eynidir. Yeni təhlükəsizlik xəbərdarlığı yoxdur; yeni şəxsi cədvəllərdə yalnız server rolu üçün açıq şəkildə göstərilmiş RLS qaydaları var.
-- Yayımlanmış Edge Function girişsiz status sorğusunu `401 auth_required` ilə rədd edir. Xidmət RPC-si də girişsiz və adi istifadəçi roluna açılmır. DB statusu `enabled:false`, real təsdiq sətrləri `0`-dır.
+- Yayımlanmış Edge Function girişsiz status sorğusunu `401 auth_required` ilə rədd edir. Xidmət RPC-si də girişsiz və adi istifadəçi roluna açılmır. Ümumi bayraq `enabled:false` olaraq qalır; admin üçün icazə ayrıca mövcud hesab girişi və `cenub_admin_yoxla` ilə yoxlanır. Xidmət açarı istifadəçinin admin icazəsini yoxlamaq üçün işlədilmir.
 
-Tam avtomatik dəst: **78 Node və 161 Chromium brauzer sınağı** keçib. JavaScript sintaksisi və `git diff --check` keçib. Canlı statik faylların yoxlama nəticəsi istifadəçiyə ayrıca bildirilir. Canlı qarşılıqlı sınaqlarda da provayder/yazma əməliyyatları əvəz edilir; real provayderə şəkil, ödəniş, SMS və e-poçt göndərilmir.
+Əvvəlki mərhələnin tam avtomatik dəsti: **78 Node və 161 Chromium brauzer sınağı** keçib. JavaScript sintaksisi və `git diff --check` keçib. Canlı statik faylların yoxlama nəticəsi istifadəçiyə ayrıca bildirilir. Canlı qarşılıqlı sınaqlarda da provayder/yazma əməliyyatları əvəz edilir; real provayderə şəkil, ödəniş, SMS və e-poçt göndərilmir.
 
 ## Aktivləşdirmədən əvvəl
 
-[PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md) üzrə provayder hesabı/açarı və uyğun model qoşulmalıdır. Real düzgün və yanlış şəkillərlə tanıma dəqiqliyi yoxlanıldıqdan sonra baza bayrağı ayrıca açılır. Açarlar brauzerə və GitHub-a yazılmır.
+[PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md) üzrə qoşulmuş açarın real işləməsi və standart modelə giriş təsdiqlənməlidir. Real düzgün və yanlış şəkillərlə tanıma dəqiqliyi yoxlanıldıqdan sonra baza bayrağı ayrıca açılır. Açarlar brauzerə və GitHub-a yazılmır.
 
 Görünən ekran interfeysi aşkar edilə bilər; ekran görüntüsündən bütün interfeys kəsilərək yalnız avtomobil saxlanılıbsa, onun mənbəyini hər dəfə müəyyən etmək mümkün deyil. Elanın son yayımı üçün admin təsdiqi saxlanılır.
+
+## Cari sınaq mexanizmi
+
+«Şəkilləri yoxla» düyməsi boş elan formasında da işləyir. Mövcud girişlə qorunan şəkil yoxlaması yolunu çağırır, elan sorğusu göndərmir, sahə və faylları saxlayır. Təsdiqlənmiş nəticə adi göndərişdə təkrar istifadə edilir. Qaytarılan məzmun, hesab, bölmə, status və fayl izi eyni server/baza qaydalarından keçir.

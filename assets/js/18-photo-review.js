@@ -12,7 +12,7 @@ const categories={
  other:{label:'Digər şəkillər',guide:'Avtomobilə aid təkər, detal və digər yaxın görünüşlər əlavə et.'}
 };
 const endpoint=CA_URL.replace(/\/$/,'')+'/functions/v1/ca-photo-review';
-let cached=null,pending=null,epoch=0,sessionOwner=currentUser?.id||null,mode=null;
+let cached=null,pending=null,epoch=0,sessionOwner=currentUser?.id||null,mode=null,precheck=null,available=false;
 const groupStates=new Map();
 function stale(owner,submission){return !owner||currentUser?.id!==owner||submission!==undefined&&submission!==null&&caListingSubmissionSequence!==submission;}
 function assertCurrent(owner,submission){if(stale(owner,submission)){const error=Error('Hesab və ya elan forması dəyişib. Şəkil yoxlaması dayandırıldı.');error.code='photo_review_stale';throw error;}}
@@ -25,7 +25,15 @@ function drawGroup(category){
  el.textContent=state.error||(state.checking?'Şəkil yoxlanır…':state.approved+' şəkil yoxlamadan keçdi.');
  const input=document.getElementById('photos-'+category);if(input){if(error)input.setAttribute('aria-invalid','true');else input.removeAttribute('aria-invalid');}
 }
+function syncPrecheck(){
+ const button=document.getElementById('caPhotoPrecheck'),form=document.getElementById('listingForm');if(!button)return;
+ const busy=Boolean(precheck&&!stale(precheck.owner,precheck.submission))||form?.getAttribute('aria-busy')==='true'||Boolean(document.getElementById('submitListingBtn')?.disabled);
+ button.hidden=!available;button.disabled=!available||busy;
+ const label=precheck&&!stale(precheck.owner,precheck.submission)?'Şəkillər yoxlanır…':'Şəkilləri yoxla';if(button.textContent!==label)button.textContent=label;
+}
+function precheckMessage(text,error=false){const el=document.getElementById('caPhotoPrecheckResult');if(el){el.textContent=text;el.setAttribute('role',error?'alert':'status');el.setAttribute('aria-live',error?'assertive':'polite');}}
 function setMode(status){
+ available=status.enabled&&status.configured;syncPrecheck();
  const next=status.enabled?'automatic':'manual';
  if(mode!==null&&next!==mode){window.caPhotoReviewModeChanged?.();for(const category of Object.keys(categories))clearGroup(category);}
  mode=next;
@@ -68,6 +76,8 @@ function humanError(error,category,fileName){
   category_mismatch:'Şəkil bu bölməyə uyğun deyil. '+(item?.guide||'Uyğun bölməni seç.'),
   uncertain:'Şəklin uyğunluğu aydın deyil. Avtomobili daha aydın göstərən foto seç.',
   rate_limited:'Çox şəkil yoxlaması göndərilib. Bir qədər gözləyib yenidən yoxla.',
+  provider_quota:'Şəkil tanıma xidmətinin limiti dolub. Şəkillərin formadadır; bir qədər sonra yenidən yoxla.',
+  provider_denied:'Şəkil tanıma xidmətinə giriş təsdiqlənmədi. Şəkillərin formadadır; dəstək xidməti ilə əlaqə saxla.',
   auth_required:'Sessiya bitib. Hesabına yenidən daxil ol.',
   invalid_image:'Şəkil açıla bilmir və ya uyğun ölçüdə deyil. Başqa foto seç.',
   provider_unavailable:'Şəkil yoxlaması hazırda mümkün deyil. Şəkillərin formadadır; bir qədər sonra yenidən cəhd et.',
@@ -99,9 +109,32 @@ window.caReviewPreparedPhoto=async function(blob,{category,owner,submission,toke
   const message=humanError(error,category,fileName);state.error=message;const failure=Error(message);failure.code=error.code||'photo_review_failed';throw failure;
  }finally{if(!stale(owner,submission)&&groupStates.get(category)===state){state.checking--;drawGroup(category);}}
 };
+// Review selected new photos without creating or editing an advertisement.
+async function precheckPhotos(){
+ const form=document.getElementById('listingForm');if(!form||form.getAttribute('aria-busy')==='true'||document.getElementById('submitListingBtn')?.disabled)return false;
+ if(!currentUser){requireLogin('sell');return false;}
+ const inputs=[...form.querySelectorAll('.photo-input')];
+ if(!inputs.some(input=>input.files.length)){precheckMessage('Yoxlamaq üçün ən azı bir yeni avtomobil şəkli seç.',true);return false;}
+ const task={owner:currentUser.id,submission:++caListingSubmissionSequence};precheck=task;
+ caSetListingFormBusy(form,true);syncPrecheck();precheckMessage('Yeni şəkillər yoxlanır…');
+ try{
+  const token=await caToken();assertCurrent(task.owner,task.submission);
+  const status=await window.caPhotoReviewBeforeBatch({...task,token});assertCurrent(task.owner,task.submission);
+  if(!status.enabled){precheckMessage('Şəkillər admin tərəfindən yoxlanacaq.');return false;}
+  const photos={};await caUploadSelectedPhotos(inputs,photos);assertCurrent(task.owner,task.submission);
+  precheckMessage('Yeni şəkillər yoxlamadan keçdi. Elanı göndərə bilərsən.');return true;
+ }catch(error){
+  if(stale(task.owner,task.submission))return false;
+  const message=[...groupStates.values()].some(state=>state.error===error.message)?error.message:humanError(error);
+  precheckMessage(message,true);caShowListingFeedback(message,'error');return false;
+ }finally{
+  if(precheck===task){precheck=null;if(!stale(task.owner,task.submission))caSetListingFormBusy(form,false);syncPrecheck();}
+ }
+}
+window.caPrecheckPhotos=precheckPhotos;
 window.caPhotoReviewSessionChanged=function(){
  const owner=currentUser?.id||null;if(owner===sessionOwner)return;
- sessionOwner=owner;epoch++;cached=null;pending=null;mode=null;for(const category of Object.keys(categories))clearGroup(category);
+ sessionOwner=owner;epoch++;cached=null;pending=null;mode=null;precheck=null;available=false;precheckMessage('');syncPrecheck();for(const category of Object.keys(categories))clearGroup(category);
  note('Şəkli uyğun bölməyə əlavə et. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.','pending');
 };
 async function refreshNote(){
@@ -112,15 +145,23 @@ async function refreshNote(){
 const inputs=[...document.querySelectorAll('.photo-input')];
 if(inputs.length){
  const notice=document.createElement('p');notice.id='caPhotoReviewNote';notice.className='ca-photo-review-note';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.textContent='Şəkli uyğun bölməyə əlavə et. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.';
- document.querySelector('.photo-groups')?.before(notice);
+ const groups=document.querySelector('.photo-groups');groups?.before(notice);
+ const button=document.createElement('button');button.type='button';button.id='caPhotoPrecheck';button.className='back-btn';button.textContent='Şəkilləri yoxla';button.hidden=true;button.disabled=true;button.addEventListener('click',precheckPhotos);
+ const result=document.createElement('p');result.id='caPhotoPrecheckResult';result.className='ca-photo-review-status';result.setAttribute('role','status');result.setAttribute('aria-live','polite');
+ groups?.before(button,result);
  for(const input of inputs){
   const category=input.dataset.category,item=categories[category];if(!item)continue;
   const help=document.createElement('p');help.id='caPhotoGuide-'+category;help.className='ca-photo-review-guide';help.textContent=item.guide;
   const status=document.createElement('p');status.id='caPhotoReview-'+category;status.className='ca-photo-review-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   input.before(help);input.after(status);input.setAttribute('aria-describedby',[input.getAttribute('aria-describedby'),help.id,status.id].filter(Boolean).join(' '));
-  input.addEventListener('change',()=>{clearGroup(category);if(input.files.length)refreshNote();});
+  input.addEventListener('change',()=>{clearGroup(category);precheckMessage('');if(input.files.length)refreshNote();});
  }
- document.getElementById('listingForm')?.addEventListener('reset',()=>{for(const category of Object.keys(categories))clearGroup(category);});
+ const form=document.getElementById('listingForm');
+ form?.addEventListener('reset',()=>{if(precheck&&stale(precheck.owner,precheck.submission))precheck=null;precheckMessage('');for(const category of Object.keys(categories))clearGroup(category);syncPrecheck();});
+ if(typeof MutationObserver==='function'){
+  if(form)new MutationObserver(syncPrecheck).observe(form,{attributes:true,attributeFilter:['aria-busy']});
+  const submit=document.getElementById('submitListingBtn');if(submit)new MutationObserver(syncPrecheck).observe(submit,{attributes:true,attributeFilter:['disabled']});
+ }
  if(typeof MutationObserver==='function')new MutationObserver(()=>{window.caPhotoReviewSessionChanged();if(document.body.classList.contains('sell-open'))refreshNote();}).observe(document.body,{attributes:true,attributeFilter:['class']});
  if(document.body.classList.contains('sell-open'))refreshNote();
 }

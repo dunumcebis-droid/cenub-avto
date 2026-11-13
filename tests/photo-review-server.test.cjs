@@ -19,6 +19,7 @@ async function fixture(options={}){
   const call={url:String(url),method:init.method||'GET',headers:new Headers(init.headers),body:init.body};calls.push(call);
   if(call.url===BASE+'/auth/v1/user')return response(state.authUser,state.authStatus);
   if(call.url===BASE+'/rest/v1/rpc/ca_photo_review_service_status')return response(state.statusBody??{enabled:state.enabled});
+  if(call.url===BASE+'/rest/v1/rpc/cenub_admin_yoxla')return response(Object.hasOwn(state,'adminResult')?state.adminResult:false,state.adminStatus||200);
   if(call.url===BASE+'/rest/v1/rpc/ca_photo_review_reserve')return state.reserveError?response(state.reserveError,state.reserveStatus||400):response(state.reservation??REVIEW);
   if(call.url.startsWith('https://generativelanguage.googleapis.com/')){
    if(state.providerThrow)throw Error('fixture-secret-provider-error');
@@ -67,12 +68,12 @@ test('wrong origin and unsupported methods are denied before Auth',async()=>{
  const preflight=await f.handler(new Request(BASE+'/functions/v1/ca-photo-review',{method:'OPTIONS',headers:{Origin:'https://dunumcebis-droid.github.io'}}));assert.equal(preflight.status,204);assert.equal(f.calls.length,0);
 });
 test('disabled or unconfigured mode fails closed for POST before reservation/provider',async()=>{
- for(const options of [{enabled:false},{env:{GEMINI_API_KEY:''}},{env:{PHOTO_REVIEW_MODEL:''}},{env:{PHOTO_REVIEW_PROVIDER:'unsupported'}}]){
+ for(const options of [{enabled:false},{env:{GEMINI_API_KEY:''}},{env:{PHOTO_REVIEW_MODEL:'invalid model'}},{env:{PHOTO_REVIEW_PROVIDER:'unsupported'}}]){
   const f=await fixture(options);const r=await f.invoke();assert.equal(r.status,503);assert.equal(r.data.code,'provider_unavailable');assert.equal(f.calls.length,2);assert.equal(providerCalls(f.calls).length,0);
  }
 });
 test('status exposes unconfigured state without leaking keys',async()=>{
- const f=await fixture({env:{PHOTO_REVIEW_MODEL:''}});const r=await f.invoke({method:'GET',status:true});assert.deepEqual(r.data,{enabled:true,configured:false});assert.doesNotMatch(r.raw,/fixture-(?:service|gemini|anon)-key/);
+ const f=await fixture({env:{GEMINI_API_KEY:''}});const r=await f.invoke({method:'GET',status:true});assert.deepEqual(r.data,{enabled:true,configured:false});assert.doesNotMatch(r.raw,/fixture-(?:service|gemini|anon)-key/);
 });
 test('unknown malformed service status fails closed',async()=>{
  const f=await fixture({statusBody:{enabled:'true'}});const r=await f.invoke();assert.equal(r.status,503);assert.equal(providerCalls(f.calls).length,0);
@@ -104,7 +105,7 @@ test('strict schema rejects extra keys, wrong types, NaN-like strings and unknow
  for(const verdict of invalid){const f=await fixture({verdict});const r=await f.invoke();assert.equal(r.status,503);assert.equal(uploadCalls(f.calls).length,0);assert.equal(proofCalls(f.calls).length,0);}
 });
 test('provider errors, refusals, truncated and non-JSON responses cannot approve bytes or leak raw provider details',async()=>{
- const cases=[{providerStatus:429},{providerThrow:true},{providerBody:{candidates:[{finishReason:'MAX_TOKENS',content:{parts:[{text:JSON.stringify(VERDICT)}]}}]}},{providerBody:{candidates:[{finishReason:'STOP',content:{parts:[{text:'not JSON'}]}}]}},{env:{PHOTO_REVIEW_PROVIDER:'openai',OPENAI_API_KEY:'fixture-openai-key'},providerBody:{choices:[{finish_reason:'stop',message:{refusal:'private refusal'}}]}}];
+ const cases=[{providerStatus:500},{providerThrow:true},{providerBody:{candidates:[{finishReason:'MAX_TOKENS',content:{parts:[{text:JSON.stringify(VERDICT)}]}}]}},{providerBody:{candidates:[{finishReason:'STOP',content:{parts:[{text:'not JSON'}]}}]}},{env:{PHOTO_REVIEW_PROVIDER:'openai',OPENAI_API_KEY:'fixture-openai-key'},providerBody:{choices:[{finish_reason:'stop',message:{refusal:'private refusal'}}]}}];
  for(const options of cases){const f=await fixture(options);const r=await f.invoke();assert.equal(r.status,503);assert.equal(uploadCalls(f.calls).length,0);assert.equal(proofCalls(f.calls).length,0);assert.doesNotMatch(r.raw,/fixture-private|private refusal|fixture-secret/);}
 });
 test('approved bytes are stored immutably in server-derived owner/reservation namespace then bound to SHA and category',async()=>{
@@ -127,4 +128,55 @@ test('false proof response is rejected and cleaned rather than returning an unbo
 });
 test('failed upload response never creates a DB proof or approved URL',async()=>{
  const f=await fixture({uploadStatus:503});const r=await f.invoke();assert.equal(r.status,503);assert.equal(proofCalls(f.calls).length,0);assert.equal(r.data.url,undefined);assert.equal(f.calls.filter(c=>c.method==='DELETE').length,1);
+});
+
+// The preview cohort uses existing admin authorization, never a special endpoint.
+test('Gemini defaults to the current stable model and omits deprecated sampling parameters',async()=>{
+ for(const model of [undefined,'']){
+  const f=await fixture({env:{PHOTO_REVIEW_MODEL:model}});const r=await f.invoke();assert.equal(r.status,200);
+  const provider=providerCalls(f.calls)[0],body=JSON.parse(provider.body);
+  assert.equal(provider.url,'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
+  assert.equal(body.generationConfig.maxOutputTokens,1024);assert.equal(body.generationConfig.responseMimeType,'application/json');
+  assert.equal(Object.hasOwn(body.generationConfig,'temperature'),false);assert.equal(Object.hasOwn(body.generationConfig,'thinkingConfig'),false);
+ }
+});
+test('OpenAI remains unconfigured without an explicit model or key',async()=>{
+ for(const env of [{PHOTO_REVIEW_MODEL:'',OPENAI_API_KEY:'fixture-openai-key'},{PHOTO_REVIEW_MODEL:'fixture-model',OPENAI_API_KEY:''}]){
+  const f=await fixture({env:{...env,PHOTO_REVIEW_PROVIDER:'openai'}});const r=await f.invoke({method:'GET',status:true});
+  assert.equal(r.status,200);assert.deepEqual(r.data,{enabled:true,configured:false});assert.equal(providerCalls(f.calls).length,0);
+ }
+});
+test('admin preview uses only the confirmed user bearer and anon key for existing admin RPC',async()=>{
+ const f=await fixture({statusBody:{enabled:false,admin_preview:true},adminResult:true});
+ const status=await f.invoke({method:'GET',status:true});assert.deepEqual(status.data,{enabled:true,configured:true});
+ const check=f.calls.find(c=>c.url.endsWith('/cenub_admin_yoxla'));assert.ok(check);
+ assert.equal(check.headers.get('authorization'),'Bearer fixture-user-token');assert.equal(check.headers.get('apikey'),ENV.SUPABASE_ANON_KEY);assert.equal(check.body,'{}');
+ assert.notEqual(check.headers.get('authorization'),'Bearer '+ENV.SUPABASE_SERVICE_ROLE_KEY);
+ assert.equal(providerCalls(f.calls).length,0);assert.equal((await f.invoke()).status,200);
+});
+test('admin preview never enables ordinary users despite editable admin metadata',async()=>{
+ const f=await fixture({statusBody:{enabled:false,admin_preview:true},adminResult:false});
+ assert.deepEqual((await f.invoke({method:'GET',status:true})).data,{enabled:false,configured:true});
+ const r=await f.invoke();assert.equal(r.status,503);assert.equal(providerCalls(f.calls).length,0);
+ assert.equal(f.calls.filter(c=>c.url.endsWith('/ca_photo_review_reserve')).length,0);
+});
+test('malformed or failed admin preview authorization fails closed without provider requests',async()=>{
+ for(const config of [{adminResult:'true'},{adminResult:{admin:true}},{adminResult:[true]},{adminStatus:403},{adminStatus:500},{statusBody:{enabled:false,admin_preview:'true'},adminResult:true}]){
+  const f=await fixture({statusBody:{enabled:false,admin_preview:true},...config});
+  const r=await f.invoke({method:'GET',status:true});assert.equal(r.status,503);assert.equal(r.data.enabled,undefined);assert.equal(providerCalls(f.calls).length,0);
+ }
+});
+test('admin authorization is not queried when preview is off or globally enabled',async()=>{
+ for(const statusBody of [{enabled:false,admin_preview:false},{enabled:false},{enabled:true,admin_preview:true}]){
+  const f=await fixture({statusBody});const r=await f.invoke({method:'GET',status:true});assert.equal(r.status,200);
+  assert.equal(f.calls.some(c=>c.url.endsWith('/cenub_admin_yoxla')),false);
+ }
+});
+test('provider quota and denied access return safe distinct codes without revealing upstream content',async()=>{
+ for(const [providerStatus,status,code] of [[429,429,'provider_quota'],[401,503,'provider_denied'],[403,503,'provider_denied']]){
+  const f=await fixture({providerStatus});const r=await f.invoke();assert.equal(r.status,status);assert.equal(r.data.code,code);
+  assert.equal(uploadCalls(f.calls).length,0);assert.equal(proofCalls(f.calls).length,0);
+  assert.doesNotMatch(r.raw,/fixture-private|fixture-secret|fixture-(?:service|gemini|anon)-key/);
+  if(providerStatus===429)assert.equal(r.headers.get('retry-after'),'60');
+ }
 });

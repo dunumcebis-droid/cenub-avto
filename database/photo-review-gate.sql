@@ -2,7 +2,8 @@
 -- Existing vehicle rows, images and packages are never rewritten.
 create table if not exists ca_private.photo_review_config (
  singleton boolean primary key default true check(singleton),
- enabled boolean not null default false
+ enabled boolean not null default false,
+ admin_preview boolean not null default false
 );
 insert into ca_private.photo_review_config(singleton,enabled) values(true,false) on conflict(singleton) do nothing;
 create table if not exists ca_private.photo_reviews (
@@ -31,9 +32,16 @@ begin
 end $private_policies$;
 revoke all on ca_private.photo_review_config,ca_private.photo_reviews from public,anon,authenticated;
 
+create or replace function ca_private.photo_review_allowed(p_owner uuid)
+returns boolean language sql stable security definer set search_path='' as $$
+ select coalesce((select c.enabled or (c.admin_preview and exists(select 1 from public.adminler a where a.istifadeci_id=p_owner))
+ from ca_private.photo_review_config c where c.singleton),false);
+$$;
+revoke all on function ca_private.photo_review_allowed(uuid) from public,anon,authenticated;
+
 create or replace function public.ca_photo_review_service_status()
 returns jsonb language sql stable security definer set search_path='' as $$
- select jsonb_build_object('enabled',coalesce((select enabled from ca_private.photo_review_config where singleton),false));
+ select jsonb_build_object('enabled',coalesce((select enabled from ca_private.photo_review_config where singleton),false),'admin_preview',coalesce((select admin_preview from ca_private.photo_review_config where singleton),false));
 $$;
 revoke all on function public.ca_photo_review_service_status() from public,anon,authenticated;
 grant execute on function public.ca_photo_review_service_status() to service_role;
@@ -43,7 +51,7 @@ returns uuid language plpgsql security definer set search_path='' as $$
 declare result uuid;
 begin
  if p_owner is null or not exists(select 1 from auth.users where id=p_owner) then raise exception 'CA_PHOTO_REVIEW_OWNER' using errcode='22023';end if;
- if not coalesce((select enabled from ca_private.photo_review_config where singleton),false) then raise exception 'CA_PHOTO_REVIEW_DISABLED';end if;
+ if not ca_private.photo_review_allowed(p_owner) then raise exception 'CA_PHOTO_REVIEW_DISABLED';end if;
  perform pg_advisory_xact_lock(hashtextextended('ca_photo_review:'||p_owner::text,0));
  if (select count(*) from ca_private.photo_reviews where owner_id=p_owner and created_at>clock_timestamp()-interval '10 minutes')>=120
  or (select count(*) from ca_private.photo_reviews where owner_id=p_owner and created_at>clock_timestamp()-interval '1 day')>=2000 then
@@ -59,7 +67,7 @@ create or replace function public.ca_photo_review_complete(p_review_id uuid,p_ow
 returns boolean language plpgsql security definer set search_path='' as $$
 declare changed uuid;
 begin
- if not coalesce((select enabled from ca_private.photo_review_config where singleton),false) then raise exception 'CA_PHOTO_REVIEW_DISABLED';end if;
+ if not ca_private.photo_review_allowed(p_owner) then raise exception 'CA_PHOTO_REVIEW_DISABLED';end if;
  if p_owner is null or p_category is null or p_category not in ('front','rear','side','interior','engine','other')
  or p_path is distinct from p_owner::text||'/checked/'||p_review_id::text||'-ca-wm1.jpg'
  or p_sha256 is null or p_sha256 !~ '^[0-9a-f]{64}$' then raise exception 'CA_PHOTO_REVIEW_INVALID' using errcode='22023';end if;
@@ -106,7 +114,7 @@ declare
  flat_urls text[]:='{}';legacy boolean;prefix constant text:='https://iqdtehqxusfiwokrzceo.supabase.co/storage/v1/object/public/elan-sekilleri/';
  categories constant text[]:=array['front','rear','side','interior','engine','other'];
 begin
- if not coalesce((select enabled from ca_private.photo_review_config where singleton),false) then return new;end if;
+ if not ca_private.photo_review_allowed(new.satici_id) then return new;end if;
  if tg_op='UPDATE' and new.satici_id=old.satici_id and new.sekiller is not distinct from old.sekiller
  and new.ca_data->'photos' is not distinct from old.ca_data->'photos'
  and new.ca_data->'photo' is not distinct from old.ca_data->'photo' then return new;end if;

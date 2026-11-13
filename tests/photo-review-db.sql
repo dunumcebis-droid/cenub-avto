@@ -34,8 +34,8 @@ begin
  if not (select relrowsecurity from pg_class where oid='ca_private.photo_reviews'::regclass)
  or not (select relrowsecurity from pg_class where oid='ca_private.photo_review_config'::regclass) then raise exception 'Private-table RLS missing';end if;
 
- update ca_private.photo_review_config set enabled=false where singleton;
- if public.ca_photo_review_service_status() is distinct from '{"enabled":false}'::jsonb then raise exception 'Disabled status mismatch';end if;
+ update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
+ if public.ca_photo_review_service_status() is distinct from '{"enabled":false,"admin_preview":false}'::jsonb then raise exception 'Disabled status mismatch';end if;
  blocked:=false;
  begin perform public.ca_photo_review_reserve(test_owner);
  exception when raise_exception then blocked:=sqlerrm='CA_PHOTO_REVIEW_DISABLED';end;
@@ -49,7 +49,7 @@ begin
  perform set_config('role','none',true);
 
  update ca_private.photo_review_config set enabled=true where singleton;
- if public.ca_photo_review_service_status() is distinct from '{"enabled":true}'::jsonb then raise exception 'Enabled status mismatch';end if;
+ if public.ca_photo_review_service_status() is distinct from '{"enabled":true,"admin_preview":false}'::jsonb then raise exception 'Enabled status mismatch';end if;
 
  -- Only server-issued reservations completed against stored metadata become proofs.
  front_review:=public.ca_photo_review_reserve(test_owner);
@@ -99,7 +99,7 @@ begin
     when 'proof_read' then perform id from ca_private.photo_reviews limit 1;
     when 'proof_write' then update ca_private.photo_reviews set approved=true where id=front_review;
     when 'config_read' then perform enabled from ca_private.photo_review_config;
-    when 'config_write' then update ca_private.photo_review_config set enabled=false where singleton;
+    when 'config_write' then update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
     when 'reserve_call' then perform public.ca_photo_review_reserve(test_owner);
     when 'complete_call' then perform public.ca_photo_review_complete(front_review,test_owner,'front',front_path,repeat('a',64),verdict);
     else perform public.ca_photo_review_service_status();

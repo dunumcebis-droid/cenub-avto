@@ -1,5 +1,6 @@
 /** Trusted photo review. Only confirmed Auth users and server-held provider keys. */
 export const MAX_IMAGE_BYTES=5*1024*1024;
+export const DEFAULT_GEMINI_MODEL='gemini-3.5-flash-lite';
 const MAX_BODY_BYTES=MAX_IMAGE_BYTES+64*1024;
 const CATEGORIES=new Set(['front','rear','side','interior','engine','other']);
 const RESULT_CATEGORIES=new Set([...CATEGORIES,'not_vehicle','uncertain']);
@@ -20,7 +21,8 @@ const invalidImage=()=>new ReviewError(400,'invalid_image','Düzgün JPEG şəkl
 function json(data,status,headers){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});}
 function configValue(env,name){const value=typeof env==='function'?env(name):env?.[name];return typeof value==='string'?value:'';}
 function credentials(env){
- const provider=configValue(env,'PHOTO_REVIEW_PROVIDER')||'gemini',model=configValue(env,'PHOTO_REVIEW_MODEL');
+ const provider=configValue(env,'PHOTO_REVIEW_PROVIDER')||'gemini';
+ const model=configValue(env,'PHOTO_REVIEW_MODEL')||(provider==='gemini'?DEFAULT_GEMINI_MODEL:'');
  const key=provider==='gemini'?configValue(env,'GEMINI_API_KEY'):provider==='openai'?configValue(env,'OPENAI_API_KEY'):'';
  return {provider,model,key,configured:Boolean(key&&/^[A-Za-z0-9._/-]{1,100}$/.test(model)&&['gemini','openai'].includes(provider))};
 }
@@ -66,17 +68,20 @@ async function providerReview(fetcher,credential,bytes,signal){
   // Gemini's structured schema supports propertyOrdering and enums; unknown keys
   // are still rejected locally, independent of provider schema behavior.
   const geminiSchema={type:'OBJECT',properties:{is_vehicle_photo:{type:'BOOLEAN'},contains_screen_ui:{type:'BOOLEAN'},category:{type:'STRING',enum:[...RESULT_CATEGORIES]},confidence:{type:'NUMBER',minimum:0,maximum:1}},required:SCHEMA.required,propertyOrdering:SCHEMA.required};
-  body={systemInstruction:{parts:[{text:PROMPT}]},contents:[{role:'user',parts:[{text:'Inspect this image and return your assessment.'},{inlineData:{mimeType:'image/jpeg',data:encoded}}]}],generationConfig:{temperature:0,maxOutputTokens:700,responseMimeType:'application/json',responseSchema:geminiSchema}};
+  body={systemInstruction:{parts:[{text:PROMPT}]},contents:[{role:'user',parts:[{text:'Inspect this image and return your assessment.'},{inlineData:{mimeType:'image/jpeg',data:encoded}}]}],generationConfig:{maxOutputTokens:1024,responseMimeType:'application/json',responseSchema:geminiSchema}};
  }
  let response,data,text;
- try{response=await fetcher(endpoint,{method:'POST',headers,body:JSON.stringify(body),signal});if(!response.ok)throw unavailable();data=await response.json();
+ try{response=await fetcher(endpoint,{method:'POST',headers,body:JSON.stringify(body),signal});
+  if(response.status===429){const header=response.headers.get('retry-after')||'',seconds=/^\d+$/.test(header)?Math.min(3600,Math.max(1,Number(header))):60;throw new ReviewError(429,'provider_quota','Şəkil tanıma xidmətinin sorğu limiti dolub. Bir qədər sonra yenidən yoxla.',{'Retry-After':String(seconds)});}
+  if(response.status===401||response.status===403)throw new ReviewError(503,'provider_denied','Şəkil tanıma xidmətinə giriş təsdiqlənmədi. Bir qədər sonra yenidən yoxla.');
+  if(!response.ok)throw unavailable();data=await response.json();
   if(credential.provider==='openai'){
    const choice=data?.choices?.[0];if(choice?.finish_reason!=='stop'||choice?.message?.refusal)throw unavailable();text=choice?.message?.content;
   }else{
    const candidate=data?.candidates?.[0];if(candidate?.finishReason!=='STOP')throw unavailable();const parts=candidate?.content?.parts;if(!Array.isArray(parts)||parts.some(part=>typeof part?.text!=='string'||part.thought===true))throw unavailable();text=parts.map(part=>part.text).join('');
   }
   if(typeof text!=='string'||text.length>4096)throw unavailable();return verdictFrom(JSON.parse(text));
- }catch{throw unavailable();}
+ }catch(error){if(error instanceof ReviewError)throw error;throw unavailable();}
 }
 export function createHandler({env={},fetch:fetcher=globalThis.fetch,crypto:cryptography=globalThis.crypto,now=Date.now}={}){
  return async function handler(req){
@@ -106,10 +111,22 @@ export function createHandler({env={},fetch:fetcher=globalThis.fetch,crypto:cryp
    let authResponse,user;
    try{authResponse=await fetcher(base+'/auth/v1/user',{headers:{'Authorization':authorization,'apikey':anon},signal});if(!authResponse.ok)throw new ReviewError(401,'auth_required','Sessiya bitib. Hesabına yenidən daxil ol.');user=await authResponse.json();}catch(error){if(error instanceof ReviewError)throw error;throw unavailable();}
    if(!UUID.test(user?.id||''))throw new ReviewError(401,'auth_required','Hesab təsdiqlənmədi. Yenidən daxil ol.');
-   const state=await rpc('ca_photo_review_service_status');if(!state||typeof state.enabled!=='boolean')throw unavailable();
+   const state=await rpc('ca_photo_review_service_status');
+   if(!state||typeof state.enabled!=='boolean'||Object.hasOwn(state,'admin_preview')&&typeof state.admin_preview!=='boolean')throw unavailable();
+   let enabled=state.enabled;
+   if(!enabled&&state.admin_preview===true){
+    // Preview uses the same real user session; server keys never stand in for an admin.
+    let adminResponse,admin;
+    try{
+     adminResponse=await fetcher(base+'/rest/v1/rpc/cenub_admin_yoxla',{method:'POST',headers:{'Authorization':authorization,'apikey':anon,'Content-Type':'application/json'},body:'{}',signal});
+     if(!adminResponse.ok)throw unavailable();admin=await adminResponse.json();
+    }catch{throw unavailable();}
+    if(typeof admin!=='boolean')throw unavailable();
+    enabled=admin===true;
+   }
    const credential=credentials(env);
-   if(statusPath)return json({enabled:state.enabled,configured:credential.configured},200,cors);
-   if(!state.enabled||!credential.configured)throw unavailable();
+   if(statusPath)return json({enabled,configured:credential.configured},200,cors);
+   if(!enabled||!credential.configured)throw unavailable();
    const {category,bytes}=await input(req,signal);
    const reservation=await rpc('ca_photo_review_reserve',{p_owner:user.id});if(typeof reservation!=='string'||!UUID.test(reservation))throw unavailable();
    const verdict=await providerReview(fetcher,credential,bytes,signal);decide(verdict,category);

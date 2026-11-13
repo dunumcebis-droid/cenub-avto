@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 import test_package_feedback_browser as fixtures
-from test_listing_management_browser import ORIGIN, ROOT, OWNER, OTHER_OWNER
+from test_listing_management_browser import ORIGIN, ROOT, OWNER, OTHER_OWNER, owned_row
 
 
 class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
@@ -353,4 +353,115 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertIn('Arxa görünüş', self.page.locator('#listingFeedbackText').inner_text())
         self.assertIn('bu bölməyə uyğun deyil', self.page.locator('#caPhotoReview-rear').inner_text())
         self.assertEqual(len(self.backend.saves), 1, 'The rejected category must not send a second listing write')
+        self.assertFalse(self.backend.uploads)
+
+
+    def blank_photo_form(self):
+        self.sign_in()
+        self.page.evaluate('openSellPage()')
+        self.page.locator('#photos-front').set_input_files(dict(name='precheck.png', mimeType='image/png', buffer=fixtures.PNG))
+
+    def wait_for_precheck(self):
+        self.page.locator('#caPhotoPrecheck').wait_for(state='visible')
+        self.page.wait_for_function('!document.getElementById("caPhotoPrecheck").disabled')
+
+    def test_precheck_reviews_blank_form_without_listing_write_and_fits_small_screen(self):
+        self.blank_photo_form()
+        self.wait_for_precheck()
+        self.assertFalse(self.page.locator('#listingForm').evaluate('form=>form.checkValidity()'))
+        self.page.set_viewport_size({'width': 320, 'height': 812})
+        self.assertTrue(self.page.locator('#caPhotoPrecheck').evaluate('''button=>{const r=button.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth;}'''))
+        self.page.locator('#caPhotoPrecheck').click()
+        self.page.wait_for_function('document.getElementById("caPhotoPrecheckResult").textContent.includes("Elanı göndərə bilərsən")')
+        self.assertEqual(len(self.backend.reviews), 1)
+        self.assertFalse(self.backend.saves)
+        self.assertFalse(self.backend.uploads)
+        self.assertEqual(self.page.locator('#photos-front').evaluate('input=>input.files.length'), 1)
+        self.assertEqual(self.page.locator('#listingForm [name=price]').input_value(), '')
+        self.assertTrue(self.page.locator('#photos-front').is_enabled())
+        self.assertTrue(self.page.locator('#submitListingBtn').is_enabled())
+        self.assertTrue(self.page.locator('#caPhotoPrecheck').is_enabled())
+
+    def test_form_submit_after_precheck_reuses_category_verified_url(self):
+        self.blank_photo_form()
+        self.wait_for_precheck()
+        self.page.locator('#caPhotoPrecheck').click()
+        self.page.wait_for_function('document.getElementById("caPhotoPrecheckResult").textContent.includes("Elanı göndərə bilərsən")')
+        fields = {key: value for key, value in owned_row()['ca_data'].items()
+                  if key not in ('photos', 'photo', 'equipment', 'pack')}
+        self.page.evaluate('''data=>{const form=document.getElementById('listingForm');for(const [key,value] of Object.entries(data)){const field=form.elements.namedItem(key);if(field&&'value' in field){field.disabled=false;field.value=String(value);}}form.elements.namedItem('package').selectedIndex=0;}''', fields)
+        self.assertTrue(self.page.locator('#listingForm').evaluate('form=>form.checkValidity()'))
+        self.submit()
+        self.assertEqual(len(self.backend.reviews), 1, 'Confirmed photo must not run through the model twice')
+        self.assertEqual(len(self.backend.saves), 1)
+        self.assertFalse(self.backend.uploads)
+        self.assertIn(f'/{OWNER}/checked/', self.backend.saves[0]['sekiller'][0])
+
+    def test_failed_precheck_preserves_blank_form_file_and_translates_quota_errors(self):
+        self.blank_photo_form()
+        self.wait_for_precheck()
+        for code, text in (('category_mismatch', 'bu bölməyə uyğun deyil'),
+                           ('provider_quota', 'xidmətinin limiti dolub'),
+                           ('provider_denied', 'xidmətinə giriş təsdiqlənmədi')):
+            with self.subTest(code=code):
+                self.backend.error_code = code
+                self.backend.error_status = 429 if code == 'provider_quota' else 422
+                self.page.locator('#caPhotoPrecheck').click()
+                self.page.locator('#listingFeedback').wait_for(state='visible')
+                self.assertIn(text, self.page.locator('#listingFeedbackText').inner_text())
+                self.assertIn(text, self.page.locator('#caPhotoPrecheckResult').inner_text())
+                self.assertEqual(self.page.locator('#photos-front').evaluate('input=>input.files[0].name'), 'precheck.png')
+                self.assertTrue(self.page.locator('#photos-front').is_enabled())
+                self.assertTrue(self.page.locator('#submitListingBtn').is_enabled())
+                self.assertFalse(self.backend.saves)
+                self.assertFalse(self.backend.uploads)
+                self.dismiss()
+
+    def test_manual_mode_hides_precheck_and_never_uploads_when_invoked(self):
+        self.backend.enabled = False
+        self.backend.configured = False
+        self.blank_photo_form()
+        self.page.wait_for_function('document.getElementById("caPhotoReviewNote").dataset.reviewMode==="manual"')
+        self.assertTrue(self.page.locator('#caPhotoPrecheck').is_hidden())
+        self.assertFalse(self.page.evaluate('caPrecheckPhotos()'))
+        self.assertFalse(self.backend.reviews)
+        self.assertFalse(self.backend.uploads)
+        self.assertFalse(self.backend.saves)
+        self.assertIn('admin tərəfindən yoxlanacaq', self.page.locator('#caPhotoPrecheckResult').inner_text())
+        self.assertTrue(self.page.locator('#photos-front').is_enabled())
+
+    def test_precheck_with_no_new_photo_warns_without_provider_call(self):
+        self.sign_in()
+        self.page.evaluate('openSellPage()')
+        self.wait_for_precheck()
+        self.page.locator('#caPhotoPrecheck').click()
+        self.assertIn('ən azı bir yeni', self.page.locator('#caPhotoPrecheckResult').inner_text())
+        self.assertFalse(self.backend.reviews)
+        self.assertFalse(self.backend.uploads)
+        self.assertFalse(self.backend.saves)
+
+    def test_pending_precheck_locks_controls_and_account_switch_keeps_new_draft(self):
+        self.backend.hold_review = True
+        self.blank_photo_form()
+        self.wait_for_precheck()
+        self.page.locator('#caPhotoPrecheck').click()
+        for _ in range(100):
+            if self.backend.pending_reviews:
+                break
+            self.page.wait_for_timeout(20)
+        self.assertTrue(self.backend.pending_reviews)
+        self.assertTrue(self.page.locator('#caPhotoPrecheck').is_disabled())
+        self.assertTrue(self.page.locator('#photos-front').is_disabled())
+        self.assertTrue(self.page.locator('#listingForm [name=price]').is_disabled())
+        self.assertTrue(self.page.locator('#submitListingBtn').is_disabled())
+        self.page.evaluate('''async id=>{await caPersistSession({access_token:'second-token',expires_at:4102444800,user:{id,email:'second@example.invalid',user_metadata:{telefon:'+994000000002'}}});openSellPage();document.querySelector('#listingForm [name=price]').value='55555';}''', OTHER_OWNER)
+        route, response = self.backend.pending_reviews.pop()
+        route.fulfill(content_type='application/json', body=json.dumps(response))
+        self.page.wait_for_timeout(100)
+        self.assertEqual(self.page.locator('#listingForm [name=price]').input_value(), '55555')
+        self.assertTrue(self.page.locator('#listingForm [name=price]').is_enabled())
+        self.assertTrue(self.page.locator('#listingFeedback').is_hidden())
+        self.assertEqual(self.page.locator('#caPhotoPrecheckResult').inner_text(), '')
+        self.assertEqual(self.page.locator('#caPhotoReview-front').inner_text(), '')
+        self.assertFalse(self.backend.saves)
         self.assertFalse(self.backend.uploads)
