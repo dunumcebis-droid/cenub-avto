@@ -280,9 +280,17 @@ class PhotoReviewBrowserTests(unittest.TestCase):
 
     def test_parallel_file_reviews_share_status_and_all_verified_urls_are_saved(self):
         self.new_listing()
-        self.page.locator('#photos-front').set_input_files([
-            dict(name=f'view-{n}.png', mimeType='image/png', buffer=fixtures.PNG)
-            for n in range(4)])
+        # Distinct pixels: identical files may legitimately reuse an approval.
+        self.page.locator('#photos-front').evaluate('''async input=>{
+            const files=new DataTransfer();
+            for(let i=0;i<4;i++){
+                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=24;
+                const context=canvas.getContext('2d');context.fillStyle=`rgb(${i*60},${30+i*40},${180-i*30})`;context.fillRect(0,0,32,24);
+                const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+                files.items.add(new File([blob],`view-${i}.png`,{type:'image/png'}));
+            }
+            input.files=files.files;input.dispatchEvent(new Event('change',{bubbles:true}));
+        }''')
         self.submit()
         self.assertEqual(len(self.backend.reviews), 4)
         self.assertEqual(len(self.backend.status_calls), 1)
