@@ -126,3 +126,9 @@ Mövcud əl ilə paket sorğusu və admin təsdiqi axını saxlanılıb. İstifa
 Admin ZIP-i şəxsi axtarışları, şikayət mətnini və daxili qeydləri də daşıya bilər. Faylı məxfi saxlayın; serverdə gündəlik izlərin təmizlənməsi artıq yüklənmiş ZIP-i dəyişmir. İxrac zamanı yeni baxış/klik və ya başqa məlumat dəyişikliyi baş verərsə, son manifest yoxlaması nüsxəni natamam sayıb dayandıra bilər. Sakit vaxtda yenidən cəhd edin. İxrac tətbiqin məntiqi nüsxəsidir, atomik PostgreSQL snapshot-u və ya avtomatik bərpa xidməti deyil.
 
 Qəzalı avtomobillər də qəbul edilir: formada «Vəziyyəti → Qəzalı» və uyğun qəza tarixçəsi seçilə bilər. Şəkil yoxlaması zədəyə görə rədd etməmək üçün konfiqurasiya edilib; aydın avtomobil fotosu və düzgün görünüş yenə tələb olunur.
+
+## Son hazırlıq yoxlamaları
+
+Admin şikayət kartındakı «Elana bax» düyməsi həmin elanı ayrıca məxfi baxışda açır; elan hazırkı siyahı səhifəsində olmasa da işləyir. 16 yeni və 21 mövcud brauzer ssenarisi keçib.
+
+`database/browse-performance.sql` əvvəlki sxem miqrasiyalarından sonra tətbiq olunan sürət düzəlişidir. Elanın bütün geniş məlumatları əvvəlcədən hesablanmır; filtr və səhifə seçildikdən sonra açıq sütunlar qaytarılır. [10 000 sintetik elan və 20 paralel sessiyanın ölçmələri](docs/performance/populated-browse.md), [canlı məhdud oxuma yoxlaması](docs/performance/README.md) və [həqiqi elan/şəkil nüsxəsinin yerli bərpası](RESTORE_DRILL.md) ayrıca sənədləşdirilib. Real sınaq elanları ictimai sayta yerləşdirilməyib.

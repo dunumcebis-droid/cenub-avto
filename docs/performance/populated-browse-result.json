@@ -1,0 +1,211 @@
+{
+  "complete": true,
+  "success": true,
+  "generatedAt": "2026-11-13T21:40:17.191Z",
+  "scope": "Synthetic isolated PostgreSQL only; no live Supabase requests, no real business records, no model or image requests.",
+  "image": "postgres:17.7-alpine@sha256:bb377b7239d2774ac8cc76f481596ce96c5a6b5e9d141f6d0a0ee371a6e7c0f2",
+  "serverVersion": "PostgreSQL 17.7 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "functionName": "public.ca_browse_listings",
+  "permissions": {
+    "role": "anon",
+    "rlsEnabled": true,
+    "tableLevelSelectGranted": false,
+    "privateColumnSelectGranted": false
+  },
+  "limits": {
+    "cpus": 2,
+    "memoryMiB": 768,
+    "sharedBuffersMiB": 128,
+    "statementTimeoutSeconds": 15
+  },
+  "dataset": {
+    "sold": 250,
+    "pending": 250,
+    "rejected": 250,
+    "total_rows": 10750,
+    "active_unsold": 10000,
+    "relation_bytes": 25419776
+  },
+  "executedBrowseSha256": "dd81a8937ac3068a1309dec1d3fa160804b43a01218dc2f1f7383b3362c57b0d",
+  "referenceSourceSha256": "56672cf2fee6c2bbf50aa9c762e324d67b6f632bc33464b4860b71acfbbfa52f",
+  "cases": [
+    {
+      "name": "first_page",
+      "filters": {},
+      "page": 1,
+      "totalMatches": 10000,
+      "returnedItems": 24,
+      "payloadBytes": 103708,
+      "warmRuns": 1,
+      "executionMs": [
+        50.844
+      ],
+      "p50Ms": 50.844,
+      "p95Ms": 50.844
+    },
+    {
+      "name": "deep_page_200",
+      "filters": {},
+      "page": 200,
+      "totalMatches": 10000,
+      "returnedItems": 24,
+      "payloadBytes": 104723,
+      "warmRuns": 1,
+      "executionMs": [
+        47.277
+      ],
+      "p50Ms": 47.277,
+      "p95Ms": 47.277
+    },
+    {
+      "name": "last_page_417",
+      "filters": {},
+      "page": 417,
+      "totalMatches": 10000,
+      "returnedItems": 16,
+      "payloadBytes": 76742,
+      "warmRuns": 1,
+      "executionMs": [
+        45.295
+      ],
+      "p50Ms": 45.295,
+      "p95Ms": 45.295
+    },
+    {
+      "name": "make_city_price_filter",
+      "filters": {
+        "make": "BMW",
+        "city": "Bakı",
+        "priceMax": 20000
+      },
+      "page": 1,
+      "totalMatches": 294,
+      "returnedItems": 24,
+      "payloadBytes": 103975,
+      "warmRuns": 1,
+      "executionMs": [
+        130.53
+      ],
+      "p50Ms": 130.53,
+      "p95Ms": 130.53
+    },
+    {
+      "name": "price_ascending",
+      "filters": {
+        "sort": "priceAsc"
+      },
+      "page": 1,
+      "totalMatches": 10000,
+      "returnedItems": 24,
+      "payloadBytes": 104267,
+      "warmRuns": 1,
+      "executionMs": [
+        51.498
+      ],
+      "p50Ms": 51.498,
+      "p95Ms": 51.498
+    },
+    {
+      "name": "price_descending",
+      "filters": {
+        "sort": "priceDesc"
+      },
+      "page": 1,
+      "totalMatches": 10000,
+      "returnedItems": 24,
+      "payloadBytes": 104447,
+      "warmRuns": 1,
+      "executionMs": [
+        43.948
+      ],
+      "p50Ms": 43.948,
+      "p95Ms": 43.948
+    }
+  ],
+  "concurrency": [
+    {
+      "name": "default",
+      "filters": {},
+      "clients": 1,
+      "workerThreads": 1,
+      "transactions": 3,
+      "requestedTransactions": 3,
+      "failedOrUnfinishedTransactions": 0,
+      "stageAborted": false,
+      "p50Ms": 36.594,
+      "p95Ms": 47.74,
+      "maxMs": 47.74,
+      "transactionsPerSecond": 25.756379,
+      "scope": "Concurrent database sessions inside one network-isolated two-CPU container; excludes HTTP, browser and images."
+    },
+    {
+      "name": "default",
+      "filters": {},
+      "clients": 5,
+      "workerThreads": 4,
+      "transactions": 5,
+      "requestedTransactions": 5,
+      "failedOrUnfinishedTransactions": 0,
+      "stageAborted": false,
+      "p50Ms": 61.629,
+      "p95Ms": 68.921,
+      "maxMs": 68.921,
+      "transactionsPerSecond": 72.44277,
+      "scope": "Concurrent database sessions inside one network-isolated two-CPU container; excludes HTTP, browser and images."
+    },
+    {
+      "name": "default",
+      "filters": {},
+      "clients": 10,
+      "workerThreads": 4,
+      "transactions": 10,
+      "requestedTransactions": 10,
+      "failedOrUnfinishedTransactions": 0,
+      "stageAborted": false,
+      "p50Ms": 126.863,
+      "p95Ms": 171.007,
+      "maxMs": 171.007,
+      "transactionsPerSecond": 58.419405,
+      "scope": "Concurrent database sessions inside one network-isolated two-CPU container; excludes HTTP, browser and images."
+    },
+    {
+      "name": "default",
+      "filters": {},
+      "clients": 20,
+      "workerThreads": 4,
+      "transactions": 20,
+      "requestedTransactions": 20,
+      "failedOrUnfinishedTransactions": 0,
+      "stageAborted": false,
+      "p50Ms": 274.473,
+      "p95Ms": 339.592,
+      "maxMs": 350.357,
+      "transactionsPerSecond": 56.721176,
+      "scope": "Concurrent database sessions inside one network-isolated two-CPU container; excludes HTTP, browser and images."
+    },
+    {
+      "name": "combined_filter",
+      "filters": {
+        "make": "BMW",
+        "city": "Bakı",
+        "priceMax": 20000
+      },
+      "clients": 20,
+      "workerThreads": 4,
+      "transactions": 20,
+      "requestedTransactions": 20,
+      "failedOrUnfinishedTransactions": 0,
+      "stageAborted": false,
+      "p50Ms": 1027.361,
+      "p95Ms": 1108.307,
+      "maxMs": 1108.743,
+      "transactionsPerSecond": 18.033387,
+      "scope": "Concurrent database sessions inside one network-isolated two-CPU container; excludes HTTP, browser and images."
+    }
+  ],
+  "claims": {
+    "productionCapacityEstablished": false,
+    "realUsersSimulated": false,
+    "liveWrites": 0
+  }
+}

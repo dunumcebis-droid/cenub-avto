@@ -1,0 +1,45 @@
+{
+  "recorded_at_utc": "2026-11-13T21:41:41.111306+00:00",
+  "success": true,
+  "mode": "post-migration",
+  "read_only": true,
+  "authenticated_accounts_used": 0,
+  "real_writes": 0,
+  "request_limit": 21,
+  "requests_started": 21,
+  "maximum_concurrency": 20,
+  "per_request_timeout_seconds": 15,
+  "overall_deadline_seconds": 180,
+  "active_listing_total": 0,
+  "static_gets": [],
+  "warmup": {
+    "status": 200,
+    "milliseconds": 1253.14,
+    "wire_bytes": 100,
+    "decoded_bytes": 109,
+    "encoding": "gzip",
+    "listing_total": 0
+  },
+  "read_rpc_stages": [
+    {
+      "concurrency_limit": 20,
+      "requested_count": 20,
+      "completed_requests": 20,
+      "wall_seconds": 1.067,
+      "requests_per_second": 18.74,
+      "p50_milliseconds": 848.97,
+      "p95_milliseconds": 973.24,
+      "max_milliseconds": 1062.05,
+      "wire_bytes_total": 2000,
+      "decoded_bytes_total": 2180
+    }
+  ],
+  "stop_reason": null,
+  "limits": [
+    "A bounded read smoke probe, not an unrestricted stress test or a capacity guarantee.",
+    "Concurrency counts overlapping HTTP jobs, not complete simultaneous browser users.",
+    "Each job includes fresh HTTPS/proxy/TLS overhead from this cloud environment.",
+    "An empty live dataset does not verify populated query performance; see isolated probe.",
+    "No phone/email, private record content, API keys, or response bodies are stored."
+  ]
+}

@@ -1,5 +1,13 @@
 # Qalan elan platforması funksiyaları
 
+## 13 noyabr 2026 — reklamdan əvvəl əlavə yoxlamalar
+
+- Şikayət kartından «Elana bax» əlavə edilib. Səhifədən kənar elanın məxfi admin baxışı, xəta/təkrar cəhd, hesabdan çıxış, filtr dəyişikliyi, eyni vaxtlı baxışlar və 320 px idarəetmə üzrə 16 yeni və 21 mövcud ssenari keçib.
+- 10 000 aktiv sintetik elanda tapılan sorğu ləngliyi `browse_late_projection_performance` miqrasiyası ilə düzəldilib. 472 tam JSON müqayisəsi və canlı bazada geri qaytarılan 155 yoxlama keçib. 20 paralel yerli baza sessiyasında standart siyahı p95 340 ms, birləşmiş filtr p95 1108 ms olub; 58 tranzaksiyanın hamısı tamamlanıb. [Sınaq əhatəsi və məhdudiyyətləri](docs/performance/populated-browse.md).
+- Canlı xidmətə 79 ilkin və 21 son oxuma sorğusu uğurla tamamlanıb. Canlı aktiv elan sayı 0 olub; bu rəqəmlər dolu canlı xidmətin tutumuna zəmanət deyil.
+- Saytın öz ZIP kodu ilə həqiqi tətbiq nüsxəsi yaradılıb: 12 mənbə, 266 sətir, 247 şəkil. Ayrı yerli PostgreSQL-ə bərpada bütün sətir və foto heşləri uyğun gəlib; 44 məhdudiyyət və 16 xarici açar yoxlanıb. Canlı manifest sınaqdan sonra da ilkin nüsxəyə uyğundur. [Bərpanın dəqiq əhatəsi](RESTORE_DRILL.md).
+- 106 Node və 18 arxiv yoxlaması keçib. Məxfi ZIP/snapshot/foto faylları GitHub-a yerləşdirilməyib. İstifadəçinin hələ real elan üçün avtomobili yoxdur; uydurma elan və avtomatik təsdiq yaradılmayıb.
+
 ## 13 noyabr 2026 — yeni beş funksiya
 
 Bu bölmə yeni kodun davranışını və yerli yoxlamalarını təsvir edir. Aşağıdakı əvvəlki mərhələnin tətbiq/yayım nəticələri öz tarixçəsi ilə saxlanılıb; yeni SQL və statik faylların canlıda tətbiqi üçün ayrıca təsdiq tələb olunur.

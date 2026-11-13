@@ -1,0 +1,94 @@
+{
+  "success": true,
+  "engine": "PGlite 0.5.16",
+  "postgresVersion": "18.6",
+  "typedTablesRestored": 12,
+  "constraintsValidated": 44,
+  "foreignKeysValidated": 16,
+  "identitySequencesReseeded": 1,
+  "placeholderAuthRows": 2,
+  "resources": [
+    {
+      "name": "elanlar",
+      "rows": 10,
+      "sha256Matches": true
+    },
+    {
+      "name": "paket_sorgulari",
+      "rows": 5,
+      "sha256Matches": true
+    },
+    {
+      "name": "profiller",
+      "rows": 2,
+      "sha256Matches": true
+    },
+    {
+      "name": "adminler",
+      "rows": 1,
+      "sha256Matches": true
+    },
+    {
+      "name": "storage_objects",
+      "rows": 247,
+      "sha256Matches": true
+    },
+    {
+      "name": "listing_stats",
+      "rows": 0,
+      "sha256Matches": true
+    },
+    {
+      "name": "listing_events",
+      "rows": 0,
+      "sha256Matches": true
+    },
+    {
+      "name": "listing_reports",
+      "rows": 0,
+      "sha256Matches": true
+    },
+    {
+      "name": "saved_searches",
+      "rows": 0,
+      "sha256Matches": true
+    },
+    {
+      "name": "approved_listing_events",
+      "rows": 0,
+      "sha256Matches": true
+    },
+    {
+      "name": "notification_progress",
+      "rows": 1,
+      "sha256Matches": true
+    },
+    {
+      "name": "search_notifications",
+      "rows": 0,
+      "sha256Matches": true
+    }
+  ],
+  "allPostgresRowHashesMatch": true,
+  "restoredPhotos": 247,
+  "restoredPhotoBytes": 31047805,
+  "allPhotoHashesMatch": true,
+  "productionWrites": 0,
+  "authCredentialsRestored": false,
+  "fullSupabaseRecovery": false,
+  "source": "real read-only application export",
+  "archiveSha256": "c0b4ce1a43b307a865a88bb896d9ce13db5737709fb6ad8520bd2c83fe6d6187",
+  "zipWriter": "assets/js/14-server-backup.js",
+  "interceptedBrowserReads": {
+    "manifest": 3,
+    "pages": 8,
+    "photos": 247
+  },
+  "realHttpMethods": {
+    "GET": 0
+  },
+  "cachedSourcePhotos": 247,
+  "applicationRows": 266,
+  "snapshotManifestStillMatchesProduction": true,
+  "downloadNote": "247 original photo objects were fetched read-only before this run; this final export reused their verified private cache."
+}

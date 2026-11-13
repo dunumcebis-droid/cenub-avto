@@ -1,0 +1,117 @@
+{
+  "recorded_at_utc": "2026-11-13T19:28:14.523957+00:00",
+  "success": true,
+  "read_only": true,
+  "authenticated_accounts_used": 0,
+  "real_writes": 0,
+  "request_limit": 79,
+  "requests_started": 79,
+  "maximum_concurrency": 20,
+  "per_request_timeout_seconds": 15,
+  "overall_deadline_seconds": 180,
+  "active_listing_total": 0,
+  "static_gets": [
+    {
+      "status": 200,
+      "milliseconds": 324.62,
+      "wire_bytes": 12207,
+      "decoded_bytes": 50717,
+      "encoding": "gzip",
+      "sha256": "c861ed6075987dfbd66ef8f0b34ae83862a6da212ca5cf12c3958455d91abbc8",
+      "path": "index.html"
+    },
+    {
+      "status": 200,
+      "milliseconds": 261.7,
+      "wire_bytes": 29650,
+      "decoded_bytes": 134989,
+      "encoding": "gzip",
+      "sha256": "f9689e1d6bfa8e365257181f7f985ea6a0cbf21be7dea5ddb9bff9dea4a12acc",
+      "path": "assets/site.css"
+    },
+    {
+      "status": 200,
+      "milliseconds": 307.27,
+      "wire_bytes": 184461,
+      "decoded_bytes": 888145,
+      "encoding": "gzip",
+      "sha256": "d0b19640276d815c088740493340644f604be78885524142f0e1a79bf0626b92",
+      "path": "assets/js/01-main.js"
+    },
+    {
+      "status": 200,
+      "milliseconds": 190.71,
+      "wire_bytes": 42437,
+      "decoded_bytes": 42437,
+      "encoding": "identity",
+      "sha256": "34dbfc142c2317412827da3d377f3e1eee732e9d9ca37fb3b7408e0942bef94f",
+      "path": "assets/branding/cenub-avto-logo.jpg"
+    }
+  ],
+  "warmup": {
+    "status": 200,
+    "milliseconds": 1531.75,
+    "wire_bytes": 100,
+    "decoded_bytes": 109,
+    "encoding": "gzip",
+    "listing_total": 0
+  },
+  "read_rpc_stages": [
+    {
+      "concurrency_limit": 1,
+      "requested_count": 4,
+      "completed_requests": 4,
+      "wall_seconds": 2.371,
+      "requests_per_second": 1.69,
+      "p50_milliseconds": 621.16,
+      "p95_milliseconds": 763.12,
+      "max_milliseconds": 763.12,
+      "wire_bytes_total": 400,
+      "decoded_bytes_total": 436
+    },
+    {
+      "concurrency_limit": 5,
+      "requested_count": 10,
+      "completed_requests": 10,
+      "wall_seconds": 1.285,
+      "requests_per_second": 7.78,
+      "p50_milliseconds": 359.59,
+      "p95_milliseconds": 654.74,
+      "max_milliseconds": 654.74,
+      "wire_bytes_total": 1000,
+      "decoded_bytes_total": 1090
+    },
+    {
+      "concurrency_limit": 10,
+      "requested_count": 20,
+      "completed_requests": 20,
+      "wall_seconds": 1.21,
+      "requests_per_second": 16.53,
+      "p50_milliseconds": 264.4,
+      "p95_milliseconds": 659.44,
+      "max_milliseconds": 722.27,
+      "wire_bytes_total": 2000,
+      "decoded_bytes_total": 2180
+    },
+    {
+      "concurrency_limit": 20,
+      "requested_count": 40,
+      "completed_requests": 40,
+      "wall_seconds": 1.198,
+      "requests_per_second": 33.39,
+      "p50_milliseconds": 325.62,
+      "p95_milliseconds": 688.94,
+      "max_milliseconds": 720.11,
+      "wire_bytes_total": 4000,
+      "decoded_bytes_total": 4360
+    }
+  ],
+  "stop_reason": null,
+  "limits": [
+    "A bounded read smoke probe, not an unrestricted stress test or a capacity guarantee.",
+    "Concurrency counts overlapping HTTP jobs, not complete simultaneous browser users.",
+    "Each job includes fresh HTTPS/proxy/TLS overhead from this cloud environment.",
+    "An empty live dataset does not verify populated query performance; see isolated probe.",
+    "No phone/email, private record content, API keys, or response bodies are stored."
+  ]
+}

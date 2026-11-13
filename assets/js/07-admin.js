@@ -2,7 +2,7 @@
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let owner=null,authorized=false,verifySequence=0,busy=false,sessionEpoch=0;
-let previewSequence=0,previewActive=false;
+let previewSequence=0,previewActive=false,previewSource=null;
 const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false,linked:null});
 let ads=state(),payments=state();
 function reset(){closePreview();sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();if(el('caPayLinkedNotice')){el('caPayLinkedNotice').replaceChildren();el('caPayLinkedNotice').hidden=true;}el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
@@ -22,20 +22,29 @@ async function verify(){
 function closePreview(closeDetail=true){
  previewSequence++;
  if(el('caAdminActionMsg')?.textContent==='Elanın tam məlumatları yüklənir...')el('caAdminActionMsg').textContent='';
- const wasActive=previewActive;previewActive=false;
+ const wasActive=previewActive;previewActive=false;previewSource=null;
  if(closeDetail&&wasActive&&el('detailOverlay')?.dataset.adminPreview==='true')closeCarDetail();
 }
 window.caCloseAdminPreview=()=>closePreview();
 window.caAdminPreviewClosed=()=>closePreview(false);
-async function previewListing(button){
+// Report previews use the same lifecycle, without requiring a match on the
+// currently paged advertisement list. The server still rechecks admin rights.
+window.caCancelReportPreview=()=>{if(previewSource==='report')closePreview();};
+window.caAdminPreviewReportListing=(id,button,isCurrent)=>{
+ if(!button?.isConnected||!button.closest('#caReportsAdmin')||typeof isCurrent!=='function')return Promise.resolve(false);
+ return previewListing(button,{id,source:'report',isCurrent});
+};
+async function previewListing(button,options={}){
  if(!authorized||!owner||el('caAdminPanel').style.display==='none')return false;
- const id=button.dataset.previewId;
- if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'')||!ads.rows.some(row=>row.id===id))return false;
+ const report=options.source==='report',id=report?options.id:button.dataset.previewId;
+ const current=()=>report?options.isCurrent():ads.rows.some(row=>row.id===id);
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'')||!current())return false;
+ closePreview();previewSource=report?'report':'listing';
  const expected=owner,epoch=sessionEpoch,sequence=++previewSequence,listSequence=ads.sequence;
  button.disabled=true;el('caAdminActionMsg').textContent='Elanın tam məlumatları yüklənir...';
  try{
   const row=await rpc('ca_admin_listing_detail',{p_id:id},expected);
-  if(sequence!==previewSequence||epoch!==sessionEpoch||expected!==owner||currentUser?.id!==expected||!authorized||listSequence!==ads.sequence||el('caAdminPanel').style.display==='none')return false;
+  if(sequence!==previewSequence||epoch!==sessionEpoch||expected!==owner||currentUser?.id!==expected||!authorized||listSequence!==ads.sequence||el('caAdminPanel').style.display==='none'||!current())return false;
   if(!row){el('caAdminActionMsg').textContent='Elan tapılmadı və ya artıq baxış üçün əlçatan deyil.';return false;}
   if(Array.isArray(row)||row.id!==id||typeof window.caOpenCarRecord!=='function')throw Error('Elanın tam məlumatları düzgün gəlmədi.');
   const car=caRemoteToCar(row);
@@ -44,11 +53,17 @@ async function previewListing(button){
   previewActive=true;
   el('caAdminActionMsg').textContent='';return true;
  }catch(error){
-  if(sequence===previewSequence&&epoch===sessionEpoch&&expected===owner&&currentUser?.id===expected){
+  if(sequence===previewSequence&&epoch===sessionEpoch&&expected===owner&&currentUser?.id===expected&&current()){
    previewActive=false;el('caAdminActionMsg').textContent='Elan açılmadı: '+error.message;
   }
   return false;
- }finally{if(button.isConnected)button.disabled=false;}
+ }finally{
+  if(sequence===previewSequence&&!previewActive){
+   previewSource=null;
+   if(el('caAdminActionMsg')?.textContent==='Elanın tam məlumatları yüklənir...')el('caAdminActionMsg').textContent='';
+  }
+  if(button.isConnected)button.disabled=false;
+ }
 }
 function pager(s,id,handler){el(id).innerHTML=s.pages>1?`<div class="ca-actions"><button type="button" onclick="${handler}(-1)" ${s.loading||s.page<=1?'disabled':''}>← Əvvəlki</button><span>${s.page} / ${s.pages}</span><button type="button" onclick="${handler}(1)" ${s.loading||s.page>=s.pages?'disabled':''}>Növbəti →</button></div>`:'';}
 function packageInfo(x){

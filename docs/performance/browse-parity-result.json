@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "contexts": [
+    "admin",
+    "anon",
+    "other_signed_in",
+    "owner"
+  ],
+  "live_writes": 0,
+  "exact_json_comparisons": 472,
+  "isolated_synthetic_rows": 480,
+  "public_projection_columns": 29
+}

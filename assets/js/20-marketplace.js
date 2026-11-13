@@ -10,7 +10,7 @@ const reasons = {fraud:'Dələduzluq şübhəsi',wrong_info:'Yanlış məlumat',
 let owner = ownerNow(), epoch = 0, modalSequence = 0, modal = null, savedSequence = 0, statsSequence = 0;
 let statsCache = new Map(), statsPending = '', savedRows = [], notificationState = null;
 let notificationSequence = 0, notificationBusy = false, notificationPage = 1, pollTimer = null, drainTimer = null;
-let adminSequence = 0, adminAuthorized = false, reportPage = 1, reportRows = [], adminOwner = null;
+let adminSequence = 0, reportPreviewSequence = 0, adminAuthorized = false, reportPage = 1, reportRows = [], adminOwner = null;
 let overlay, content, message, title, close, form, submit, returnFocus, oldOverflow = '';
 const validSession = (expected, version = epoch) => !!expected && expected === owner && expected === ownerNow() && version === epoch;
 async function rpc(name, body, expected = owner, version = epoch) {
@@ -366,12 +366,14 @@ function reportsSection() {
 function adminVisible(){return $('caAdminPanel')&&$('caAdminPanel').style.display!=='none';}
 async function initReports(){
  const section=reportsSection();if(!section||!owner||!adminVisible())return;
+ window.caCancelReportPreview?.();
  const expected=owner,version=epoch,sequence=++adminSequence;adminAuthorized=false;adminOwner=null;section.hidden=true;
  try{const ok=await rpc('cenub_admin_yoxla',{},expected,version);if(!validSession(expected,version)||sequence!==adminSequence||!adminVisible())return;if(ok!==true)return;adminAuthorized=true;adminOwner=expected;section.hidden=false;loadReports(1);}
  catch(_){if(validSession(expected,version)&&sequence===adminSequence)section.hidden=true;}
 }
 async function loadReports(page=reportPage){
  if(!adminAuthorized||adminOwner!==owner||!adminVisible())return;
+ window.caCancelReportPreview?.();
  const expected=owner,version=epoch,sequence=++adminSequence,status=$('caReportsFilter').value;reportPage=page;$('caReportsMessage').textContent='Şikayətlər yüklənir...';
  try{
   const data=await rpc('ca_admin_browse_reports',{p_status:status,p_page:page,p_page_size:24},expected,version);
@@ -387,10 +389,25 @@ function drawReports(data){
   card.append(node('strong',[row.marka,row.model].filter(Boolean).join(' ')),node('p',reasons[row.reason]||'Digər'),node('p',row.details||''),node('p','Status: '+({open:'Açıq',resolved:'Həll edilib',dismissed:'Əsassız hesab edilib'}[row.status]||row.status)));
   const note=node('textarea');note.maxLength=1000;note.rows=2;note.value=row.admin_note||'';note.dataset.caReportNote=row.id;note.setAttribute('aria-label','Daxili admin qeydi');card.append(note);
   const actions=node('div',null,'ca-actions');
+  const preview=button('Elana bax',()=>previewReportListing(row.id,row.elan_id,preview));
+  preview.dataset.caReportPreview=row.id;preview.dataset.listingId=row.elan_id||'';preview.disabled=!UUID.test(row.elan_id||'');actions.append(preview);
   for(const [status,label]of [['resolved','Həll edildi'],['dismissed','Əsassızdır']]){const b=button(label,()=>resolveReport(row.id,status,note.value,b));b.dataset.caReportStatus=status;b.disabled=row.status===status;actions.append(b);}
   card.append(actions);list.append(card);
  }
  const pager=$('caReportsPager');pager.replaceChildren();if(data.total_pages>1){const prev=button('← Əvvəlki',()=>loadReports(reportPage-1));prev.disabled=reportPage<=1;const next=button('Növbəti →',()=>loadReports(reportPage+1));next.disabled=reportPage>=data.total_pages;pager.append(prev,node('span',reportPage+' / '+data.total_pages),next);}
+}
+async function previewReportListing(reportId,listingId,b){
+ if(!adminAuthorized||adminOwner!==owner||!adminVisible()||!UUID.test(listingId||'')||!reportRows.some(row=>row.id===reportId&&row.elan_id===listingId))return;
+ const expected=owner,version=epoch,sequence=adminSequence,previewSequence=++reportPreviewSequence;
+ const current=()=>previewSequence===reportPreviewSequence&&validSession(expected,version)&&adminAuthorized&&adminOwner===expected&&adminVisible()&&sequence===adminSequence&&b.isConnected&&reportRows.some(row=>row.id===reportId&&row.elan_id===listingId);
+ $('caReportsMessage').textContent='Elanın tam məlumatları yüklənir...';
+ try{
+  if(typeof window.caAdminPreviewReportListing!=='function')throw Error('Baxış xidməti hazır deyil. Səhifəni yenilə.');
+  const opened=await window.caAdminPreviewReportListing(listingId,b,current);
+  if(!current())return;
+  const detailMessage=$('caAdminActionMsg')?.textContent||'';
+  $('caReportsMessage').textContent=opened?'':(detailMessage&&detailMessage!=='Elanın tam məlumatları yüklənir...'?detailMessage:'Elan açılmadı. Yenidən yoxla.');
+ }catch(error){if(current()){$('caReportsMessage').textContent='Elan açılmadı: '+error.message;b.disabled=false;}}
 }
 async function resolveReport(id,status,note,b){
  if(!adminAuthorized||adminOwner!==owner||!adminVisible()||!reportRows.some(r=>r.id===id))return;
