@@ -1,7 +1,7 @@
 -- Read-only role, private-preview and exact keyset-export checks. Always rolled back.
 begin;
 do $$
-declare admin_id uuid; private_id uuid; expected jsonb; manifest jsonb; page jsonb; resource jsonb;
+declare admin_id uuid; private_id uuid; expected jsonb; manifest jsonb; page jsonb; resource jsonb; resource_name text;
  cursor_id uuid; total integer; hashes text; seen integer; denied boolean; statement text; actual jsonb;
 begin
  select istifadeci_id into admin_id from public.adminler limit 1;
@@ -11,13 +11,23 @@ begin
     has_function_privilege('anon','public.ca_admin_export_manifest()','execute') or
     has_function_privilege('anon','public.ca_admin_export_page(text,uuid,integer)','execute') then raise exception 'Anonymous RPC execution is open.'; end if;
  if exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname in ('ca_admin_listing_detail','ca_admin_export_manifest','ca_admin_export_page') and p.prosecdef) then raise exception 'Public wrappers must be invoker.'; end if;
+ if has_function_privilege('anon','ca_private.export_resource_sql(text)','execute') or
+    has_function_privilege('authenticated','ca_private.export_resource_sql(text)','execute') or
+    has_function_privilege('authenticated','ca_private.require_admin()','execute') then raise exception 'Private helpers are directly callable.'; end if;
+ foreach resource_name in array array['listing_stats','listing_events','listing_reports','saved_searches','approved_listing_events','notification_progress','search_notifications'] loop
+  if has_table_privilege('anon','ca_private.'||resource_name,'SELECT,INSERT,UPDATE,DELETE') or
+     has_table_privilege('authenticated','ca_private.'||resource_name,'SELECT,INSERT,UPDATE,DELETE') then raise exception 'Private table grants opened for %.',resource_name;end if;
+  if not (select relrowsecurity from pg_class where oid=('ca_private.'||resource_name)::regclass) then raise exception 'Private table RLS disabled for %.',resource_name;end if;
+ end loop;
  perform set_config('request.jwt.claim.sub',admin_id::text,true);
  perform set_config('request.jwt.claims',jsonb_build_object('sub',admin_id,'role','authenticated')::text,true);
  perform set_config('role','authenticated',true);
  if private_id is not null and public.ca_admin_listing_detail(private_id) is distinct from expected then raise exception 'Admin preview is incomplete.'; end if;
  if public.ca_admin_listing_detail('ffffffff-ffff-4fff-8fff-ffffffffffff') is not null then raise exception 'Missing listing did not return null.'; end if;
  manifest:=public.ca_admin_export_manifest();
- if manifest->>'version'<>'1' or jsonb_array_length(manifest->'resources')<>5 then raise exception 'Manifest is incomplete.'; end if;
+ if manifest->>'version'<>'1' or jsonb_array_length(manifest->'resources')<>12 or
+    (select jsonb_agg(value->>'name' order by ordinal) from jsonb_array_elements(manifest->'resources') with ordinality as r(value,ordinal))<>
+    '["elanlar","paket_sorgulari","profiller","adminler","storage_objects","listing_stats","listing_events","listing_reports","saved_searches","approved_listing_events","notification_progress","search_notifications"]'::jsonb then raise exception 'Manifest names or order are incomplete.'; end if;
  for resource in select value from jsonb_array_elements(manifest->'resources') loop
   cursor_id:=null;total:=0;hashes:='';seen:=0;
   loop
@@ -36,7 +46,11 @@ begin
  foreach statement in array array[
   $q$select public.ca_admin_export_page('elanlar',null,0)$q$,
   $q$select public.ca_admin_export_page('elanlar',null,201)$q$,
+  $q$select public.ca_admin_export_page('listing_events',null,null)$q$,
   $q$select public.ca_admin_export_page('auth.users',null,100)$q$,
+  $q$select public.ca_admin_export_page('ca_private.listing_reports',null,100)$q$,
+  $q$select public.ca_admin_export_page('../listing_reports',null,100)$q$,
+  $q$select public.ca_admin_export_page(null,null,100)$q$,
   $q$select public.ca_admin_export_page('elanlar; delete from public.elanlar',null,100)$q$
  ] loop
   denied:=false;begin execute statement into actual;exception when invalid_parameter_value then denied:=true;end;
@@ -55,9 +69,13 @@ begin
   denied:=false;begin execute statement into actual;exception when insufficient_privilege then denied:=true;end;
   if not denied then raise exception 'Ordinary user accessed private data.'; end if;
  end loop;
+ foreach resource_name in array array['listing_stats','listing_events','listing_reports','saved_searches','approved_listing_events','notification_progress','search_notifications'] loop
+  denied:=false;begin perform public.ca_admin_export_page(resource_name,null,100);exception when insufficient_privilege then denied:=true;end;
+  if not denied then raise exception 'Ordinary user exported private resource %.',resource_name;end if;
+ end loop;
  perform set_config('role','anon',true);
  denied:=false;begin perform public.ca_admin_export_manifest();exception when insufficient_privilege then denied:=true;end;
  if not denied then raise exception 'Anonymous user accessed export.'; end if;
 end $$;
 rollback;
-select jsonb_build_object('admin_preview','passed','exact_keyset_export_all_five_resources','passed','public_invoker_wrappers','passed','anonymous_and_non_admin_denials','passed','editable_metadata_not_authorization','passed','invalid_resource_and_size_denials','passed','real_records_changed',false) as result;
+select jsonb_build_object('admin_preview','passed','exact_keyset_export_all_twelve_resources','passed','private_marketplace_tables_rls_and_grants','passed','private_helper_denials','passed','public_invoker_wrappers','passed','anonymous_and_non_admin_denials','passed','editable_metadata_not_authorization','passed','invalid_resource_and_size_denials','passed','real_records_changed',false) as result;

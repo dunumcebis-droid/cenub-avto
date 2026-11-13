@@ -314,3 +314,11 @@ test('a failed reservation drains in-flight siblings without starting another ba
  const r=await f.invoke({batch:true});assert.equal(r.status,503);assert.equal(active,0);
  assert.equal(f.calls.filter(c=>c.url.endsWith('/ca_photo_review_reserve')).length,3);assert.equal(providerCalls(f.calls).length,0);assert.equal(uploadCalls(f.calls).length,0);
 });
+
+test('single and batch review instructions allow damaged vehicles without bypassing view and screenshot checks',async()=>{
+ for(const batch of [false,true]){
+  const f=await fixture({batch,batchCategories:['front']});const r=await f.invoke({batch,categories:['front']});assert.equal(r.status,200);
+  const prompt=JSON.parse(providerCalls(f.calls)[0].body).systemInstruction.parts[0].text;
+  assert.match(prompt,/Damage alone must never cause rejection/);assert.match(prompt,/intact headlights, grille, bumper or body panels are not required/);assert.match(prompt,/visible screenshot interfaces/);
+ }
+});

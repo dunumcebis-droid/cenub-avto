@@ -5,7 +5,23 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
-## Son düzəliş və yoxlama
+## Son beş əlavə — 13 noyabr 2026
+
+- **Şəkil idarəetməsi:** ayrıca şəkli silmək, eyni bölmədə sırasını dəyişmək və ★ ilə əsas şəkli seçmək olur. Redaktədə köhnə şəkillər qorunur; yeni şəkil əlavə ediləndə saxlanılanlarla birlikdə hər bölmədə 6, bütün elanda 36 həddi yoxlanır. Limitdən böyük köhnə bölmədə mövcud şəkli silmək və sıralamaq olar; yeni şəkil üçün əvvəl limitə endirmək lazımdır. Yeni faylların real uyğunluq yoxlaması saxlanılır.
+- **Satılıb:** satıcı elanı satılmış kimi qeyd edir. Elan açıq nəticələrdən çıxır, şəkilləri və paket tarixçəsi şəxsi kabinetdə qalır. Admin satılmış elan üçün yayım statusunu dəyişən düymələr görmür.
+- **Şəxsi statistika:** satıcı yalnız öz elanlarının baxış və telefon düyməsi kliklərini görür. Bunlar təxmini göstəricilərdir; zəng kliki baş tutmuş zəng demək deyil.
+- **Şikayət və moderasiya:** daxil olmuş istifadəçi başqasının aktiv elanını səbəb və izahla şikayət edə bilir. Admin açıq/həll edilmiş/əsassız şikayətləri səhifələrlə yoxlayır və daxili qeyd saxlayır. Şikayət elanı avtomatik gizlətmir.
+- **Saxlanılan axtarış və bildiriş:** filtrlər və sıralama yadda saxlanılır, kabinetdən yenidən açılır və silinir. Sonradan uyğun təsdiqlənən elanlar üçün yalnız sayt daxilində bildiriş yaranır; e-poçt və SMS göndərilmir.
+
+Şəkil idarəetməsinin 12 və marketplace interfeysinin 15 imitasiya edilmiş brauzer sınağı keçib. İcazə, məlumat məxfiliyi, SQL və yayım mərhələləri [COMPLETION_VERIFICATION.md](COMPLETION_VERIFICATION.md) sənədində ayrıca göstərilir; bu saylar həmin iki yeni test faylına aiddir.
+
+### Statistikada məxfilik
+
+Brauzerdə təsadüfi identifikator və gündəlik təkrar klik/baxış qeydləri yerli yaddaşda saxlanılır. Cihazın barmaq izi yaradılmır. Server identifikatorun günə bağlı heşini eyni elan və hadisə növünü bir gündə təkrar saymamaq üçün istifadə edir; bu sayğac mexanizmi IP və brauzer xüsusiyyətlərini toplamır. İki gündən köhnə günlük izlər yeni sorğular zamanı hissə-hissə təmizlənir; dəqiq 48 saatlıq silinmə zəmanəti yoxdur. Elanın ümumi sayğacları elan saxlandığı müddətdə qalır. Fərqli brauzer/cihazlar və yaddaşın təmizlənməsi səbəbindən rəqəmlər unikal şəxslərin və ya real zənglərin dəqiq sayı deyil.
+
+Saxlanılan axtarışlar, bildirişlər, şikayətlər və daxili admin qeydləri ictimai siyahıya açılmır. İstifadəçi yalnız öz axtarış və bildirişlərini görür; şikayət baxışı admin səlahiyyəti tələb edir. Cari məlumat izahı [məxfilik siyasətində](privacy.html) var.
+
+## Şəkil tanıma və sürət yoxlaması
 
 Şəkillərin avtomobilə və seçilən bölməyə uyğunluğunu yoxlayan server/forma inteqrasiyası hazırlanıb. **Real şəkil tanıma xidməti qoşulub.** Yoxlama 6-lıq qruplarla aparılır; təsdiqlənmiş şəkillər yenidən seçildikdə eyni bölmədə təkrar yoxlanmır. «Şəkilləri yoxla» düyməsi ilə elan yaratmadan yoxlama aparmaq mümkündür. Aktivləşdirmə və real dəqiqlik sınağı üçün [PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md), proqram/baza sınaqları üçün [PHOTO_REVIEW_VERIFICATION.md](PHOTO_REVIEW_VERIFICATION.md).
 
@@ -52,7 +68,7 @@ Kartlar, admin, parol bərpası, BMW seçimi, nəsil məlumatı və müqayisə a
 ## Cari düzəlişlər
 
 - Marka, model, qiymət, il, yürüş və texniki məlumatlar baza sütunlarından və əvvəlki `ca_data` formatlarından oxunur. Boş yürüş `null`, daxil edilmiş sıfır isə `0 km` olaraq qorunur.
-- Redaktə forması təchizat seçimlərini və şəkillərin bölmələrini bərpa edir. Yeni şəkil seçilməyən bölmələr, mövcud şəkil sırası və kataloqda olmayan köhnə təchizat dəyərləri saxlanılır.
+- Redaktə forması təchizat seçimlərini və şəkillərin bölmələrini bərpa edir. Mövcud şəkillər yeni fayl seçiləndə də saxlanılır; yalnız ayrıca «Sil» əməliyyatı ilə çıxarılır. İstifadəçinin seçdiyi sıra, əsas şəkil və kataloqda olmayan köhnə təchizat dəyərləri qorunur.
 - Elan yaratma, redaktə və silmə serverin qaytardığı elan ID-si ilə təsdiqlənir. Heç bir sətri dəyişməyən sorğu uğur kimi göstərilmir. Silmə şəkilləri və ödəniş tarixçəsini saxlayan arxivləşdirmədir (`silindi`).
 - Redaktədə cari paket saxlanılır; yeni paket yalnız ayrıca seçildikdə istənilir. VIP, Premium və Standart müddətləri müvafiq olaraq 15, 5 və 3 gündür; faktiki paket bazanın təsdiqlənmiş vəziyyətindən və bitmə tarixindən oxunur.
 - Elan siyahısı serverdə süzülür və sıralanır, səhifədə 24 elan göstərilir. Ümumi say üçün kodda əvvəlki 500 elan məhdudiyyəti yoxdur. Satıcının elanları ayrıca 100-lük hissələrlə oxunur.
@@ -68,6 +84,7 @@ Admin elanları və paket sorğuları serverdə axtarılır və 24-lük səhifə
 
 - `index.html`: səhifənin quruluşu; əvvəlki 12,47 MB əvəzinə təxminən 46 KB.
 - `assets/site.css`: əvvəlki 9 stil blokunun ardıcıllığı qorunmuş vahid stil faylı.
+- `assets/js/19-photo-manager.js` və `assets/js/20-marketplace.js`: şəkil sırası/əsas şəkil, satılıb statusu, şəxsi statistika, şikayət, axtarış və sayt bildirişləri. Əsas HTML 18 klassik skripti müəyyən ardıcıllıqla yükləyir.
 - `assets/js/01-main.js`: elanlar, hesab, redaktə, filtrlər və əsas interfeys. İlkin digər 7 faylın ardıcıllığı qorunub. Əlavə `00-auth-callback.js` URL-i resurslardan əvvəl təmizləyir, `09-auth.js` isə parol bərpasını idarə edir.
 - `assets/images/`: 56 daxili şəkil istinadının 46 unikal faylı. Şəkillər yalnız base64-dən fayla çıxarılıb; baytları dəyişdirilməyib, yenidən kodlaşdırılmayıb.
 - `assets/manifest.json`: ilkin istinadlar, fayl yolları, ölçülər və SHA-256 izləri. `tests/assets.test.cjs` fayllardan ilkin data URI-lərini yenidən quraraq eyniliyi yoxlayır.
@@ -99,3 +116,13 @@ Node testləri daxili test kitabxanasından istifadə edir. Python testləri ü�
 Mövcud əl ilə paket sorğusu və admin təsdiqi axını saxlanılıb. İstifadəçinin hazırda merchant hesabı yoxdur; VÖEN və ABB ilə internet ekvayrinq/merchant girişi alındıqdan sonra bank inteqrasiyası ayrıca tamamlanmalıdır. Bu məlumatlar olmadan kartdan avtomatik ödəniş və bankın təsdiqlədiyi ödəniş nəticəsi aktiv deyil.
 
 Əvvəlki açıq elan oxuma icazəsinin tətbiq tarixçəsi [PUBLIC_LISTING_ACCESS.md](PUBLIC_LISTING_ACCESS.md) sənədində saxlanılır; həmin sənəd cari yeniləmənin yayım sübutu deyil.
+
+## Yeni sxem və ehtiyat nüsxə
+
+[database/marketplace-features.sql](database/marketplace-features.sql) yeni özəl cədvəlləri və RPC-ləri, [database/photo-manager-legacy-subsets.sql](database/photo-manager-legacy-subsets.sql) əvvəlki şəkillərin bölmə daxilində təhlükəsiz silinmə/sıra qaydasını təsvir edir. SQL faylının repozitoriyada olması onun canlı bazaya tətbiq edildiyini göstərmir; tətbiq və baza yoxlaması ayrıca qeyd olunmalıdır.
+
+[database/marketplace-backup.sql](database/marketplace-backup.sql) əvvəlki admin ZIP ixracının sabit siyahısını 5-dən 12 mənbəyə genişləndirir: elanlar, paket sorğuları, profillər, adminlər və şəkil obyektlərinə əlavə olaraq statistika, gündəlik təkrar yoxlama izləri, şikayətlər, saxlanılan axtarışlar və bildiriş üçün üç əlaqəli mənbə daxil edilir. Bu genişlənmə uyğun `14-server-backup.js` versiyası ilə birlikdə tətbiq olunmalıdır. 7 imitasiya edilmiş ZIP brauzer sınağı və ayrıca sintetik PostgreSQL yoxlaması keçib; canlı tətbiq ayrıca əməliyyatdır. Məxfi Auth parolları/tokenləri yenə ixrac olunmur.
+
+Admin ZIP-i şəxsi axtarışları, şikayət mətnini və daxili qeydləri də daşıya bilər. Faylı məxfi saxlayın; serverdə gündəlik izlərin təmizlənməsi artıq yüklənmiş ZIP-i dəyişmir. İxrac zamanı yeni baxış/klik və ya başqa məlumat dəyişikliyi baş verərsə, son manifest yoxlaması nüsxəni natamam sayıb dayandıra bilər. Sakit vaxtda yenidən cəhd edin. İxrac tətbiqin məntiqi nüsxəsidir, atomik PostgreSQL snapshot-u və ya avtomatik bərpa xidməti deyil.
+
+Qəzalı avtomobillər də qəbul edilir: formada «Vəziyyəti → Qəzalı» və uyğun qəza tarixçəsi seçilə bilər. Şəkil yoxlaması zədəyə görə rədd etməmək üçün konfiqurasiya edilib; aydın avtomobil fotosu və düzgün görünüş yenə tələb olunur.

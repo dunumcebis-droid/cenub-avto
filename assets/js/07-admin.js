@@ -71,7 +71,15 @@ function drawPaymentLink(){
  notice.hidden=!payments.linked;
 }
 function drawAds(){
- el('caAdminList').innerHTML=ads.rows.map(x=>{const info=packageInfo(x);return `<article class="ca-item" data-ad-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(x.veziyyet)}</p>${packageMarkup(x)}<p>${esc(String(x.tesvir||'').slice(0,250))}</p><button type="button" class="ca-admin-preview" data-preview-id="${esc(x.id)}">Şəkillər və tam məlumat</button><div class="ca-actions">${x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv" ${info.canPublish?'':'disabled aria-disabled="true" title="Əvvəl paket sorğusunu yoxla və təsdiqlə"'}>✓ Təsdiqlə</button>`}${x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>'}${x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:''}</div></article>`;}).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
+ el('caAdminList').innerHTML=ads.rows.map(x=>{
+  const info=packageInfo(x),isSold=x.veziyyet==='satilib'||x.is_sold===true;
+  const status=isSold?'Satılıb':x.veziyyet;
+  const actions=isSold?'<span class="ca-status-sold" role="status">✓ Satılıb · Şəxsi arxiv</span>':
+   (x.veziyyet==='aktiv'?'<span class="ca-status-confirmed" role="status">✓ Təsdiqlənib</span>':`<button class="ca-yes" data-id="${esc(x.id)}" data-status="aktiv" ${info.canPublish?'':'disabled aria-disabled="true" title="Əvvəl paket sorğusunu yoxla və təsdiqlə"'}>✓ Təsdiqlə</button>`)+
+   (x.veziyyet!=='reddedildi'?`<button class="ca-no" data-id="${esc(x.id)}" data-status="reddedildi">✕ Rədd et</button>`:'<span class="ca-status-rejected">✕ Rədd edilib</span>')+
+   (x.veziyyet!=='gozlemede'?`<button data-id="${esc(x.id)}" data-status="gozlemede">↶ Gözləməyə qaytar</button>`:'');
+  return `<article class="ca-item" data-ad-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.il)}</strong><p>${esc(x.qiymet)} AZN · ${esc(x.seher)} · Status: ${esc(status)}</p>${packageMarkup(x)}<p>${esc(String(x.tesvir||'').slice(0,250))}</p><button type="button" class="ca-admin-preview" data-preview-id="${esc(x.id)}">Şəkillər və tam məlumat</button><div class="ca-actions">${actions}</div></article>`;
+ }).join('')||'<p>Bu axtarışa uyğun elan yoxdur.</p>';pager(ads,'caAdminPager','caAdminPage');
 }
 function drawPayments(){
  drawPaymentLink();

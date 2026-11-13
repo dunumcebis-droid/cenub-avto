@@ -990,3 +990,40 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 
 /* Vehicle photograph category guidance and review outcomes. */
 .ca-photo-review-note{padding:14px 16px;border:1px solid #558b96;border-radius:12px;background:#112b3c;color:#dcecf2;line-height:1.6;margin:14px 0}.ca-photo-review-guide{font-size:.85rem;line-height:1.5;color:#c0d3e0;margin:8px 0}.ca-photo-review-status{font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}.ca-photo-review-status[data-review-state="error"]{color:#ffd0cf}.ca-photo-review-status[data-review-state="approved"]{color:#bfeecb}.photo-input[aria-invalid="true"]{outline:2px solid #e68e89;outline-offset:4px}
+
+/* Editable photo cards and marketplace controls. */
+.ca-managed-photos{display:flex!important;gap:12px;flex-wrap:wrap}.ca-managed-photo{margin:0;width:150px;max-width:100%;background:#10283d;border:1px solid #426477;border-radius:12px;padding:8px}.ca-managed-photo img{width:100%!important;height:94px!important;object-fit:cover;border-radius:7px}.ca-managed-photo figcaption{font-size:12px;line-height:1.5;color:#dcf2ea;margin:6px 0}.ca-photo-actions{display:flex;gap:4px;flex-wrap:wrap}.ca-photo-actions button{font-size:12px;padding:5px 8px;min-height:32px;max-width:100%;background:#173b50;color:#eef8fd;border:1px solid #71939f;border-radius:7px}.ca-photo-actions button:disabled{opacity:.45}@media(max-width:360px){.ca-managed-photo{width:128px}}
+
+/* Seller marketplace tools use the same dark cards and accessible dialog layout. */
+.ca-market-overlay[hidden],.ca-market-section[hidden],.ca-notification-launch[hidden],.ca-notification-badge[hidden]{display:none!important}
+.ca-market-overlay{z-index:16500;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));overscroll-behavior:contain}
+.ca-market-box{position:relative;width:min(100%,580px);max-width:100%;max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;background:#10263b;color:#eff7ff;border:1px solid #5c7d92;border-radius:18px;padding:22px;overflow-wrap:anywhere}
+.ca-market-box h2{margin:8px 0 16px;color:#eff7ff;font-size:23px;line-height:1.4}
+.ca-market-box #caMarketForm{display:grid;gap:14px;min-width:0;margin:0}
+.ca-market-close{position:static!important;display:block;margin:0 0 6px auto;max-width:100%;min-height:42px}
+.ca-market-content{display:grid;gap:12px;min-width:0;max-width:100%}
+.ca-market-content p,.ca-market-message{margin:0;color:#c7dbe9;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.ca-market-message:empty{display:none}.ca-market-message.ca-market-error{color:#ffc7c7}
+.ca-market-field{display:grid;gap:7px;min-width:0;max-width:100%;color:#e2edf6;font-size:14px;line-height:1.6}
+.ca-market-field input,.ca-market-field select,.ca-market-field textarea,.ca-market-item textarea{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;border:1px solid #7590a5;border-radius:9px;background:#172e45;color:#eff7ff;padding:11px 12px;font:inherit;line-height:1.5}
+.ca-market-field textarea,.ca-market-item textarea{resize:vertical;min-height:92px}
+.ca-market-box button,.ca-market-section button,.ca-notification-launch{min-height:44px;max-width:100%;box-sizing:border-box;border:1px solid #6797a6;border-radius:10px;background:#183d51;color:#effaff;padding:10px 14px;font:inherit;font-size:14px;line-height:1.4;font-weight:700;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+.ca-market-box button:disabled,.ca-market-section button:disabled{opacity:.55;cursor:not-allowed}
+.ca-market-box button:focus-visible,.ca-market-section button:focus-visible,.ca-market-field input:focus-visible,.ca-market-field select:focus-visible,.ca-market-field textarea:focus-visible,.ca-market-item textarea:focus-visible,.ca-notification-launch:focus-visible{outline:3px solid #77e6d7;outline-offset:3px}
+.ca-market-box #caMarketSubmit{background:#b7f434;border-color:#c8ff58;color:#112d20;font-weight:800}
+.ca-market-section{max-width:100%;min-width:0;box-sizing:border-box;margin:24px 0;padding:18px;background:#10263b;border:1px solid #42677c;border-radius:16px;color:#e5f0f8;overflow-wrap:anywhere}
+.ca-market-section h3{margin:0;color:#f1f8ff;font-size:21px;line-height:1.5}
+.ca-market-section p{font-size:14px;line-height:1.7;color:#c3d8e8}
+.ca-market-section .ca-actions,.ca-market-item .ca-actions,.ca-market-pager{display:flex;flex-wrap:wrap;gap:9px;align-items:center;max-width:100%;min-width:0}
+.ca-market-section select{max-width:100%;min-width:0;min-height:44px;box-sizing:border-box;border:1px solid #7590a5;border-radius:9px;background:#172e45;color:#eff7ff;padding:10px;font:inherit}
+.ca-market-item{display:grid;gap:10px;margin:14px 0;padding:16px;max-width:100%;min-width:0;box-sizing:border-box;border:1px solid #42677c;border-radius:12px;background:#122e44;overflow-wrap:anywhere}
+.ca-market-item strong,.ca-market-item small{display:block;max-width:100%;overflow-wrap:anywhere}.ca-market-item strong{color:#f2f8ff;line-height:1.5}.ca-market-item small{color:#c5dfed;line-height:1.5}.ca-market-item p{margin:0}
+.ca-market-item.ca-unread{border-color:#b4e94e;box-shadow:inset 3px 0 0 #b4e94e}
+.ca-listing-stats{margin:9px 0 0;color:#c8e4eb;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.ca-market-pager{justify-content:center;margin-top:16px}.ca-market-pager span{color:#d6e7f4;font-size:14px}
+.ca-notification-launch{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#17384b;font-size:12px;padding:10px 12px;flex:0 1 auto}
+.ca-notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:21px;min-height:21px;padding:2px 5px;box-sizing:border-box;border-radius:30px;background:#b7f434;color:#102a20;font-size:11px;font-weight:900;line-height:1}
+#caReportsAdmin{width:min(100% - 36px,1100px);margin:28px auto 45px}.ca-status-sold{display:inline-block;padding:8px 12px;border:1px solid #83a1b4;border-radius:9px;background:#213e50;color:#e2f0fa;font-size:14px;font-weight:800}
+body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-market-open #caServerNotice{display:none!important;visibility:hidden;pointer-events:none}
+@media(max-width:600px){header .header-actions{flex-wrap:wrap;justify-content:flex-end;max-width:100%}.ca-market-box{padding:17px}.ca-market-box h2{font-size:21px}.ca-market-section{padding:15px}.ca-market-item{padding:13px}.ca-notification-launch{font-size:12px}.ca-market-box .ca-actions>button,.ca-market-section .ca-actions>button{flex:1 1 auto}#caReportsAdmin{width:calc(100% - 24px)}}
+@media(max-width:360px){.ca-market-overlay{padding:10px}.ca-market-box{padding:14px;max-height:calc(100dvh - 20px)}.ca-market-box h2{font-size:20px}.ca-market-section h3{font-size:19px}.ca-market-item .ca-actions{gap:7px}.ca-market-item .ca-actions>button{flex:1 1 100%}.ca-notification-launch{padding:9px 10px;font-size:11px}.ca-managed-photo{width:124px}}

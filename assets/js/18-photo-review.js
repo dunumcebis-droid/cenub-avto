@@ -180,7 +180,7 @@ window.caPrecheckPhotos=precheckPhotos;
 window.caPhotoReviewSessionChanged=function(){
  const owner=currentUser?.id||null;if(owner===sessionOwner)return;
  sessionOwner=owner;epoch++;cached=null;pending=null;mode=null;precheck=null;available=false;precheckMessage('');syncPrecheck();for(const category of Object.keys(categories))clearGroup(category);
- note('Şəkli uyğun bölməyə əlavə et. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.','pending');
+ note('Şəkli uyğun bölməyə əlavə et. Qəzalı avtomobilin aydın fotosu da qəbul edilir. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.','pending');
 };
 async function refreshNote(){
  const owner=currentUser?.id;if(!owner)return;const submission=caListingSubmissionSequence;
@@ -189,7 +189,7 @@ async function refreshNote(){
 }
 const inputs=[...document.querySelectorAll('.photo-input')];
 if(inputs.length){
- const notice=document.createElement('p');notice.id='caPhotoReviewNote';notice.className='ca-photo-review-note';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.textContent='Şəkli uyğun bölməyə əlavə et. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.';
+ const notice=document.createElement('p');notice.id='caPhotoReviewNote';notice.className='ca-photo-review-note';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.textContent='Şəkli uyğun bölməyə əlavə et. Qəzalı avtomobilin aydın fotosu da qəbul edilir. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.';
  const groups=document.querySelector('.photo-groups');groups?.before(notice);
  const button=document.createElement('button');button.type='button';button.id='caPhotoPrecheck';button.className='back-btn';button.textContent='Şəkilləri yoxla';button.hidden=true;button.disabled=true;button.addEventListener('click',precheckPhotos);
  const result=document.createElement('p');result.id='caPhotoPrecheckResult';result.className='ca-photo-review-status';result.setAttribute('role','status');result.setAttribute('aria-live','polite');

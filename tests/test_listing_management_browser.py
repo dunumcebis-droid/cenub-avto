@@ -14,7 +14,7 @@ import unittest
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from playwright.sync_api import sync_playwright
-from test_cards_browser import browse_fixture_response
+from test_cards_browser import browse_fixture_response, market_read_fixture_response, MARKET_READ_RPC_NAMES
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'http://127.0.0.1:8766/'
@@ -99,7 +99,8 @@ class OfflineBackend:
 
     @property
     def writes(self):
-        return [call for call in self.calls if call['method'] in ('POST','PATCH','DELETE')]
+        return [call for call in self.calls if call['method'] in ('POST','PATCH','DELETE') and
+                call['path'] not in {'/rest/v1/rpc/'+name for name in MARKET_READ_RPC_NAMES}]
 
     def route(self, route):
         if urlsplit(route.request.url).path == '/functions/v1/ca-photo-review/status':
@@ -132,6 +133,11 @@ class OfflineBackend:
         def send(payload, status=200, headers=None):
             route.fulfill(status=status, content_type='application/json',
                           body=json.dumps(payload), headers=headers or {})
+
+        if parsed.path.startswith('/rest/v1/rpc/') and parsed.path.rsplit('/',1)[-1] in MARKET_READ_RPC_NAMES:
+            assert req.method == 'POST'
+            send(market_read_fixture_response(parsed.path.rsplit('/',1)[-1], body, req.headers.get('authorization')))
+            return
 
         if parsed.path == '/rest/v1/rpc/ca_browse_listings' and req.method == 'POST':
             send(browse_fixture_response(self.rows, body, today_approved=self.today_approved))

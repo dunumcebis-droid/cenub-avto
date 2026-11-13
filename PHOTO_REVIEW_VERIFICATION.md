@@ -2,6 +2,14 @@
 
 **Real tanıma normal, hesaba girişlə qorunan yolda yoxlanıb.** Düzgün ön, arxa, yan, salon, mühərrik və digər avtomobil detalı təsdiqləri mövcuddur; rədd cavabları da müşahidə edilib. Bu, real provayderin işlədiyini göstərir, dəqiqliyə dair universal zəmanət deyil. Son yayım üçün admin təsdiqi qalır.
 
+## 13 noyabr 2026 — şəkil idarəetməsi
+
+`19-photo-manager.js` önbaxışda ayrıca «Sil», eyni bölmə daxilində əvvəlki/növbəti sıra və ★ əsas şəkil seçimi əlavə edir. Yeni fayl seçmək saxlanılan şəkilləri avtomatik əvəz etmir. Yeni şəkil əlavə ediləndə bölmə üçün 6 və elan üçün 36 həddi köhnə+yeni cəminə aiddir. Əvvəldən limitdən böyük köhnə bölmənin şəkillərini azaltmaq və sıralamaq mümkündür; yeni şəkil əlavə etmək üçün bölmə əvvəl limitə endirilməlidir. Mövcud təsdiqlənmiş şəkil öz əvvəlki hesab/bölməsində saxlanır; başqa bölməyə yeni fayl kimi qoyulursa uyğunluq yoxlaması yenidən tələb olunur. Köhnə şəklin silinməsi və ya sırasının dəyişməsi onu yeni model sorğusuna çevirmir.
+
+Formanın saxlama kilidi və hesab dəyişməsində təmizlənməsi saxlanılıb. Yeni əsas şəkil və qalereya sırası serverin qəbul etdiyi URL-lərlə uyğunlaşdırılır. Köhnə bölmənin yalnız icazəli altçoxluğu/sırası `database/photo-manager-legacy-subsets.sql` qaydaları ilə qorunur; bu faylın hazırlanması onun canlı bazada tətbiq edildiyinə dair ayrıca sübut deyil.
+
+`tests/test_photo_manager_browser.py` üzrə **14/14** imitasiya edilmiş brauzer sınağı keçib: saxlanılan əsas şəkil/sıra, ayrıca silmə, köhnə şəkillərin qorunması, təsdiq önbelleyi, xəta/təkrar cəhd, URL təmizlənməsi, saxlama kilidi və 320 px idarəetmə. Real model və saxlanc çağırılmayıb. Yeni marketplace funksiyaları və özəl məlumatlar üçün [COMPLETION_VERIFICATION.md](COMPLETION_VERIFICATION.md).
+
 ## Sürət düzəlişi
 
 - Ən çox 6 ayrı şəkil bir model sorğusunda yoxlanır; kollaj hazırlanmır və görüntü məlumatı azaldılmır.
@@ -11,7 +19,7 @@
 - Hər qrupun nəticə indeksləri, sayı, sahibi, bölməsi və təsdiqlənmiş URL-ləri tam yoxlanır. Uyğunsuz cavab təsdiq sayılmır.
 - Provayder cavabı üçün ayrıca vaxt həddi var: tək şəkil 12 saniyə, qrup 16 saniyə; server sorğusunun ümumi həddi 25 saniyədir. Bu hədlər istənilən internet bağlantısında yüklənmənin həmin vaxtda bitəcəyinə zəmanət deyil.
 
-Sürətə aid brauzer sınağında 12 yeni şəkil iki paralel HTTP sorğusu yaradır. Qismən rədddən sonra yalnız rədd edilmiş şəkil göndərilir; dekoder sayı artmır. Bu sınaqlar şəbəkəni imitasiya edir, real provayderin yeni qrup gecikməsini ölçmür. Təhlükəsiz əməliyyat və dəqiqlik yoxlamaları `tests/photo-review-server.test.cjs`, `tests/test_photo_review_browser.py` və `tests/test_photo_batch_pipeline_browser.py` fayllarındadır.
+Sürətə aid brauzer sınağında 14 yeni şəkil iki paralel HTTP sorğusu yaradır. Qismən rədddən sonra yalnız rədd edilmiş şəkil göndərilir; dekoder sayı artmır. Bu sınaqlar şəbəkəni imitasiya edir, real provayderin yeni qrup gecikməsini ölçmür. Təhlükəsiz əməliyyat və dəqiqlik yoxlamaları `tests/photo-review-server.test.cjs`, `tests/test_photo_review_browser.py` və `tests/test_photo_batch_pipeline_browser.py` fayllarındadır.
 
 ## Hazırlanan davranış
 
@@ -38,3 +46,7 @@ Görünən ekran interfeysi aşkar edilə bilər; ekran görüntüsündən büt�
 ## Cari sınaq mexanizmi
 
 «Şəkilləri yoxla» düyməsi boş elan formasında da işləyir. Mövcud girişlə qorunan şəkil yoxlaması yolunu çağırır, elan sorğusu göndərmir, sahə və faylları saxlayır. Təsdiqlənmiş nəticə adi göndərişdə təkrar istifadə edilir. Qaytarılan məzmun, hesab, bölmə, status və fayl izi eyni server/baza qaydalarından keçir.
+
+## 13 noyabr — qəzalı avtomobillər
+
+Model təlimatı zədəni rədd səbəbi saymır; bütöv fara, bamper və panellər məcburi deyil. Görünüş yenə aydın seçilməli, ekran interfeysi olmamalıdır. Tək və qrup sorğusuna eyni təlimat gedir. Edge Function versiya 5, `verify_jwt=true`, canlıya yerləşdirilib. Yeni «Qəzalı» forma seçimi `ca_data.condition` daxilində saxlanılır. Sınaqlar modelin real şəkillər üzrə mütləq dəqiqliyini təsdiqləmir.

@@ -19,12 +19,31 @@ PHOTO = 'https://fixture.invalid/portrait.svg'
 FIXTURE_IDS = {key:f'00000000-0000-4000-8000-{index:012d}' for index,key in enumerate(('vip','premium','standard','free-expensive','free-cheap','missing','pending'),1)}
 # Public response contract: excludes the internal package approval note.
 PUBLIC_COLUMNS = frozenset((
-    'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
+    'id', 'satici_id', 'is_sold', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
     'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
     'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
     'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
     'paket_adi', 'paket_baslayir', 'paket_bitir', 'tesdiq_tarixi',
 ))
+MARKET_READ_RPC_NAMES = frozenset(('ca_my_listing_stats', 'ca_list_saved_searches', 'ca_list_notifications'))
+
+
+def market_read_fixture_response(name, body, authorization):
+    """Exact synthetic read contracts; these POST RPCs do not mutate records."""
+    assert authorization and authorization.startswith('Bearer '), 'Private marketplace reads require a user token'
+    if name == 'ca_my_listing_stats':
+        assert set(body) == {'p_ids'}
+        assert isinstance(body['p_ids'], list) and 0 < len(body['p_ids']) <= 100
+        assert len(set(body['p_ids'])) == len(body['p_ids'])
+        assert all(re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', id, re.I) for id in body['p_ids'])
+        return [dict(id=id, views=0, contact_clicks=0) for id in body['p_ids']]
+    if name == 'ca_list_saved_searches':
+        assert body == {}
+        return []
+    assert name == 'ca_list_notifications'
+    assert set(body) == {'p_page', 'p_page_size'}
+    assert isinstance(body['p_page'], int) and body['p_page'] >= 1 and body['p_page_size'] == 24
+    return dict(items=[], total=0, unread_count=0, page=1, page_size=24, total_pages=0, processing=False)
 
 
 def fixtures():
@@ -144,6 +163,19 @@ class CardBrowserTests(unittest.TestCase):
                 self.assertEqual(req.method,'POST')
                 response = browse_fixture_response(fixtures(), req.post_data_json)
                 request.fulfill(content_type='application/json',body=json.dumps(response))
+            elif urlsplit(req.url).path.startswith('/rest/v1/rpc/') and urlsplit(req.url).path.rsplit('/', 1)[-1] in MARKET_READ_RPC_NAMES:
+                self.assertEqual(req.method, 'POST')
+                response = market_read_fixture_response(urlsplit(req.url).path.rsplit('/', 1)[-1],
+                                                        req.post_data_json, req.headers.get('authorization'))
+                request.fulfill(content_type='application/json', body=json.dumps(response))
+            elif urlsplit(req.url).path == '/rest/v1/rpc/ca_record_listing_event':
+                self.assertEqual(req.method, 'POST')
+                body = req.post_data_json
+                self.assertEqual(set(body), {'p_id', 'p_kind', 'p_visitor'})
+                self.assertIn(body['p_id'], [row['id'] for row in fixtures() if row['veziyyet']=='aktiv'])
+                self.assertIn(body['p_kind'], ('view', 'contact'))
+                self.assertRegex(body['p_visitor'], r'^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$')
+                request.fulfill(content_type='application/json', body='true')
             elif '/rest/v1/elanlar?' in req.url:
                 self.assertEqual(req.method, 'GET', 'Production mutations are forbidden in tests')
                 columns = self.assert_public_select(req.url)
@@ -168,9 +200,11 @@ class CardBrowserTests(unittest.TestCase):
 
     def tearDown(self):
         self.assertFalse(self.errors, 'Uncaught browser errors')
+        permitted_posts = {'/rest/v1/rpc/'+name for name in MARKET_READ_RPC_NAMES}
+        permitted_posts.update(('/rest/v1/rpc/ca_browse_listings', '/rest/v1/rpc/ca_record_listing_event'))
         self.assertFalse([item for item in self.requests if item[0] not in ('GET','HEAD') and
-                          not (item[0]=='POST' and urlsplit(item[1]).path=='/rest/v1/rpc/ca_browse_listings')],
-                         'Only the mocked read-only browse RPC may use POST')
+                          not (item[0]=='POST' and urlsplit(item[1]).path in permitted_posts)],
+                         'Only exact mocked browse/read and listing-event contracts may use POST; listing mutations stay forbidden')
         self.assertTrue(any(method=='POST' and urlsplit(url).path=='/rest/v1/rpc/ca_browse_listings' for method,url in self.requests))
         reads = [(method, url) for method, url in self.requests if '/rest/v1/elanlar?' in url]
         for method, url in reads:

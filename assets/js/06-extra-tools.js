@@ -17,7 +17,7 @@ if(toolsBar){
 }
 // Floating page tools must not cover or take focus from an open dialog.
 if(toolsBar){
- const modalIds=['detailOverlay','authOverlay','vehiclePicker','generationPicker','listingFeedback','caOverlay','caAdminPanel','caPhotoViewer'];
+ const modalIds=['detailOverlay','authOverlay','vehiclePicker','generationPicker','listingFeedback','caOverlay','caAdminPanel','caPhotoViewer','caMarketOverlay'];
  const observedModals=new WeakSet();
  let modalObserver;
  function syncModalTools(){

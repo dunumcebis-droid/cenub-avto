@@ -45,15 +45,16 @@ test('saving a blank mileage preserves null while an entered zero remains zero',
   assert.equal(caListingPayload({ mileage: '120 000 km' }).yurus, 120000);
 });
 
-test('seller payloads derive ownership from the current account and exclude protected package columns', () => {
+test('seller payloads derive ownership from the current account and exclude protected package and sold columns', () => {
   const { caListingPayload } = payloadContext();
   const payload = caListingPayload({
     make: 'Toyota', ownerId: 'another-owner', satici_id: 'another-owner',
     pack: 'VIP', paket_adi: 'VIP', paket_baslayir: '2099-01-01', paket_bitir: '2099-12-31',
+    is_sold: true, isSold: true, status: 'satilib',
   });
   assert.equal(payload.satici_id, 'fixture-owner');
   assert.equal(payload.veziyyet, 'gozlemede');
-  for (const key of ['paket_adi', 'paket_baslayir', 'paket_bitir', 'tesdiq_tarixi', 'paket_tesdiq_qeydi']) {
+  for (const key of ['paket_adi', 'paket_baslayir', 'paket_bitir', 'tesdiq_tarixi', 'paket_tesdiq_qeydi', 'is_sold']) {
     assert.equal(Object.hasOwn(payload, key), false, `Seller payload must not set ${key}`);
   }
 });
@@ -330,7 +331,9 @@ function assertScopedRead(call) {
   const url = new URL(call.pathname, 'https://fixture.invalid');
   assert.equal(url.pathname, '/rest/v1/elanlar');
   const columns = url.searchParams.get('select').split(',');
-  assert.equal(new Set(columns).size, 29);
+  assert.equal(columns.length, 30);
+  assert.equal(new Set(columns).size, 30);
+  assert.ok(columns.includes('is_sold'));
   assert.ok(columns.includes('tesdiq_tarixi'));
   assert.ok(!columns.includes('*') && !columns.includes('paket_tesdiq_qeydi'));
   assert.equal(url.searchParams.get('limit'), '100');

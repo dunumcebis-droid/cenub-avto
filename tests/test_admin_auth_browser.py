@@ -82,6 +82,13 @@ class AdminAuthBackend(OfflineBackend):
             self.admin_calls.append(dict(name=name,body=body,admin=admin))
             if name=='cenub_admin_yoxla':send(admin);return
             if not admin:send({'message':'Admin denied'},403);return
+            if name=='ca_admin_browse_reports':
+                assert req.method=='POST'
+                assert set(body)=={'p_status','p_page','p_page_size'}
+                assert body['p_status'] in ('open','resolved','dismissed','all')
+                assert isinstance(body['p_page'],int) and body['p_page']>=1
+                assert body['p_page_size']==24
+                send({'items':[],'total':0,'page':1,'page_size':24,'total_pages':0});return
             if name in ('ca_admin_browse_listings','ca_admin_browse_payments'):
                 assert set(body)=={'p_status','p_query','p_page','p_page_size'}
                 assert body['p_page_size']==24

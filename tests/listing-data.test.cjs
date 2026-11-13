@@ -134,6 +134,25 @@ test('an explicitly empty database equipment list does not resurrect old form se
   assert.deepEqual(plain(car.equipment), []);
 });
 
+test('sold display state comes from the database flag instead of editable form snapshots', () => {
+  const sold = caRemoteToCar({
+    id: 'sold-listing', veziyyet: 'aktiv', is_sold: true,
+    ca_data: { isSold: false, status: 'aktiv', veziyyet: 'aktiv' },
+  });
+  assert.equal(sold.isSold, true);
+  assert.equal(sold.status, 'satilib');
+  assert.equal(sold.veziyyet, 'satilib');
+  for (const flag of [false, undefined]) {
+    const unsold = caRemoteToCar({
+      id: 'unsold-listing', veziyyet: 'gozlemede', is_sold: flag,
+      ca_data: { isSold: true, status: 'satilib', veziyyet: 'satilib' },
+    });
+    assert.equal(unsold.isSold, false, 'Missing legacy flags and a false database flag cannot inherit a forged sold snapshot');
+    assert.equal(unsold.status, 'gozlemede');
+    assert.equal(unsold.veziyyet, 'gozlemede');
+  }
+});
+
 test('English form snapshots work both as objects and serialized JSON', () => {
   const data = {
     make: 'Hyundai', model: 'Elantra', year: '2019', price: '25 500',
@@ -244,11 +263,11 @@ test('VIP eligibility remains tied to approved, unexpired database packages', ()
   }
 });
 
-test('the reviewed listing projection includes the approval timestamp and excludes the internal note', () => {
+test('the reviewed listing projection includes sold state and approval timestamp but excludes internal notes', () => {
   const declaration = source.match(/const CA_LISTING_COLUMNS\s*=\s*(['"])[^'"\n]+\1;/);
   assert.ok(declaration, 'The listing projection must be explicitly declared');
   const expected = [
-    'id', 'satici_id', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
+    'id', 'satici_id', 'is_sold', 'marka', 'model', 'il', 'qiymet', 'yurus', 'seher',
     'tesvir', 'veziyyet', 'yaradildi', 'neqliyyat_novu', 'nesil', 'ban_novu',
     'yanacaq', 'suretler_qutusu', 'muherrik_hecmi', 'at_gucu', 'reng',
     'bazar_ucun', 'oturacaq_sayi', 'techizat', 'sekiller', 'telefon', 'ca_data',
@@ -257,7 +276,7 @@ test('the reviewed listing projection includes the approval timestamp and exclud
   const requestContext = vm.createContext({});
   vm.runInContext(declaration[0], requestContext);
   const declared = vm.runInContext('CA_LISTING_COLUMNS', requestContext).split(',');
-  assert.equal(new Set(declared).size, 29);
+  assert.equal(new Set(declared).size, 30);
   assert.deepEqual(declared.slice().sort(), expected.slice().sort());
   assert.ok(!declared.includes('paket_tesdiq_qeydi'));
   assert.ok(!declared.includes('*'));

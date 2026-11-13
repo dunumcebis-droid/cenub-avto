@@ -34,12 +34,12 @@ test('all original embedded image bytes and 56 reference identities are preserve
 test('the initial HTML stays small and classic script execution order is preserved', () => {
   const page = loadPageSource(root);
   assert.ok(Buffer.byteLength(page.html) < 100 * 1024, 'Static image bytes must not inflate the HTML response');
-  assert.equal(page.scripts.length, 16);
+  assert.equal(page.scripts.length, 18);
   assert.deepEqual(page.scripts.map(script => script.path), [
     'assets/js/00-auth-callback.js', 'assets/js/01-main.js', 'assets/js/02-mileage-input.js', 'assets/js/03-bmw-series.js',
     'assets/js/04-bmw-picker.js', 'assets/js/05-filters-toggle.js', 'assets/js/06-extra-tools.js',
     'assets/js/07-admin.js', 'assets/js/08-equipment-toggle.js', 'assets/js/09-auth.js', 'assets/js/11-photo-viewer.js',
-    'assets/js/12-listing-navigation.js', 'assets/js/14-server-backup.js', 'assets/js/15-phone-verification.js', 'assets/js/17-account-favorites.js', 'assets/js/18-photo-review.js',
+    'assets/js/12-listing-navigation.js', 'assets/js/14-server-backup.js', 'assets/js/15-phone-verification.js', 'assets/js/17-account-favorites.js', 'assets/js/18-photo-review.js', 'assets/js/19-photo-manager.js', 'assets/js/20-marketplace.js',
   ]);
   for (const script of page.scripts) {
     if (script.path === 'assets/js/00-auth-callback.js') assert.doesNotMatch(script.attributes, /\bdefer\b/);

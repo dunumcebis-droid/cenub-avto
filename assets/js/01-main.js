@@ -60,7 +60,7 @@ async function caSaveProfile(){
 
 // Cənub Avto: server-side listings, public read and authenticated uploads.
 // Match the anonymous column grant; internal package notes stay private.
-const CA_LISTING_COLUMNS='id,satici_id,marka,model,il,qiymet,yurus,seher,tesvir,veziyyet,yaradildi,neqliyyat_novu,nesil,ban_novu,yanacaq,suretler_qutusu,muherrik_hecmi,at_gucu,reng,bazar_ucun,oturacaq_sayi,techizat,sekiller,telefon,ca_data,paket_adi,paket_baslayir,paket_bitir,tesdiq_tarixi';
+const CA_LISTING_COLUMNS='id,satici_id,is_sold,marka,model,il,qiymet,yurus,seher,tesvir,veziyyet,yaradildi,neqliyyat_novu,nesil,ban_novu,yanacaq,suretler_qutusu,muherrik_hecmi,at_gucu,reng,bazar_ucun,oturacaq_sayi,techizat,sekiller,telefon,ca_data,paket_adi,paket_baslayir,paket_bitir,tesdiq_tarixi';
 let caRemoteCars=[],caListingsError=false;
 let caPageCars=[],caVipCars=[],caOwnCars=[],caFavoriteCars=[];
 const caListingCache=new Map();
@@ -173,10 +173,10 @@ function caValidatePhotoCounts(photos,originalPhotos,inputs){
  const changedOversized=Object.entries(photos).some(([category,sources])=>{
   if(!Array.isArray(sources)||sources.length<=6)return false;
   const previous=originalPhotos?.[category];
-  return !Array.isArray(previous)||previous.length!==sources.length||sources.some((src,index)=>src!==previous[index]);
+  return !Array.isArray(previous)||sources.length>previous.length||sources.some(src=>!previous.includes(src));
  });
  if(selected.some(input=>input.files.length>6)||changedOversized||total>36&&(!originalPhotos||total>originalTotal)){
-  throw Error('Maksimum 36 şəkil, hər bölmədə ən çox 6 yeni şəkil seçmək olar.');
+  throw Error('Maksimum 36 şəkil, hər bölmədə saxlanılan və yeni birlikdə ən çox 6 şəkil ola bilər.');
  }
 }
 function caRemoteToCar(r){
@@ -193,7 +193,7 @@ function caRemoteToCar(r){
   color:text(r.reng,d.color,d.reng),market:text(r.bazar_ucun,d.market,d.bazar_ucun),seats:text(r.oturacaq_sayi,d.seats,d.oturacaq_sayi),
   vehicleType:text(r.neqliyyat_novu,d.vehicleType,d.vehicle,d.neqliyyat_novu),generation:text(r.nesil,d.generation,d.nesil),equipment:Array.isArray(equipment)?equipment:[],
   description:text(r.tesvir,d.description,d.desc,d.tesvir),phone:text(r.telefon,d.phone,d.telefon),ownerId:r.satici_id,ownerPhone:r.telefon,createdAt:r.yaradildi,
-  photo:storedPhotos.photo,photos:storedPhotos.photos,_submission_id:typeof d._submission_id==='string'?d._submission_id:null,_photoOrder:Array.isArray(r.sekiller)?r.sekiller.slice():Object.values(storedPhotos.photos).flat(),pack:caEffectivePackage(r),packageStarts:r.paket_baslayir||null,packageEnds:r.paket_bitir||null,veziyyet:r.veziyyet,status:r.veziyyet,approvedAt:r.tesdiq_tarixi||null};
+  photo:storedPhotos.photo,photos:storedPhotos.photos,_submission_id:typeof d._submission_id==='string'?d._submission_id:null,_photoOrder:Array.isArray(r.sekiller)?r.sekiller.slice():Object.values(storedPhotos.photos).flat(),pack:caEffectivePackage(r),packageStarts:r.paket_baslayir||null,packageEnds:r.paket_bitir||null,veziyyet:r.is_sold?'satilib':r.veziyyet,status:r.is_sold?'satilib':r.veziyyet,isSold:r.is_sold===true,approvedAt:r.tesdiq_tarixi||null};
 }
 function caRebuildListingCache(){
  const keys=new Set([...caPageCars,...caVipCars,...caOwnCars,...caFavoriteCars].map(listingKey));
@@ -495,7 +495,7 @@ window.addEventListener('load',()=>caFetchListings());
 let editingCarId=null,editingOriginalPhotos=null;
 let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
-function updateAccountUI(){window.caPhotoReviewSessionChanged?.();window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
+function updateAccountUI(){window.caPhotoManagerSessionChanged?.();window.caMarketSessionChanged?.();window.caPhotoReviewSessionChanged?.();window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
 let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
 function caShowListingFeedback(message,kind='success'){
@@ -560,7 +560,7 @@ function renderBuyerFavorites(){
  element.innerHTML=notice+(saved.map(card).join('')||(!caPrivateState.favoritesError?'<div class="empty">'+empty+'</div>':''));
 }
 
-function renderCabinet(){const mine=myCars();const list=document.getElementById('cabinetList');document.getElementById('cabTotal').textContent=mine.length;document.getElementById('cabVip').textContent=mine.filter(c=>c.pack==='VIP').length;if(!mine.length){list.innerHTML=caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':caPrivateState.ownLoading?'<div class="empty">Elanların yüklənir...</div>':'<div class="empty">Hələ şəxsi elan yerləşdirməmisən. İlk elanını əlavə et.</div>';return;}list.innerHTML=(caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. Əvvəlki məlumatlar göstərilir. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':'')+mine.map(c=>{const photo=c.photo||firstCarPhoto(c);const statusLabel=({'gozlemede':'Təsdiq gözləyir','aktiv':'Təsdiqlənib','reddedildi':'Rədd edilib'})[c.veziyyet]||'Status: '+String(c.veziyyet||'naməlum');return `<article class="cabinet-card">${photo?caListingPhotoMarkup(photo,'Avtomobil','cabinet'):'<div class="photo photo-placeholder" style="height:78px;border-radius:8px">Foto yoxdur</div>'}<div><b>${esc(c.make)} ${esc(c.model)}</b><div class="price" style="font-size:17px">${esc(caFormatPrice(c.price))}</div><div class="meta">${esc(c.year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))} · ${esc(packageName(c.pack))}</div><div class="ca-cab-status">${esc(statusLabel)}</div></div><div class="cab-actions"><button onclick="editCar('${c._id}')">Redaktə et</button><button class="delete" onclick="deleteCar('${c._id}')">Sil</button></div></article>`}).join('')}
+function renderCabinet(){const mine=myCars();const list=document.getElementById('cabinetList');document.getElementById('cabTotal').textContent=mine.length;document.getElementById('cabVip').textContent=mine.filter(c=>c.pack==='VIP').length;if(!mine.length){list.innerHTML=caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':caPrivateState.ownLoading?'<div class="empty">Elanların yüklənir...</div>':'<div class="empty">Hələ şəxsi elan yerləşdirməmisən. İlk elanını əlavə et.</div>';return;}list.innerHTML=(caPrivateState.ownError?'<div class="empty">Elanların yenilənmədi. Əvvəlki məlumatlar göstərilir. <button type="button" onclick="caFetchMyListings()">Yenidən yoxla</button></div>':'')+mine.map(c=>{const photo=c.photo||firstCarPhoto(c);const statusLabel=({'gozlemede':'Təsdiq gözləyir','aktiv':'Təsdiqlənib','reddedildi':'Rədd edilib','satilib':'Satılıb'})[c.veziyyet]||'Status: '+String(c.veziyyet||'naməlum');return `<article class="cabinet-card" data-listing-id="${esc(c._id)}">${photo?caListingPhotoMarkup(photo,'Avtomobil','cabinet'):'<div class="photo photo-placeholder" style="height:78px;border-radius:8px">Foto yoxdur</div>'}<div><b>${esc(c.make)} ${esc(c.model)}</b><div class="price" style="font-size:17px">${esc(caFormatPrice(c.price))}</div><div class="meta">${esc(c.year??'İl qeyd edilməyib')} · ${esc(c.city||'Şəhər qeyd edilməyib')} · ${esc(caFormatMileage(c.mileage))} · ${esc(packageName(c.pack))}</div><div class="ca-cab-status">${esc(statusLabel)}</div></div><div class="cab-actions"><button onclick="editCar('${c._id}')">Redaktə et</button><button class="delete" onclick="deleteCar('${c._id}')">Sil</button></div></article>`}).join('')}
 async function deleteCar(id){
  const c=myCars().find(x=>x._id===id);if(!c)return;
  const owner=currentUser.id;
@@ -602,7 +602,7 @@ function editCar(id){
   const images=c.photos?.[category]||[];
   document.getElementById('preview-'+category).innerHTML=images.map(src=>`<img loading="lazy" decoding="async" src="${esc(src)}" alt="Mövcud şəkil">`).join('');
  });
- document.getElementById('photoTotal').textContent='Mövcud şəkillər saxlanılır. Yeni şəkil seçdiyin bölmənin şəkilləri yenilənəcək; digər bölmələr qorunur.';
+ document.getElementById('photoTotal').textContent='Mövcud şəkillər saxlanılır. Yeni seçdiyin şəkillər bölməyə əlavə olunur. Şəkli «Sil» ilə çıxar, ★ ilə əsas şəkli seç.';
  const banner=document.getElementById('editBanner');
  banner.textContent='Elana düzəliş edirsən. Cari paket saxlanılır; yalnız ayrıca seçsən yeni paket sorğusu göndəriləcək.';banner.style.display='block';
  document.getElementById('submitListingBtn').textContent='Dəyişiklikləri yadda saxla';document.getElementById('cancelEditBtn').style.display='block';openSellPage();
@@ -1163,8 +1163,9 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  delete d.modelOther;d.ownerPhone=currentUser.phone;d.phone=d.phone||currentUser.phone;
  d.photos=editingOriginalPhotos?JSON.parse(JSON.stringify(editingOriginalPhotos)):{};
  if(wasEdit&&original?._photoOrder&&!photoInputs.some(input=>input.files.length))d._photoOrder=original._photoOrder.slice();
- const projectedPhotos=JSON.parse(JSON.stringify(d.photos));
+ let projectedPhotos=JSON.parse(JSON.stringify(d.photos));
  for(const input of photoInputs)if(input.files.length)projectedPhotos[input.dataset.category]=Array(input.files.length).fill('new');
+ projectedPhotos=window.caPhotoManagerProject?.()||projectedPhotos;
  if(Object.values(projectedPhotos).flat().length<1){alert('Elan yerləşdirmək üçün ən azı 1 avtomobil şəkli əlavə et.');return;}
  try{caValidatePhotoCounts(projectedPhotos,editingOriginalPhotos,photoInputs);}catch(error){alert(error.message);return;}
  const selectedPackage=String(d.package||'');
@@ -1177,8 +1178,9 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  try{
   await caUploadSelectedPhotos(photoInputs,d.photos);
   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
+  window.caPhotoManagerFinalize?.(d);
   caValidatePhotoCounts(d.photos,editingOriginalPhotos,photoInputs);
-  d.photo=firstCarPhoto(d);
+  d.photo=d._photoOrder?.[0]||firstCarPhoto(d);
   submitBtn.textContent='Elan saxlanılır...';
   // The listing transaction creates any requested paid package atomically.
   // A second package RPC here would duplicate that request.

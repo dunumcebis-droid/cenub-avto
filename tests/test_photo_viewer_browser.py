@@ -4,7 +4,9 @@ Exercises actual tap/pointer gestures and rendered geometry, rather than only
 calling the viewer API. No Storage uploads, account changes or emails are sent.
 """
 import copy
+import json
 import os
+import re
 import unittest
 from urllib.parse import urlsplit
 
@@ -42,6 +44,16 @@ class ViewerBackend(OfflineBackend):
 
     def route(self, route):
         request = route.request
+        if urlsplit(request.url).path == '/rest/v1/rpc/ca_record_listing_event':
+            assert request.method == 'POST'
+            body = request.post_data_json
+            assert set(body) == {'p_id', 'p_kind', 'p_visitor'}
+            assert body['p_id'] in {row['id'] for row in self.rows if row['veziyyet']=='aktiv'}
+            assert body['p_kind'] in ('view', 'contact')
+            assert re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', body['p_visitor'], re.I)
+            self.calls.append(dict(method=request.method, path=urlsplit(request.url).path, body=copy.deepcopy(body)))
+            route.fulfill(content_type='application/json', body=json.dumps(True))
+            return
         if request.url.startswith(PHOTO_BASE):
             assert request.method == 'GET'
             if request.url == BROKEN:
@@ -92,7 +104,9 @@ class PhotoViewerBrowserTests(unittest.TestCase):
         self.assertEqual(self.backend.rows, self.original_rows)
         self.assertFalse([call for call in self.backend.calls
                           if call['method'] != 'GET' and
-                          call['path'] != '/rest/v1/rpc/ca_browse_listings'])
+                          not (call['method']=='POST' and call['path'] in
+                               ('/rest/v1/rpc/ca_browse_listings', '/rest/v1/rpc/ca_record_listing_event'))],
+                         'Only browsing and exact validated listing events are permitted; listing mutations stay forbidden')
 
     def card(self, model):
         return self.page.locator('#allGrid .car-card').filter(has_text='BMW ' + model)

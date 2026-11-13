@@ -2,7 +2,7 @@
    Credentials are never copied into the archive. No server data is modified. */
 (function(){
 'use strict';
-const RESOURCE_NAMES=['elanlar','paket_sorgulari','profiller','adminler','storage_objects'];
+const RESOURCE_NAMES=['elanlar','paket_sorgulari','profiller','adminler','storage_objects','listing_stats','listing_events','listing_reports','saved_searches','approved_listing_events','notification_progress','search_notifications'];
 const encoder=new TextEncoder(),HEX=/^[0-9a-f]{64}$/i,UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const BLOB_LIMIT=512*1024*1024,ZIP_LIMIT=0xffffffff;
 let prepared=null,viewOwner=null,viewSequence=0,validation=null,job=null,downloadUrl=null;
@@ -153,7 +153,7 @@ window.caShowServerBackup=async function(){
  cancel();prepared=null;viewOwner=ownerNow();const owner=viewOwner,sequence=++viewSequence;
  const overlay=el('caOverlay'),body=el('caDialogBody');if(!overlay||!body)return;
  el('caDialogTitle').textContent='Server məlumatlarının ehtiyat nüsxəsi';
- body.innerHTML='<section id="caServerBackup"><p>ZIP faylı elanları, paket sorğularını, profilləri, admin siyahısını və bütün elan şəkillərini saxlayır. Giriş parolları və server ayarları daxil deyil.</p><p>Faylda şəxsi məlumatlar var; yalnız təhlükəsiz yerdə saxla.</p><p id="caServerBackupStatus" role="status" aria-live="polite"></p><progress id="caServerBackupProgress" hidden></progress><div class="ca-actions"><button type="button" class="ca-tool" id="caServerBackupStart" disabled>ZIP nüsxəsini hazırla</button><button type="button" class="ca-tool" id="caServerBackupCancel" hidden>Dayandır</button><button type="button" class="ca-tool" id="caServerBackupRefresh">Yenilə</button></div></section>';
+ body.innerHTML='<section id="caServerBackup"><p>ZIP faylı elanları, paket sorğularını, profilləri, admin siyahısını, elan statistikasını, şikayətləri, saxlanılan axtarışları, bildirişləri və bütün elan şəkillərini saxlayır. Giriş parolları və server ayarları daxil deyil.</p><p>Faylda şəxsi məlumatlar var; yalnız təhlükəsiz yerdə saxla.</p><p id="caServerBackupStatus" role="status" aria-live="polite"></p><progress id="caServerBackupProgress" hidden></progress><div class="ca-actions"><button type="button" class="ca-tool" id="caServerBackupStart" disabled>ZIP nüsxəsini hazırla</button><button type="button" class="ca-tool" id="caServerBackupCancel" hidden>Dayandır</button><button type="button" class="ca-tool" id="caServerBackupRefresh">Yenilə</button></div></section>';
  overlay.classList.add('ca-open');el('caServerBackupStart').addEventListener('click',exportServer);el('caServerBackupCancel').addEventListener('click',()=>cancel());el('caServerBackupRefresh').addEventListener('click',window.caShowServerBackup);
  if(!owner){status('Server nüsxəsini yalnız daxil olmuş sayt admini yarada bilər.');return;}
  validation=new AbortController();status('Admin girişi və server məlumatları yoxlanılır…');
