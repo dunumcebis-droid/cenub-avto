@@ -79,7 +79,7 @@ Elanlardan sonra ayrıca məlumat menyusu göstərilir. [Dəstək xidməti](http
 
 ## Əvvəlki dəstək və footer düzəlişi
 
-«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və `cenubavtoelan@gmail.com` əlavə olunub. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Parol bərpasında Gmail SMTP istifadə olunur; göndərən ünvanı `cenubavtoelan@gmail.com`-dur. Ümumi quraşdırma bələdçisi: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
+«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və əvvəlki dəstək ünvanı əlavə olunmuşdu. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Cari dəstək ünvanı `azavto44@gmail.com`-dur. Parol bərpasının Gmail SMTP göndərənini bu ünvana keçirmək hələ gözlənilir; konfiqurasiya və çatdırılma yoxlanmadan keçid tamamlanmış sayılmır. Quraşdırma bələdçisi: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Əvvəlki VIP bildirişi düzəlişi
 

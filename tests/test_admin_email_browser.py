@@ -6,6 +6,7 @@ Server authorization and Auth Admin API behavior are tested separately.
 import copy
 import json
 import os
+import re
 import unittest
 from urllib.parse import urlsplit
 
@@ -16,7 +17,7 @@ from test_listing_management_browser import ORIGIN, OWNER, OTHER_OWNER, ROOT
 
 
 EMAIL = 'azavto44@gmail.com'
-OLD_EMAIL = 'cenubavtoelan@gmail.com'
+EMAIL_TOKEN = re.compile(r'[A-Za-z0-9.!#$%&\x27*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
 ENDPOINT = '/functions/v1/ca-admin-email-change'
 PUBLIC_PAGES = ('index.html', 'about.html', 'support.html',
                 'reset-password.html', 'terms.html', 'privacy.html')
@@ -307,7 +308,7 @@ class AdminEmailBrowserTests(unittest.TestCase):
         for name in PUBLIC_PAGES:
             with self.subTest(page=name):
                 self.page.goto(ORIGIN + name, wait_until='load')
-                self.assertNotIn(OLD_EMAIL, self.page.locator('body').inner_text())
+                self.assertLessEqual(set(EMAIL_TOKEN.findall(self.page.locator('body').inner_text())), {EMAIL})
                 links = self.page.locator('a[href^="mailto:"]')
                 for link in links.all():
                     self.assertTrue(link.is_visible())
@@ -326,6 +327,7 @@ class AdminEmailBrowserTests(unittest.TestCase):
         self.page.evaluate('caShowPolicy()')
         self.assertEqual(self.page.locator('#caDialogBody a[href^="mailto:"]').get_attribute('href'), 'mailto:' + EMAIL)
         self.assertIn(EMAIL, self.page.locator('#caDialogBody').inner_text())
+        self.assertEqual(set(EMAIL_TOKEN.findall(self.page.locator('#caDialogBody').inner_text())), {EMAIL})
         self.assertEqual(self.page.locator('#caDialogBody a[href^="tel:"]').get_attribute('href'), 'tel:+994709091997')
         self.assertIn('0709091997', self.page.locator('#caDialogBody').inner_text())
         self.assertFalse(self.backend.email_calls)

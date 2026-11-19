@@ -257,5 +257,6 @@
   "realWrites": 0,
   "pageErrors": [],
   "supportPhoneHref": "tel:+994709091997",
-  "supportEmailHref": "mailto:cenubavtoelan@gmail.com"
+  "supportEmailHref": "mailto:removed@example.invalid",
+  "redactionNote": "2026-11-19: historical support email removed; layout measurements and check results are unchanged."
 }

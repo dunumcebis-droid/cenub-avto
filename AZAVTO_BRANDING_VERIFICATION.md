@@ -8,7 +8,7 @@ Saytın cari brendi **AzAvto**, yeni şəkillərin su nişanı **AZAVTO**-dur. �
 - Yeni `assets/branding/azavto-logo.png` üfüqi loqosu bütün səhifələrdə istifadə edilir. Ağ/mavi təsvir bütöv görünür; qara fon `screen` qarışdırılması ilə tünd göy başlığa uyğunlaşdırılır. Başlığın qeyri-şəffaf `#071220` fonu sürüşdürmə zamanı da ayrıca qara düzbucağın görünməsini aradan qaldırır.
 - Paylaşım mətni AzAvto, yeni ZIP ehtiyat nüsxəsinin fayl adı `AzAvto_server_…` olur. ZIP-in format identifikatoru əvvəlki nüsxələrin uyğunluğu üçün saxlanılır.
 - Yeni şəkil hazırlanması və köhnə nişansız şəkillərin ekrandakı su nişanı AZAVTO-dur. Əvvəldən fayla basılmış nişanı olan şəkillərin baytları yenidən yazılmır.
-- Mövcud dəstək ünvanı `cenubavtoelan@gmail.com` və `0709091997` işlədilir. Domen/repozitoriya yolu, Supabase layihəsi, hesab/sessiya yaddaş açarları, yüklənmiş şəkillər, paketlər və məlumatlar bu brend dəyişikliyi ilə köçürülmür. Xarici SMTP göndərən ayarı ayrıca xidmət konfiqurasiyasıdır.
+- Bu brend dəyişikliyi zamanı əvvəlki dəstək ünvanı və `0709091997` saxlanılmışdı. Domen/repozitoriya yolu, Supabase layihəsi, hesab/sessiya yaddaş açarları, yüklənmiş şəkillər, paketlər və məlumatlar bu brend dəyişikliyi ilə köçürülmür. Xarici SMTP göndərən ayarı ayrıca xidmət konfiqurasiyasıdır.
 
 ## Yoxlamalar
 

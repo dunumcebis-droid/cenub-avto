@@ -1,6 +1,6 @@
 # Dəstək və alt hissənin görünüşü — 7 noyabr 2026
 
-Sayta «Dəstək xidməti ilə əlaqə» bölməsi əlavə edilib. Telefon `0709091997` (`tel:+994709091997`), e-poçt `cenubavtoelan@gmail.com` (`mailto:`) keçidləridir. Footer-də həmin bölməyə keçid var.
+Sayta «Dəstək xidməti ilə əlaqə» bölməsi əlavə edilib. Həmin yoxlamada telefon `0709091997` (`tel:+994709091997`) və əvvəlki dəstək ünvanı (`mailto:`) keçidləri istifadə olunub. Footer-də həmin bölməyə keçid var.
 
 «© 2026 Cənub Avto · Al. Sat. Tap.» yazısının rəngi aydınlaşdırılıb. Admin düyməsi müqayisə/ehtiyat nüsxə/qaydalar düymələri ilə eyni alət panelinə yerləşdirilib. Panel sətrlərə bölünür və hündürlüyü dəyişəndə səhifənin altında uyğun yer ayrılır. Ekranın təhlükəsiz alt sahəsi də nəzərə alınır; footer və düymələr bir-birini örtmür. Admin düyməsinin serverdə doğrulanan görünürlük şərti saxlanılıb.
 
