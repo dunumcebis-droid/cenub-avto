@@ -1,5 +1,6 @@
 -- Təcili manual-payment, publication, until-sold, filtering and privacy regressions.
--- Run after database/urgent-listings.sql. Fixtures are transaction-local only.
+-- Run after database/urgent-listings.sql and database/urgent-payment-search.sql.
+-- Fixtures are transaction-local only.
 -- One optional .invalid Auth identity is inserted directly; no account API,
 -- HTTP, email, payment provider or stored-image upload is used. Never COMMIT.
 begin;

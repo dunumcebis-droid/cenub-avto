@@ -19,3 +19,10 @@
 - SQL təcrid edilmiş PostgreSQL-də iki dəfə qurulub; sorğu → ödəniş təsdiqi → ayrıca yayım → redaktədən sonra təkrar yayım → satıldı axını yoxlanıb. Mövcud cron-un yalnız VIP/Premium/Standart paketlərini müddətləndirdiyi yoxlanıb.
 
 Brauzer sınaqlarında API, Auth, şəkil yükləməsi və ödəniş cavabları imitasiya olunur. Real elan, istifadəçi məktubu və ya ödəniş yaradılmır. SQL sınaqları tranzaksiya sonunda geri qaytarılır. Real şəkillər və əvvəlki paket tarixçəsi dəyişdirilmir.
+
+## Canlı yayımın yoxlanması
+
+- `0f74103786cdf9d25b8cdf8fffb1467ccc124dd4` sayt dəyişiklikləri GitHub Pages-də uğurla yayımlanıb. 44 canlı statik fayl yerli fayllarla bayt-bayt eyni çıxıb.
+- Canlıdan götürülmüş fayllarla 18 Təcili brauzer sınağı yenidən keçib; bütün API/Auth/yükləmə/ödəniş cavabları bu sınaqlarda imitasiya edilib, real yazma aparılmayıb.
+- Ayrıca təzə anonim brauzerdə real ana səhifə və 7 açıq siyahı oxuma sorğusu uğurlu olub. Təcili və Nağd/Kredit/Barter seçimləri sinxron işləyib; 320/375/768/1440 px-də iki sütun qaydası və üfüqi daşmanın olmaması yoxlanıb. Brauzer xətası olmayıb.
+- Bu yoxlama zamanı açıq aktiv elan sayı 0 idi. Real elan yaradılmayıb; nişanlı kartların görünüşü və paket dövrü yuxarıdakı sınaq məlumatları ilə yoxlanıb.
