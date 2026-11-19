@@ -66,18 +66,20 @@ async function previewListing(button,options={}){
  }
 }
 function pager(s,id,handler){el(id).innerHTML=s.pages>1?`<div class="ca-actions"><button type="button" onclick="${handler}(-1)" ${s.loading||s.page<=1?'disabled':''}>← Əvvəlki</button><span>${s.page} / ${s.pages}</span><button type="button" onclick="${handler}(1)" ${s.loading||s.page>=s.pages?'disabled':''}>Növbəti →</button></div>`:'';}
+const packageLabel=name=>name==='Tecili'?'Təcili':name;
 function packageInfo(x){
- const names=['VIP','Premium','Standart','Pulsuz'];
+ const names=['VIP','Premium','Standart','Tecili','Pulsuz'];
  const requested=names.includes(x.requested_package)?x.requested_package:'Pulsuz';
  const approved=names.includes(x.approved_package)?x.approved_package:null;
  const status=['free','pending','confirmed','rejected','legacy_unrequested'].includes(x.package_status)?x.package_status:'unknown';
- const labels={free:'Pulsuz elan',pending:requested+' sorğusu · paket təsdiqi gözləyir',confirmed:requested+' sorğusu · paket təsdiqlənib',rejected:requested+' sorğusu · paket rədd edilib',legacy_unrequested:requested+' · sorğu tarixçəsi tapılmadı',unknown:'Paket məlumatı yüklənməyib'};
+ const requestedLabel=requested==='Tecili'?'Təcili · 1 AZN / satılanadək':requested;
+ const labels={free:'Pulsuz elan',pending:requestedLabel+' sorğusu · paket təsdiqi gözləyir',confirmed:requestedLabel+' sorğusu · paket təsdiqlənib',rejected:requestedLabel+' sorğusu · paket rədd edilib',legacy_unrequested:requestedLabel+' · sorğu tarixçəsi tapılmadı',unknown:'Paket məlumatı yüklənməyib'};
  const hints={pending:'Əvvəl aşağıdakı paket sorğusunu yoxlayıb təsdiqlə, sonra elanı ayrıca yayımla.',confirmed:x.veziyyet==='aktiv'?'Paket təsdiqi qeyd olunub. Elan yayımdadır.':'Paket təsdiqi qeyd olunub. Elanı ayrıca təsdiqləyərək yayımla.',rejected:'Paket sorğusu rədd edilib. Elanı yayımlamadan əvvəl paket sorğusunu həll et.',legacy_unrequested:'Bu paket üçün təsdiq sorğusu tapılmadı. Paket tarixçəsini yoxla.',unknown:'Elanı yayımlamadan əvvəl siyahını yenilə və paket məlumatını yoxla.'};
  return {status,label:labels[status],hint:hints[status]||'',approved,canPublish:status==='free'||status==='confirmed'};
 }
 function packageMarkup(x){
  const info=packageInfo(x),request=typeof x.package_request_id==='string'?x.package_request_id:'';
- return `<div class="ca-package-box"><span class="ca-package-badge ca-package-${info.status}" data-package-status="${info.status}">${esc(info.label)}</span>${info.approved&&info.approved!=='Pulsuz'?`<p class="ca-package-recorded">Qeydiyyatdakı paket: ${esc(info.approved)}</p>`:''}${info.hint?`<p class="ca-package-hint">${esc(info.hint)}</p>`:''}${request?`<button type="button" class="ca-package-link" data-package-request-id="${esc(request)}" data-listing-id="${esc(x.id)}">↓ Paket sorğusuna bax</button>`:''}</div>`;
+ return `<div class="ca-package-box"><span class="ca-package-badge ca-package-${info.status}" data-package-status="${info.status}">${esc(info.label)}</span>${info.approved&&info.approved!=='Pulsuz'?`<p class="ca-package-recorded">Qeydiyyatdakı paket: ${esc(packageLabel(info.approved))}</p>`:''}${info.hint?`<p class="ca-package-hint">${esc(info.hint)}</p>`:''}${request?`<button type="button" class="ca-package-link" data-package-request-id="${esc(request)}" data-listing-id="${esc(x.id)}">↓ Paket sorğusuna bax</button>`:''}</div>`;
 }
 function drawPaymentLink(){
  let notice=el('caPayLinkedNotice');
@@ -98,7 +100,7 @@ function drawAds(){
 }
 function drawPayments(){
  drawPaymentLink();
- el('caPayList').innerHTML=payments.rows.map(x=>`<article class="ca-item${payments.linked?.requestId===x.id?' ca-payment-linked':''}" data-pay-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(x.paket_adi)}</strong><p>Ödəniş: ${esc(x.odenis_veziyyeti)} · ${esc(x.yaradilib?new Date(x.yaradilib).toLocaleString('az-AZ'):'')}</p>${x.odenis_veziyyeti==='gozlemede'?`<div class="ca-actions"><button class="ca-yes" data-pay-id="${esc(x.id)}" data-pay-action="approve">✓ Ödənişi təsdiqlə</button><button class="ca-no" data-pay-id="${esc(x.id)}" data-pay-action="reject">✕ Ödənişi rədd et</button></div>`:''}</article>`).join('')||'<p>Ödəniş sorğusu yoxdur.</p>';pager(payments,'caPayPager','caPayPage');
+ el('caPayList').innerHTML=payments.rows.map(x=>`<article class="ca-item${payments.linked?.requestId===x.id?' ca-payment-linked':''}" data-pay-row-id="${esc(x.id)}"><strong>${esc(x.marka)} ${esc(x.model)} · ${esc(packageLabel(x.paket_adi))}</strong><p>Ödəniş: ${esc(x.odenis_veziyyeti)} · ${esc(x.yaradilib?new Date(x.yaradilib).toLocaleString('az-AZ'):'')}</p>${x.odenis_veziyyeti==='gozlemede'?`<div class="ca-actions"><button class="ca-yes" data-pay-id="${esc(x.id)}" data-pay-action="approve">✓ Ödənişi təsdiqlə</button><button class="ca-no" data-pay-id="${esc(x.id)}" data-pay-action="reject">✕ Ödənişi rədd et</button></div>`:''}</article>`).join('')||'<p>Ödəniş sorğusu yoxdur.</p>';pager(payments,'caPayPager','caPayPage');
 }
 function validPage(d){return d&&Array.isArray(d.items)&&['total','pending_total','page','page_size','total_pages'].every(k=>Number.isSafeInteger(d[k])&&d[k]>=0)&&d.page>=1&&d.page_size===24&&d.total_pages===Math.ceil(d.total/24)&&d.page<=Math.max(1,d.total_pages)&&d.items.length===Math.min(24,Math.max(0,d.total-(d.page-1)*24))&&d.items.every(x=>x&&typeof x.id==='string');}
 async function load(kind,page){

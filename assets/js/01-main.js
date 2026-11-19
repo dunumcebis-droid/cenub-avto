@@ -103,6 +103,7 @@ function caListingPayload(d){
 // Paid packages come from the approved database state, never the seller's original form selection.
 function caEffectivePackage(r){
  const name=String(r.paket_adi||'Pulsuz').trim();
+ if(name==='Tecili')return r.veziyyet==='aktiv'&&r.is_sold!==true?'Tecili':'Pulsuz';
  if(!['VIP','Premium','Standart'].includes(name)||r.veziyyet!=='aktiv')return 'Pulsuz';
  const end=Date.parse(r.paket_bitir||'');
  if(Number.isFinite(end))return end>Date.now()?name:'Pulsuz';
@@ -113,8 +114,8 @@ function caEffectivePackage(r){
  if(!Number.isFinite(approved))return 'Pulsuz';
  return approved<=Date.now()&&Date.now()<approved+days*86400000?name:'Pulsuz';
 }
-const caPackageRank={VIP:0,Premium:1,Standart:2,Pulsuz:3};
-function caComparePackages(a,b){return (caPackageRank[a.pack]??3)-(caPackageRank[b.pack]??3);}
+const caPackageRank={VIP:0,Premium:1,Standart:2,Tecili:3,Pulsuz:4};
+function caComparePackages(a,b){return (caPackageRank[a.pack]??4)-(caPackageRank[b.pack]??4);}
 // Keep missing values separate from valid zeroes, and read both stored field formats.
 function caValue(...items){return items.find(x=>x!==undefined&&x!==null&&String(x).trim()!=='')??null;}
 function caNumber(value){
@@ -239,7 +240,7 @@ async function caFetchListings(page=caBrowseState.requestedPage){
  const requestedPage=Math.max(1,Math.floor(Number(page)||1)),sequence=++caBrowseSequence;
  if(caBrowseController)caBrowseController.abort();
  const controller=new AbortController();caBrowseController=controller;
- caSyncSaleTypeUI();
+ caSyncSaleTypeUI();caSyncUrgentUI();
  caBrowseState.loading=true;caBrowseState.error=false;caBrowseState.requestedPage=requestedPage;caListingsError=false;render();
  try{
   const filters={...(currentSearch||{}),pack:currentFilter,sort:document.getElementById('sortListings')?.value||'newest'};
@@ -1002,7 +1003,7 @@ listingMakeEl.addEventListener('change',updateEngineSuggestions);
 listingModelEl.addEventListener('change',updateEngineSuggestions);
 
 function allCars(){return caRemoteCars.filter(c=>c.veziyyet==='aktiv' || c.status==='aktiv')}
-function packageName(pack){return ({VIP:'Önə çıxarılan',Premium:'Üstün',Standart:'Sərfəli seçim',Pulsuz:'Pulsuz'})[pack]||'Pulsuz';}
+function packageName(pack){return ({VIP:'Önə çıxarılan',Premium:'Üstün',Standart:'Sərfəli seçim',Tecili:'Təcili',Pulsuz:'Pulsuz'})[pack]||'Pulsuz';}
 // Existing photo URLs stay intact; only newly stamped uploads omit the display mark.
 function caHasEmbeddedWatermark(src){
  try{
@@ -1032,7 +1033,7 @@ function caListingPhotoFailed(img){const frame=img?.closest('.ca-watermark-frame
 window.addEventListener('resize',()=>document.querySelectorAll('.ca-watermark-frame[data-ca-photo-state="ready"] img').forEach(caPositionPhotoWatermark),{passive:true});
 function card(c){
  
- const flag=c.pack==='VIP'||c.pack==='Premium'?`<span class="flag">${packageName(c.pack)}</span>`:'';
+ const flag=c.pack==='Tecili'&&(c.veziyyet||c.status)==='aktiv'&&c.isSold!==true?'<span class="ca-urgent-badge">TƏCİLİ</span>':c.pack==='VIP'||c.pack==='Premium'?`<span class="flag">${packageName(c.pack)}</span>`:'';
  const cover=c.photo||firstCarPhoto(c),key=listingKey(c),fav=favoriteKeys().includes(key),encoded=encodeURIComponent(key).replace(/'/g,'%27');
  const carName=caCarName(c);
  const year=caValue(c.year,c.il);
@@ -1118,7 +1119,24 @@ function render(){
  pagination.innerHTML='<button type="button" id="caPagePrev" onclick="caChangePage(-1)" '+(caBrowseState.loading||caBrowseState.page<=1?'disabled':'')+'>← Əvvəlki</button><span id="caPageLabel" aria-live="polite">'+caBrowseState.page+' / '+Math.max(1,caBrowseState.totalPages)+'</span><button type="button" id="caPageNext" onclick="caChangePage(1)" '+(caBrowseState.loading||caBrowseState.page>=caBrowseState.totalPages?'disabled':'')+'>Növbəti →</button>';
  caUpdatePublicStats();
 }
-function setFilter(f,b){currentFilter=f;document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');return caFetchListings(1)}
+function setFilter(f,b){currentFilter=f;if(f!=='all'&&f!=='Tecili'&&currentSearch?.urgent){delete currentSearch.urgent;caSyncUrgentUI();}document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');return caFetchListings(1)}
+function caSyncUrgentUI(){
+ const selected=currentSearch?.urgent===true;
+ const field=document.getElementById('caUrgentFilter');if(field)field.value=selected?'true':'';
+ document.querySelectorAll('#caUrgentTabs button[data-urgent]').forEach(button=>{
+  const active=(button.dataset.urgent==='true')===selected;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+ });
+}
+function caSetUrgent(value){
+ const selected=value===true||value==='true';currentSearch={...(currentSearch||{})};
+ if(selected){
+  currentSearch.urgent=true;currentFilter='all';
+  document.querySelectorAll('.pill').forEach(button=>{button.classList.toggle('active',/setFilter\(['"]all['"]/.test(button.getAttribute('onclick')||''));});
+ }else delete currentSearch.urgent;
+ caSyncUrgentUI();return caFetchListings(1);
+}
+document.getElementById('caUrgentFilter')?.addEventListener('change',event=>caSetUrgent(event.target.value));
+document.getElementById('caUrgentTabs')?.addEventListener('click',event=>{const button=event.target.closest('button[data-urgent]');if(button)caSetUrgent(button.dataset.urgent);});
 function caSyncSaleTypeUI(){
  const selected=['cash','credit','barter'].includes(currentSearch?.saleType)?currentSearch.saleType:'';
  const field=document.getElementById('caSaleType');if(field)field.value=selected;
@@ -1136,8 +1154,8 @@ document.getElementById('caSaleTypeTabs')?.addEventListener('click',event=>{
  const button=event.target.closest('button[data-sale-type]');if(button)caSetSaleType(button.dataset.saleType);
 });
 function caVal(id){return document.getElementById(id)?.value||''}function caNum(id){return caNumber(caVal(id))}
-function searchCars(){currentSearch={make:document.getElementById('searchMake').value.trim(),model:document.getElementById('searchModel').value.trim(),price:caNum('searchPrice'),city:document.getElementById('searchCity').value,priceMin:caNum('caPriceMin'),priceMax:caNum('caPriceMax'),yearMin:caNum('caYearMin'),yearMax:caNum('caYearMax'),kmMin:caNum('caKmMin'),kmMax:caNum('caKmMax'),engineMin:caNum('caEngineMin'),engineMax:caNum('caEngineMax'),hpMin:caNum('caHpMin'),hpMax:caNum('caHpMax'),vehicle:caVal('caVehicle'),state:caVal('caState'),body:caVal('caBody'),color:caVal('caColor'),market:caVal('caMarket'),seats:caVal('caSeats'),saleType:caVal('caSaleType'),equipment:Array.from(document.querySelectorAll('input[name="caEquipment"]:checked')).map(x=>x.value)};document.getElementById('elanlar').scrollIntoView({behavior:'smooth'});return caFetchListings(1)}
-function clearCarSearch(){document.getElementById('searchMake').value='';document.getElementById('searchModel').value='';document.getElementById('searchModel').disabled=true;document.getElementById('searchModel').placeholder='Əvvəlcə marka seçin';document.getElementById('searchPrice').value='';document.getElementById('searchCity').value='';document.querySelectorAll('#caAdvanced input,#caAdvanced select').forEach(x=>{if(x.type==='checkbox')x.checked=false;else x.value=''});currentSearch=null;caSyncSaleTypeUI();return caFetchListings(1);}
+function searchCars(){currentSearch={make:document.getElementById('searchMake').value.trim(),model:document.getElementById('searchModel').value.trim(),price:caNum('searchPrice'),city:document.getElementById('searchCity').value,priceMin:caNum('caPriceMin'),priceMax:caNum('caPriceMax'),yearMin:caNum('caYearMin'),yearMax:caNum('caYearMax'),kmMin:caNum('caKmMin'),kmMax:caNum('caKmMax'),engineMin:caNum('caEngineMin'),engineMax:caNum('caEngineMax'),hpMin:caNum('caHpMin'),hpMax:caNum('caHpMax'),vehicle:caVal('caVehicle'),state:caVal('caState'),body:caVal('caBody'),color:caVal('caColor'),market:caVal('caMarket'),seats:caVal('caSeats'),saleType:caVal('caSaleType'),...(caVal('caUrgentFilter')==='true'?{urgent:true}:{}),equipment:Array.from(document.querySelectorAll('input[name="caEquipment"]:checked')).map(x=>x.value)};document.getElementById('elanlar').scrollIntoView({behavior:'smooth'});return caFetchListings(1)}
+function clearCarSearch(){document.getElementById('searchMake').value='';document.getElementById('searchModel').value='';document.getElementById('searchModel').disabled=true;document.getElementById('searchModel').placeholder='Əvvəlcə marka seçin';document.getElementById('searchPrice').value='';document.getElementById('searchCity').value='';document.querySelectorAll('#caAdvanced input,#caAdvanced select').forEach(x=>{if(x.type==='checkbox')x.checked=false;else x.value=''});currentSearch=null;caSyncSaleTypeUI();caSyncUrgentUI();return caFetchListings(1);}
 document.getElementById('sortListings')?.addEventListener('change',()=>caFetchListings(1));
 // Şəkillər seçildikcə kiçik önizləmə və ümumi say göstərilir.
 const descriptionInput=document.getElementById('sellerDescription');const descriptionCounter=document.getElementById('descriptionCounter');if(descriptionInput&&descriptionCounter){const updateDescriptionCounter=()=>{descriptionCounter.textContent=descriptionInput.value.length.toLocaleString('az-AZ')+' / 10 000 simvol';};descriptionInput.addEventListener('input',updateDescriptionCounter);updateDescriptionCounter();}
@@ -1205,7 +1223,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  if(Object.values(projectedPhotos).flat().length<1){alert('Elan yerləşdirmək üçün ən azı 1 avtomobil şəkli əlavə et.');return;}
  try{caValidatePhotoCounts(projectedPhotos,editingOriginalPhotos,photoInputs);}catch(error){alert(error.message);return;}
  const selectedPackage=String(d.package||'');
- const paidPackage=selectedPackage.includes('15 AZN')?'VIP':selectedPackage.includes('5 AZN')?'Premium':selectedPackage.includes('3 AZN')?'Standart':null;
+ const paidPackage=selectedPackage.includes('15 AZN')?'VIP':selectedPackage.includes('5 AZN')?'Premium':selectedPackage.includes('3 AZN')?'Standart':selectedPackage.includes('1 AZN')||selectedPackage==='Tecili'?'Tecili':null;
  d.requestedPackage=paidPackage?selectedPackage:'';d.pack='Pulsuz';delete d.package;
  if(wasEdit){if(original?._submission_id)d._submission_id=original._submission_id;}else{if(!caCreateSubmission||caCreateSubmission.owner!==owner)caCreateSubmission={owner,key:crypto.randomUUID()};d._submission_id=caCreateSubmission.key;}
  const submission=++caListingSubmissionSequence;
@@ -1231,7 +1249,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
   const refreshed=await Promise.allSettled([caFetchListings(1),caFetchMyListings()]);
   if(currentUser?.id!==owner||submission!==caListingSubmissionSequence)return;
   let viewUpdated=localSaved!==false&&refreshed.every(result=>result.status==='fulfilled'&&result.value!==false);
-  const message=paidPackage?(wasEdit?'Dəyişiklikləriniz və ':'Elanınız və ')+paidPackage+' paket müraciətiniz qəbul edildi. Paket və elan admin təsdiqini gözləyir.':wasEdit?'Dəyişikliklər saxlanıldı. Elan yenidən admin təsdiqini gözləyir.':'Elanınız qəbul edildi. Admin təsdiqindən sonra yayımlanacaq.';
+  const message=paidPackage?(wasEdit?'Dəyişiklikləriniz və ':'Elanınız və ')+(paidPackage==='Tecili'?'Təcili':paidPackage)+' paket müraciətiniz qəbul edildi. Paket və elan admin təsdiqini gözləyir.':wasEdit?'Dəyişikliklər saxlanıldı. Elan yenidən admin təsdiqini gözləyir.':'Elanınız qəbul edildi. Admin təsdiqindən sonra yayımlanacaq.';
   try{caClearListingDraft();render();renderCabinet();closeSellPage();document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth'});}catch(error){viewUpdated=false;}
   if(currentUser?.id===owner)caShowListingFeedback(message+(viewUpdated?'':' Siyahı tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.'),viewUpdated?'success':'warning');
  }catch(error){if(currentUser?.id===owner&&submission===caListingSubmissionSequence){if(error.code==='CA_SAVED_DRAFT_CHANGED'&&error.savedRow){caResumeSavedListingDraft(error.savedRow,d);caShowListingFeedback('Əvvəlki elan saxlanıb. Yeni dəyişikliklərin formadadır; onları həmin elana əlavə etmək üçün yenidən yadda saxla.','warning');}else caShowListingFeedback(confirmedSave?'Müraciətiniz saxlanıldı. Görünüş tam yenilənmədi; son vəziyyəti görmək üçün səhifəni yeniləyin.':'Elanı göndərmək mümkün olmadı: '+error.message,confirmedSave?'warning':'error');}}

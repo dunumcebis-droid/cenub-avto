@@ -290,3 +290,26 @@ test('sale methods read saved arrays and legacy JSON without trusting unrelated 
     assert.deepEqual(plain(caRemoteToCar({ca_data}).saleOptions), ['cash']);
   }
 });
+
+test('urgent package remains active until sale and never trusts the requested form label', () => {
+  for (const paket_bitir of [null, undefined, '2001-01-01T00:00:00Z', '2099-01-01T00:00:00Z']) {
+    assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet:'aktiv',paket_bitir}), 'Tecili');
+  }
+  for (const veziyyet of ['gozlemede','reddedildi','silindi']) {
+    assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet}), 'Pulsuz');
+  }
+  assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet:'aktiv',is_sold:true}), 'Pulsuz');
+  assert.equal(caRemoteToCar({paket_adi:'Pulsuz',veziyyet:'aktiv',ca_data:{pack:'Tecili',requestedPackage:'Təcili — 1 AZN / satılanadək'}}).pack, 'Pulsuz');
+});
+
+test('approved urgent listings remain urgent until sold without a calendar expiry', () => {
+  for (const end of [null, '', '2000-01-01T00:00:00Z', '2099-01-01T00:00:00Z']) {
+    assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet:'aktiv',paket_bitir:end}), 'Tecili');
+  }
+  for (const veziyyet of ['gozlemede','reddedildi','silindi']) {
+    assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet}), 'Pulsuz');
+  }
+  assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet:'aktiv',is_sold:true}), 'Pulsuz');
+  assert.equal(caRemoteToCar({veziyyet:'aktiv',ca_data:{pack:'Tecili',requestedPackage:'Təcili — 1 AZN'}}).pack, 'Pulsuz');
+  assert.deepEqual([{pack:'Pulsuz'},{pack:'Tecili'},{pack:'Standart'},{pack:'Premium'},{pack:'VIP'}].sort(helpers.caComparePackages).map(c=>c.pack),['VIP','Premium','Standart','Tecili','Pulsuz']);
+});

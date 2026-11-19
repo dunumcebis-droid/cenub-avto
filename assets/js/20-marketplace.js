@@ -207,6 +207,7 @@ function selectedFilters() {
   if (value !== '' && value != null && (typeof value !== 'number' || Number.isFinite(value))) filters[key] = value;
  });
  filters.equipment = [...document.querySelectorAll('input[name="caEquipment"]:checked')].map(n => n.value);
+ if($('caUrgentFilter')?.value==='true')filters.urgent=true;
  filters.pack = currentFilter || 'all'; filters.sort = $('sortListings')?.value || 'newest';
  return filters;
 }
@@ -270,8 +271,9 @@ function applySearch(id) {
  const row = savedRows.find(r => r.id === id); if (!owner || !row) return;
  const filters = JSON.parse(JSON.stringify(row.filters));
  currentSearch = {}; Object.keys(searchFields).forEach(key => { if (filters[key] != null) currentSearch[key] = filters[key]; });
+ if(filters.urgent===true)currentSearch.urgent=true;
  currentSearch.equipment = Array.isArray(filters.equipment) ? filters.equipment : [];
- currentFilter = ['all','VIP','Premium','Standart','Pulsuz'].includes(filters.pack) ? filters.pack : 'all';
+ currentFilter = ['all','VIP','Premium','Standart','Tecili','Pulsuz'].includes(filters.pack) ? filters.pack : 'all';
  Object.entries(searchFields).forEach(([key,id]) => { const element = $(id); if (element) element.value = filters[key] == null ? '' : String(filters[key]); });
  if ($('searchModel')) $('searchModel').disabled = !filters.make;
  document.querySelectorAll('input[name="caEquipment"]').forEach(n => { n.checked = currentSearch.equipment.includes(n.value); });
@@ -279,7 +281,7 @@ function applySearch(id) {
  document.querySelectorAll('.pill').forEach(p => {
   const match = (p.getAttribute('onclick') || '').match(/setFilter\(['"]([^'"]+)['"]/); if (match) p.classList.toggle('active',match[1] === currentFilter);
  });
- caSyncSaleTypeUI();
+ caSyncSaleTypeUI();caSyncUrgentUI();
  closeModal(false); closeCabinet(); closeSellPage(); caFetchListings(1); $('elanlar')?.scrollIntoView({behavior:'smooth'});
 }
 function updateNotificationBadge() {

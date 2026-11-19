@@ -74,7 +74,7 @@ def browse_fixture_response(rows, payload, today_approved=3):
     assert payload['p_page_size'] == 24 and int(payload['p_page']) >= 1
     filters = payload['p_filters']
     active = [row for row in rows if row.get('veziyyet') == 'aktiv']
-    rank = {'VIP':0,'Premium':1,'Standart':2,'Pulsuz':3}
+    rank = {'VIP':0,'Premium':1,'Standart':2,'Tecili':3,'Pulsuz':4}
 
     def field(row, key, fallback):
         value = row.get(key)
@@ -106,7 +106,7 @@ def browse_fixture_response(rows, payload, today_approved=3):
 
     selected = [row for row in active if matches(row)]
     def sort_key(row):
-        package = rank.get(row.get('paket_adi','Pulsuz'),3)
+        package = rank.get(row.get('paket_adi','Pulsuz'),4)
         price = number(field(row,'qiymet','price'))
         if filters.get('sort') in ('priceAsc','priceDesc'):
             return (package, price is None, (price or 0) * (-1 if filters['sort']=='priceDesc' else 1))

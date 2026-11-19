@@ -297,7 +297,7 @@ function listingHarness({ respond = async () => browseReply(), filters = null, p
   };
   const context = production([
     'listingKey', 'caRebuildListingCache', 'caRememberListings', 'caCurrentListings',
-    'caInvalidatePrivateRequests', 'caClearPrivateListings', 'caUpdatePublicStats', 'caSyncSaleTypeUI', 'caFetchListings',
+    'caInvalidatePrivateRequests', 'caClearPrivateListings', 'caUpdatePublicStats', 'caSyncSaleTypeUI', 'caSyncUrgentUI', 'caFetchListings',
     'caFetchScopedListings', 'caFetchMyListings', 'caFetchFavoriteListings', 'caChangePage',
   ], {
     AbortController,

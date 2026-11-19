@@ -5,6 +5,14 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## Təcili paket və iki sütun — 19 noyabr 2026
+
+- **Təcili:** 1 AZN-lik paket müraciəti əlavə olunub. Paket və elan ayrıca admin təsdiqindən sonra yaşıl **TƏCİLİ** nişanı ilə görünür və elan satılanadək qalır; gün limiti yoxdur. Kartla avtomatik ödəniş hələ qoşulmayıb.
+- **Alıcı axtarışı:** əsas ekranda Təcili seçimi və geniş filtrlərdə Təcili filtri var. Nağd/Kredit/Barter və digər axtarış seçimləri ilə birlikdə işləyir; saxlanılan axtarış və sayt bildirişləri də eyni qaydanı istifadə edir.
+- **İki sütun:** əsas elanlar, önə çıxarılanlar və seçilmişlər kompüterdə və telefonda iki sütun göstərilir. Mobil kartlarda ad, qiymət, şərtlər və düymələr uyğunlaşdırılıb.
+
+SQL istinadı [database/urgent-listings.sql](database/urgent-listings.sql), sınaq əhatəsi [URGENT_LISTINGS_VERIFICATION.md](URGENT_LISTINGS_VERIFICATION.md) faylındadır.
+
 ## Son beş əlavə — 13 noyabr 2026
 
 - **Şəkil idarəetməsi:** ayrıca şəkli silmək, eyni bölmədə sırasını dəyişmək və ★ ilə əsas şəkli seçmək olur. Redaktədə köhnə şəkillər qorunur; yeni şəkil əlavə ediləndə saxlanılanlarla birlikdə hər bölmədə 6, bütün elanda 36 həddi yoxlanır. Limitdən böyük köhnə bölmədə mövcud şəkli silmək və sıralamaq olar; yeni şəkil üçün əvvəl limitə endirmək lazımdır. Yeni faylların real uyğunluq yoxlaması saxlanılır.
@@ -70,7 +78,7 @@ Kartlar, admin, parol bərpası, BMW seçimi, nəsil məlumatı və müqayisə a
 - Marka, model, qiymət, il, yürüş və texniki məlumatlar baza sütunlarından və əvvəlki `ca_data` formatlarından oxunur. Boş yürüş `null`, daxil edilmiş sıfır isə `0 km` olaraq qorunur.
 - Redaktə forması təchizat seçimlərini və şəkillərin bölmələrini bərpa edir. Mövcud şəkillər yeni fayl seçiləndə də saxlanılır; yalnız ayrıca «Sil» əməliyyatı ilə çıxarılır. İstifadəçinin seçdiyi sıra, əsas şəkil və kataloqda olmayan köhnə təchizat dəyərləri qorunur.
 - Elan yaratma, redaktə və silmə serverin qaytardığı elan ID-si ilə təsdiqlənir. Heç bir sətri dəyişməyən sorğu uğur kimi göstərilmir. Silmə şəkilləri və ödəniş tarixçəsini saxlayan arxivləşdirmədir (`silindi`).
-- Redaktədə cari paket saxlanılır; yeni paket yalnız ayrıca seçildikdə istənilir. VIP, Premium və Standart müddətləri müvafiq olaraq 15, 5 və 3 gündür; faktiki paket bazanın təsdiqlənmiş vəziyyətindən və bitmə tarixindən oxunur.
+- Redaktədə cari paket saxlanılır; yeni paket yalnız ayrıca seçildikdə istənilir. VIP, Premium və Standart müddətləri müvafiq olaraq 15, 5 və 3 gündür; Təcili satılanadək qalır. Faktiki paket bazanın təsdiqlənmiş vəziyyətindən oxunur.
 - Elan siyahısı serverdə süzülür və sıralanır, səhifədə 24 elan göstərilir. Ümumi say üçün kodda əvvəlki 500 elan məhdudiyyəti yoxdur. Satıcının elanları ayrıca 100-lük hissələrlə oxunur.
 - «Bu gün təsdiqlənən» göstəricisi server hesabından gəlir; sıfır düzgün göstərilir. Uğursuz sorğu əvvəlki uğurlu məlumatları silmir, köhnə sorğu cavabı yeni səhifəni əvəz etmir.
 

@@ -5,7 +5,7 @@
 Bank hazır olduqda aşağıdakılar tamamlanır:
 
 - Bankın verdiyi rəsmi test/istehsal inteqrasiya sənədi, API ünvanları və merchant girişləri alınır. Məxfi açarlar yalnız serverin məxfi ayarlarına yerləşdirilir; söhbətə, HTML/JavaScript-ə və GitHub-a əlavə edilmir.
-- Sifarişin paket/qiymət/müddəti serverdə mövcud 3/5/15 AZN və 3/5/15 gün qaydaları ilə yoxlanır. İstifadəçi brauzerindən «ödənilib» iddiası qəbul edilmir.
+- Sifarişin paket/qiymət/müddəti serverdə mövcud qiymətlərlə yoxlanır: Təcili 1 AZN (elan satılanadək, gün limiti yoxdur); Standart/Premium/VIP 3/5/15 AZN və 3/5/15 gün. İstifadəçi brauzerindən «ödənilib» iddiası qəbul edilmir.
 - Bankın təsdiq cavabı serverdə sənədləşdirilmiş qayda ilə doğrulanır; eyni ödəniş iki dəfə tətbiq edilmir. Ödənişin və elanın moderasiya təsdiqi ayrı qalır.
 - Bankın sınaq mühitində uğur, imtina, yarımçıq dönüş, təkrar bildiriş və geri qaytarma halları yoxlanır. Real pul sınağı ayrıca icazə ilə edilir.
 - Bank funksiyası aktivləşəndə saytın ödəniş bildirişləri və qaydalar/məxfilik mətnləri faktiki axına uyğun yenilənir.
