@@ -31,3 +31,12 @@ Ayrı anonim, yalnız oxuma yoxlamasında faktiki açıq elan, dinamik Car/Offer
 Server v2 üçün girişsiz preflight **204**, tokensiz/yanlış tokenli POST sorğuları **401** qaytarır. Adminin real e-poçt dəyişikliyini isə avtomatik sınaq yox, istifadəçinin öz qorunan klik əməliyyatı icra edib.
 
 Yeni SMTP sahələrinin saxlanması istifadəçi tərəfindən təsdiqlənib. İstifadəçi öz bərpa sınağında yeni göndərənin real məktubda görünməsini təsdiqləyib. Avtomatik sınaqlar real məktub göndərməyib; həmin məktubdakı yeni keçidin açılması/parol dəyişikliyi ayrıca təsdiqlənməyib.
+
+
+## Son Gmail təmizləməsi
+
+Köhnə ünvanın əlavə hesab qeydində qalması aşkarlandıqdan sonra v3 qorunan əməliyyat və brauzer keşinin uyğunlaşdırılması əlavə olunub. İstifadəçi yeni səhifədə düyməyə basıb və uğur mesajını təsdiqləyib. Son canlı baza yoxlamasında giriş, identiklik və `user_metadata.email` yeni ünvandır; əvvəlki Gmaillər cari profil/metadata/identiklik sahələrində yoxdur. Digər user metadata və app metadata əvvəl/sonra heş müqayisəsində eynidir. Eyni admin UUID-si, rolu və profili qorunub; parol atributu heç bir yeniləmə sorğusuna daxil edilməyib.
+
+Cari repozitoriya fayllarındakı əvvəlki real Gmail istinadlarının sayı **0**-dır. Testlərdə əvvəlki ünvan üçün ümumi saxta nümunə istifadə olunur. Git tarixçəsi və artıq göndərilmiş məktublar yenidən yazılmayıb.
+
+Son runtime dəyişiklikləri **d44257f**, Pages yayımı **44619722466** ilə uğurla yayımlanıb. Yeni kodla **128/128 Node** və **15/15 admin brauzer** sınağı keçir. Son canlı admin sınağında **46 statik faylın bayt uyğunluğu** təsdiqlənib; Auth/SMTP/provayder cavabları imitasiya olunub, real məktub və hesab yazması yoxdur. Real hesab təmizləməsini istifadəçinin qorunan klik əməliyyatı, real SMTP məktubunu istifadəçinin öz bərpa sınağı icra edib.

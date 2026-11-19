@@ -24,7 +24,7 @@ UUID, profil/elan əlaqələri və admin üzvlüyü dəyişdirilmir; parol atrib
 
 ## Yoxlama
 
-- Yeni admin ünvanı, Auth e-poçt identikliyi, təsdiqlənmiş e-poçt, eyni UUID, profil və admin üzvlüyü canlı bazadan təsdiqlənib. Şəxsi identifikator və sessiya məlumatları sənəddə saxlanılmır.
+- Yeni admin ünvanı, Auth e-poçt identikliyi, təsdiqlənmiş e-poçt, eyni UUID, profil və admin üzvlüyü canlı bazadan təsdiqlənib. Əlavə `user_metadata.email` sahəsi də yeni ünvanla uyğunlaşdırılıb. Qalan user/app metadata dəyişməzliyi əvvəl/sonra heş müqayisəsi ilə yoxlanılıb. Cari profil, metadata və identiklik sahələrində əvvəlki Gmaillər yoxdur. Şəxsi identifikator, heşlər və sessiya məlumatları sənəddə saxlanılmır.
 - 17 server təhlükəsizlik ssenarisi keçib; ümumi 128 Node yoxlaması yeni brend üçün keçir. Auth və admin yoxlamaları bitmədən xidmət açarının oxunmadığı və yazmanın başlamadığı ayrıca yoxlanıb.
 - Yeni admin hədəfi üçün 15 imitasiya edilmiş brauzer sınağı keçib; əvvəlki giriş/admin pəncərəsi əhatəsi tarixi yoxlamalarda saxlanılıb.
 - Altı səhifə və qaydalar pəncərəsində 5 e-poçt keçidi yeni ünvandır; 5 telefon keçidi saxlanılıb.
