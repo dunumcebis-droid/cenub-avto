@@ -1,5 +1,5 @@
 /** Changes only the authenticated administrator's own login to the approved address. */
-const TARGET_EMAIL='azavto44@gmail.com';
+const TARGET_EMAIL='avtounvan@gmail.com';
 const ALLOWED_ORIGIN='https://dunumcebis-droid.github.io';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_BODY_BYTES=256;

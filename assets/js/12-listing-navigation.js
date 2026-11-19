@@ -59,7 +59,7 @@ window.caShareListing=async function(){
  sharing=true;if(button)button.disabled=true;
  try{
   if(typeof navigator.share==='function'){
-   try{await navigator.share({title:caCarName(car),text:caCarName(car)+' · AzAvto',url});shareStatus(id,'Paylaşım pəncərəsi bağlandı.');return true;}
+   try{await navigator.share({title:caCarName(car),text:caCarName(car)+' · AvtoUnvan',url});shareStatus(id,'Paylaşım pəncərəsi bağlandı.');return true;}
    catch(error){if(error?.name==='AbortError'){shareStatus(id,'Paylaşım ləğv edildi.');return false;}}
   }
   if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(url);shareStatus(id,'Elanın linki kopyalandı.');return true;}catch(error){}}

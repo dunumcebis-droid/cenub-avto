@@ -16,7 +16,7 @@ from test_admin_auth_browser import AdminAuthBackend
 from test_listing_management_browser import ORIGIN, OWNER, OTHER_OWNER, ROOT
 
 
-EMAIL = 'azavto44@gmail.com'
+EMAIL = 'avtounvan@gmail.com'
 EMAIL_TOKEN = re.compile(r'[A-Za-z0-9.!#$%&\x27*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
 ENDPOINT = '/functions/v1/ca-admin-email-change'
 PUBLIC_PAGES = ('index.html', 'about.html', 'support.html',

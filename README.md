@@ -1,4 +1,4 @@
-# AzAvto
+# AvtoUnvan
 
 Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və JavaScript GitHub Pages-də yerləşir; hesablar, elanlar və şəkil saxlancı Supabase ilə işləyir.
 
@@ -7,21 +7,21 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 
 ## SEO hazırlığı — 19 noyabr 2026
 
-Açıq səhifələr üçün ayrıca axtarış başlıqları, təsvirlər, paylaşım metadata-sı, canonical qaydaları, AzAvto `WebSite`/`Organization` məlumatı və beş səhifəlik `sitemap.xml` hazırlanıb. Parol bərpası `noindex, nofollow` saxlayır. SEO ünvanlarının əsas mənbəyi `seo.config.json`-dur; `node tools/generate-seo.cjs` nəticələri yaradır, `--check` isə dəyişiklik yazmadan uyğunluğu yoxlayır.
+Açıq səhifələr üçün ayrıca axtarış başlıqları, təsvirlər, paylaşım metadata-sı, canonical qaydaları, AvtoUnvan `WebSite`/`Organization` məlumatı və beş səhifəlik `sitemap.xml` hazırlanıb. Parol bərpası `noindex, nofollow` saxlayır. SEO ünvanlarının əsas mənbəyi `seo.config.json`-dur; `node tools/generate-seo.cjs` nəticələri yaradır, `--check` isə dəyişiklik yazmadan uyğunluğu yoxlayır.
 
-Search Console sahiblik təsdiqi üçün istifadəçinin açıq Google tokeni gözlənilir. Hazırkı GitHub Pages layihə yolunda `robots.txt` və Google sayt adı məhdudiyyətləri, təsdiq addımları və gələcək şəxsi domenə keçid [SEO_SETUP.md](SEO_SETUP.md) sənədindədir. Bu hazırlıq indekslənmə və nəticə sırası zəmanəti vermir.
+İstifadəçi Search Console sahiblik təsdiqini domen və hostinq alındıqdan sonraya saxlayıb; təsdiq tokeni hələ verilməyib. Hazırkı GitHub Pages layihə yolunda `robots.txt` və Google sayt adı məhdudiyyətləri, təsdiq addımları və gələcək şəxsi domenə keçid [SEO_SETUP.md](SEO_SETUP.md) sənədindədir. Bu hazırlıq indekslənmə və nəticə sırası zəmanəti vermir.
 
 ## Saytın adı — 19 noyabr 2026
 
-Saytın yeni brendi **AzAvto**-dur. Loqo, səhifə başlıqları, alt yazılar, giriş/bərpa ekranları, paylaşım mətni və yeni şəkillərin su nişanı uyğunlaşdırılıb. Şüar: **Xəyal etdiyin avtomobili kəşf et**.
+Saytın yeni brendi **AvtoUnvan**-dur. Loqo, səhifə başlıqları, alt yazılar, giriş/bərpa ekranları, paylaşım mətni və yeni şəkillərin su nişanı uyğunlaşdırılıb. Şüar: **Xəyal etdiyin avtomobili kəşf et**.
 
-Yoxlamalar və texniki uyğunluq: [AZAVTO_BRANDING_VERIFICATION.md](AZAVTO_BRANDING_VERIFICATION.md).
+AvtoUnvan üçün cari yoxlama: [AVTOUNVAN_BRANDING_VERIFICATION.md](AVTOUNVAN_BRANDING_VERIFICATION.md). Əvvəlki brendin tarixi yoxlaması ayrıca saxlanılıb.
 
 ## Dəstək və admin Gmaili — 19 noyabr 2026
 
-Cari dəstək və admin giriş ünvanı **azavto44@gmail.com**-dur. Admin ünvanı bazadan, yeni ünvanla giriş isə istifadəçi tərəfindən təsdiqlənib; hesabın UUID-si, profili və admin üzvlüyü saxlanılıb, parol dəyişdirilməyib. Texniki axın və yoxlamalar: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
+Cari dəstək ünvanı **avtounvan@gmail.com**-dur. Admin girişinin bu ünvana keçirilməsi üçün qorunan əməliyyat hazırlanıb: hazırkı admin sayta daxil olub **Admin Gmailini dəyiş** düyməsinə basır. Əməliyyat mövcud hesabın yalnız e-poçtunu yeniləyir; UUID, parol, profil, elanlar və admin üzvlüyü saxlanılır. Yeni ünvanın real Auth-da tətbiqi ayrıca yoxlanılmalıdır. Texniki axın: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
 
-Gmail SMTP ayarları da tamamlanıb: istifadəçi real bərpa məktubunun çatmasını və göndərənin **AzAvto <azavto44@gmail.com>** görünməsini təsdiqləyib. SMTP tətbiq parolu yalnız Supabase-in məxfi ayarında saxlanılıb. Bu yoxlamada yeni məktubdakı keçidin açılması və parol dəyişikliyi təkrar sınanmayıb. Əhatə: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
+Bərpa məktubunun istənilən göndərəni **AvtoUnvan <avtounvan@gmail.com>**-dur. İstifadəçi yeni Gmail üçün tətbiq parolunu yaratdığını və SMTP sahələrini paneldə saxladığını bildirib. Məktubun faktiki göndərəni HTML-dən deyil, Supabase SMTP ayarından gəlir; tətbiq parolu yalnız həmin məxfi ayara daxil edilməlidir. Yeni göndərənin real məktubda görünməsi hələ ayrıca təsdiqlənməyib. Hazır sahələr və yoxlama: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Cari paketlər — 19 noyabr 2026
 

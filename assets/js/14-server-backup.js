@@ -91,7 +91,7 @@ async function exportServer(){
  status('Nüsxə hazırlanır…');progress(0,1);
  current.ownerWatch=setInterval(()=>{if(ownerNow()!==owner)window.caServerBackupSessionChanged();},200);
  let sink,streaming=false;
- const filename='AzAvto_server_'+new Date().toISOString().replace(/[:.]/g,'-')+'.zip';
+ const filename='AvtoUnvan_server_'+new Date().toISOString().replace(/[:.]/g,'-')+'.zip';
  try{
   // Called directly from the user's click, preserving the browser activation.
   const selection=typeof window.showSaveFilePicker==='function'?window.showSaveFilePicker({suggestedName:filename,types:[{description:'ZIP ehtiyat nüsxəsi',accept:{'application/zip':['.zip']}}]}):null;

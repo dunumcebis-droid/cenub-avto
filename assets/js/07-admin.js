@@ -2,7 +2,7 @@
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let owner=null,authorized=false,verifySequence=0,busy=false,sessionEpoch=0;
-const adminEmail='azavto44@gmail.com';
+const adminEmail='avtounvan@gmail.com';
 let emailBusy=false,emailDone=false,emailFocusPending=new URLSearchParams(location.search).get('admin-email')==='1';
 let previewSequence=0,previewActive=false,previewSource=null;
 const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false,linked:null});

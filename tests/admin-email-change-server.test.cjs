@@ -6,7 +6,7 @@ const load=import('../supabase/functions/ca-admin-email-change/handler.mjs');
 const BASE='https://email-fixture.supabase.co';
 const USER='11111111-1111-4111-8111-111111111111';
 const OTHER='22222222-2222-4222-8222-222222222222';
-const TARGET='azavto44@gmail.com';
+const TARGET='avtounvan@gmail.com';
 const ORIGIN='https://dunumcebis-droid.github.io';
 const ENV={SUPABASE_URL:BASE,SUPABASE_ANON_KEY:'fixture-anon-key',SUPABASE_SERVICE_ROLE_KEY:'fixture-service-key'};
 const response=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}});
@@ -100,6 +100,15 @@ test('authenticated administrator already at the address succeeds without any Ad
  const f=await fixture({user:{id:USER,email:TARGET.toUpperCase()}});const result=await f.invoke();
  assert.equal(result.status,200);assert.deepEqual(result.data,{status:'already_current',user_id:USER,email:TARGET});assert.equal(f.calls.length,2);assert.equal(writes(f.calls).length,0);assert.equal(f.envReads.includes('SUPABASE_SERVICE_ROLE_KEY'),false);
  const ordinary=await fixture({user:{id:USER,email:TARGET},admin:false});assert.equal((await ordinary.invoke()).status,403);assert.equal(writes(ordinary.calls).length,0);
+});
+test('an administrator using the former fixed address migrates to the current brand address without changing other attributes',async()=>{
+ const f=await fixture({user:{id:USER,email:'azavto44@gmail.com',user_metadata:{role:'admin',id:OTHER},app_metadata:{provider:'email'}}});
+ const result=await f.invoke();
+ assert.equal(result.status,200);assert.deepEqual(result.data,{status:'updated',user_id:USER,email:TARGET});
+ assert.equal(writes(f.calls).length,1);assert.equal(writes(f.calls)[0].url,BASE+'/auth/v1/admin/users/'+USER);
+ assert.deepEqual(JSON.parse(writes(f.calls)[0].body),{email:'avtounvan@gmail.com'});
+ assert.equal(f.state.user.email,'azavto44@gmail.com','The injected Auth fixture is never mutated by the handler');
+ noSecrets(result);
 });
 test('missing privileged credentials fail after authorization without issuing a write',async()=>{
  const f=await fixture({env:{SUPABASE_SERVICE_ROLE_KEY:''}});const result=await f.invoke();assert.equal(result.status,503);assert.equal(f.calls.length,2);assert.equal(writes(f.calls).length,0);noSecrets(result);

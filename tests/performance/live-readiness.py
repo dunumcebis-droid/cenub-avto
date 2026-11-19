@@ -27,7 +27,7 @@ SITE = 'https://dunumcebis-droid.github.io/cenub-avto/'
 PROJECT = 'https://iqdtehqxusfiwokrzceo.supabase.co'
 RPC = PROJECT + '/rest/v1/rpc/ca_browse_listings'
 STATIC = ['index.html', 'assets/site.css', 'assets/js/01-main.js',
-          'assets/branding/azavto-logo.png']
+          'assets/branding/avtounvan-logo.png']
 STAGES = [(1, 4), (5, 10), (10, 20), (20, 40)]
 MAX_REQUESTS = 79
 TIMEOUT = 15

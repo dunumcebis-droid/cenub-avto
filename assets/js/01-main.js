@@ -308,7 +308,7 @@ function caChangePage(delta){
 // Only decoded images are uploaded; both decoders feed the same stamped JPEG path.
 const caWatermarkedPhotos=new WeakSet();
 function caDrawPhotoWatermark(context,width,height){
- const label='AZAVTO';
+ const label='AVTOUNVAN';
  let size=Math.max(.1,Math.min(width*.085,height*.16));
  context.save();
  context.font='italic 800 '+size+'px Arial, sans-serif';
@@ -846,7 +846,7 @@ function setLocalPhoto(img,key){
   img.onerror=()=>{img.hidden=true;const empty=img.parentElement?.querySelector('.photo-not-found');if(empty)empty.hidden=false;};
   img.src=src;img.hidden=false;
   const credit=img.parentElement?.querySelector('.photo-credit');
-  if(credit)credit.textContent='AzAvto · vizual foto nümunəsi';
+  if(credit)credit.textContent='AvtoUnvan · vizual foto nümunəsi';
   return true;
 }
 
@@ -863,7 +863,7 @@ function setVehicleAwarePhoto(img,make,model,category){
     img.onload=()=>{img.hidden=false;const empty=img.parentElement?.querySelector('.photo-not-found');if(empty)empty.hidden=true;};
     img.onerror=()=>{img.hidden=true;const empty=img.parentElement?.querySelector('.photo-not-found');if(empty)empty.hidden=false;};
     img.src=src;img.hidden=false;
-    const credit=img.parentElement?.querySelector('.photo-credit');if(credit)credit.textContent='AzAvto · Toyota 86 · '+({front:'ön görünüş',rear:'arxa görünüş',side:'yan görünüş',interior:'salon',engine:'mühərrik',other:'arxa bucaq',generation:'Toyota 86'}[category]||'foto nümunəsi');
+    const credit=img.parentElement?.querySelector('.photo-credit');if(credit)credit.textContent='AvtoUnvan · Toyota 86 · '+({front:'ön görünüş',rear:'arxa görünüş',side:'yan görünüş',interior:'salon',engine:'mühərrik',other:'arxa bucaq',generation:'Toyota 86'}[category]||'foto nümunəsi');
     return true;
   }
   // Other models and makes use category-specific local reference images; never reuse the front view for interior/engine/rear/side.
@@ -1014,7 +1014,7 @@ function caHasEmbeddedWatermark(src){
 function caListingPhotoMarkup(src,alt,kind='cover'){
  if(!src)return '';
  const context=['cover','gallery','thumb','cabinet'].includes(kind)?kind:'cover';
- return `<span class="ca-watermark-frame ca-watermark-${context}" data-ca-photo-state="loading"><img loading="lazy" decoding="async" src="${esc(src)}" alt="${esc(alt)}" onload="caListingPhotoReady(this)" onerror="caListingPhotoFailed(this)">${caHasEmbeddedWatermark(src)?'':'<span class="ca-photo-watermark" aria-hidden="true">AZAVTO</span>'}</span>`;
+ return `<span class="ca-watermark-frame ca-watermark-${context}" data-ca-photo-state="loading"><img loading="lazy" decoding="async" src="${esc(src)}" alt="${esc(alt)}" onload="caListingPhotoReady(this)" onerror="caListingPhotoFailed(this)">${caHasEmbeddedWatermark(src)?'':'<span class="ca-photo-watermark" aria-hidden="true">AVTOUNVAN</span>'}</span>`;
 }
 function caPositionPhotoWatermark(img){
  const frame=img?.closest('.ca-watermark-frame');if(!frame||!img.naturalWidth||!img.naturalHeight)return;

@@ -1,4 +1,4 @@
-# AzAvto SEO ayarları
+# AvtoUnvan SEO ayarları
 
 SEO saytın axtarış sistemləri tərəfindən tapılmasını və məzmununun düzgün anlaşılmasını asanlaşdırır. Bu hazırlıq Google-da indekslənmə, nəticə sırası və ya dərhal ziyarətçi artımı vəd etmir.
 
@@ -9,7 +9,7 @@ Hazırda istifadə edilən ünvan **https://dunumcebis-droid.github.io/cenub-avt
 `seo.config.json` SEO üçün əsas mənbədir: sayt ünvanı, brend, açıq dəstək əlaqələri, mövcud loqo, səhifə başlıqları, təsvirlər və Google təsdiq tokeni burada saxlanılır. Faylda parol, API açarı və şəxsi elan məlumatı saxlanılmır.
 
 - Ana səhifə, haqqımızda, dəstək, istifadə qaydaları və məxfilik siyasəti üçün ayrıca başlıq, təsvir, Open Graph və Twitter metadata var. `sitemap.xml` bu beş açıq səhifənin tam ünvanlarını göstərir.
-- Ana səhifənin ilkin HTML-ində doğru `WebSite` və `Organization` JSON-LD məlumatı var: AzAvto adı, mövcud loqo, şüar, dəstək e-poçtu və telefonu. Ünvan, reytinq, rəy sayı və işləməyən `SearchAction` əlavə edilmir.
+- Ana səhifənin ilkin HTML-ində doğru `WebSite` və `Organization` JSON-LD məlumatı var: AvtoUnvan adı, mövcud loqo, şüar, dəstək e-poçtu və telefonu. Ünvan, reytinq, rəy sayı və işləməyən `SearchAction` əlavə edilmir.
 - Dörd məlumat səhifəsi öz tam `canonical` ünvanını göstərir. Ana səhifə eyni zamanda `?ad=...` elan keçidlərini açdığı üçün ilkin HTML-də `canonical` yoxdur; həmin ünvanı `assets/js/21-seo.js` açılan marşruta uyğun yaradır. Ana səhifənin ilkin `og:url` dəyəri bu skript üçün əsas sayt ünvanıdır.
 - `reset-password.html` ilkin HTML-də `noindex, nofollow` saxlayır. Bərpa səhifəsi sitemap-a daxil edilmir, açıq paylaşım metadata-sı və canonical almır. Məxfilik **siyasəti** isə ziyarətçilər üçün açıq məlumat səhifəsidir və sitemap-a daxildir.
 - Sitemap-a şəxsi kabinet, giriş/bərpa tokenləri, filtr variantları və ya bazadan elan nüsxələri yazılmır. Elan keçidlərinin tapılması tətbiqdəki açıq elan keçidləri ilə təmin edilir; bu statik generator elan bazasını oxumur.
@@ -37,13 +37,13 @@ Birinci əmr altı HTML faylındakı `<!-- SEO:BEGIN -->` / `<!-- SEO:END -->` b
 
 Bu repozitoriyanın `robots.txt` faylı **/cenub-avto/robots.txt** ünvanında yayımlanır. Google robots qaydalarını hostun kökündəki **https://dunumcebis-droid.github.io/robots.txt** ünvanından oxuyur. Layihə daxilindəki fayl kök robots qaydası sayılmır; onun Google üçün işlədiyini və ya bərpa səhifəsini blokladığını iddia etmirik. Ona görə sitemap birbaşa Search Console-a təqdim edilməli, indeksdən kənar səhifələrin göstərişi öz HTML-ində `noindex` ilə verilməlidir. Google-un bu göstərişi oxuya bilməsi üçün səhifənin crawl edilməsi qadağan olunmur.
 
-Google-un ayrıca **sayt adı** funksiyası domen və subdomen köklərində işləyir; `/cenub-avto/` kimi alt qovluqlar üçün ayrıca sayt adı dəstəklənmir. `WebSite` məlumatının əlavə edilməsi hazırkı layihə ünvanında axtarış nəticəsində mütləq «AzAvto» sayt adı göstəriləcəyi demək deyil.
+Google-un ayrıca **sayt adı** funksiyası domen və subdomen köklərində işləyir; `/cenub-avto/` kimi alt qovluqlar üçün ayrıca sayt adı dəstəklənmir. `WebSite` məlumatının əlavə edilməsi hazırkı layihə ünvanında axtarış nəticəsində mütləq «AvtoUnvan» sayt adı göstəriləcəyi demək deyil.
 
-Elan məzmunu JavaScript və açıq API cavabından sonra göstərilir. Google-un render etməsi tələb olunur; JavaScript işlətməyən sosial paylaşım botları ilkin ümumi AzAvto metadata-sını görə bilər. Hər elan üçün serverdən hazır HTML və sosial önbaxış ayrı gələcək hosting işi tələb edir.
+Elan məzmunu JavaScript və açıq API cavabından sonra göstərilir. Google-un render etməsi tələb olunur; JavaScript işlətməyən sosial paylaşım botları ilkin ümumi AvtoUnvan metadata-sını görə bilər. Hər elan üçün serverdən hazır HTML və sosial önbaxış ayrı gələcək hosting işi tələb edir.
 
 ## Google Search Console-a qoşmaq
 
-Sahiblik hələ təsdiqlənməyib; `googleSiteVerification` hazırda boşdur. Konfiqurasiyada saxta təsdiq tokeni yoxdur və bu iş Search Console-a sitemap göndərildiyi iddiasını etmir.
+İstifadəçinin qərarı ilə sahiblik təsdiqi şəxsi domen və hostinq qoşulandan sonra aparılacaq. Sahiblik hələ təsdiqlənməyib; `googleSiteVerification` hazırda boşdur. Konfiqurasiyada saxta təsdiq tokeni yoxdur və bu iş Search Console-a sitemap göndərildiyi iddiasını etmir.
 
 1. [Google Search Console](https://search.google.com/search-console/) açın və **URL prefix** xüsusiyyəti yaradın: `https://dunumcebis-droid.github.io/cenub-avto/`.
 2. Sahiblik yoxlamasında **HTML tag** üsulunu seçin. Verilən `<meta name="google-site-verification" content="...">` içində yalnız açıq `content` tokenini `seo.config.json` → `googleSiteVerification` sahəsinə köçürün.

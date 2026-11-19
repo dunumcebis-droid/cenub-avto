@@ -18,7 +18,7 @@ function setMeta(key,value){const element=document.querySelector(metaSelector[ke
 function setCanonical(value){let element=document.getElementById('canonical-url');if(!element){element=document.createElement('link');element.id='canonical-url';element.rel='canonical';document.head.append(element);}if(element.href!==value)element.href=value;}
 function clearListingData(){document.getElementById('ca-seo-listing-data')?.remove();}
 function baseMetadata(noindex=false,page=1){
- const title=page>1?'Avtomobil elanları — Səhifə '+page+' | AzAvto':defaults.title;
+ const title=page>1?'Avtomobil elanları — Səhifə '+page+' | AvtoUnvan':defaults.title;
  document.title=title;for(const key of Object.keys(metaSelector))setMeta(key,defaults[key]);
  setMeta('title',title);setMeta('twitterTitle',title);setMeta('url',routeUrl(null,page));setCanonical(routeUrl(null,page));
  setMeta('robots',noindex?'noindex, follow':defaults.robots||'index, follow');clearListingData();
@@ -28,9 +28,9 @@ function publicMetadata(car){
  const id=idOf(car),url=routeUrl(id),name=String(caCarName(car)||'Avtomobil elanı').replace(/\s+/g,' ').trim().slice(0,120);
  const year=Number.isInteger(Number(car.year))&&Number(car.year)>=1950?String(car.year):'';
  const price=typeof car.price==='number'&&Number.isFinite(car.price)&&car.price>=0?car.price:null;
- const title=[name,year,price===null?'':caFormatPrice(price)].filter(Boolean).join(' · ')+' | AzAvto';
+ const title=[name,year,price===null?'':caFormatPrice(price)].filter(Boolean).join(' · ')+' | AvtoUnvan';
  const facts=[name,year,price===null?'':caFormatPrice(price),car.city,typeof car.mileage==='number'?caFormatMileage(car.mileage):'',car.fuel,car.gear].filter(v=>v!==null&&v!==undefined&&String(v).trim()).map(v=>String(v).trim());
- const description=(facts.join(' · ')+'. Avtomobilin şəkillərinə və elan məlumatlarına AzAvto-da baxın.').slice(0,300);
+ const description=(facts.join(' · ')+'. Avtomobilin şəkillərinə və elan məlumatlarına AvtoUnvan-da baxın.').slice(0,300);
  const photo=imageUrl(car.photo||firstCarPhoto(car)),image=photo||defaults.image;
  document.title=title;setCanonical(url);setMeta('robots','index, follow');setMeta('type','product');setMeta('url',url);setMeta('title',title);setMeta('twitterTitle',title);
  setMeta('description',description);setMeta('socialDescription',description);setMeta('twitterDescription',description);setMeta('image',image);setMeta('twitterImage',image);setMeta('imageAlt',name);setMeta('twitterImageAlt',name);
