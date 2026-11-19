@@ -19,14 +19,18 @@ function drawPages(){
  const state=caBrowseState,current=state.page,last=state.totalPages;
  element.hidden=!state.loaded||last<2;element.style.display=element.hidden?'none':'flex';
  if(element.hidden){element.replaceChildren();return;}
- element.innerHTML=`<button type="button" id="caPagePrev" onclick="caGoToPage(${current-1})" ${state.loading||current<=1?'disabled':''}>← Əvvəlki</button>${pageNumbers(current,last).map(p=>p==='…'?'<span class="ca-page-ellipsis" aria-hidden="true">…</span>':`<button type="button" class="ca-page-number${p===current?' is-current':''}" data-page="${p}" aria-label="Səhifə ${p}" ${p===current?'aria-current="page"':''} onclick="caGoToPage(${p})" ${state.loading||p===current?'disabled':''}>${p}</button>`).join('')}<button type="button" id="caPageNext" onclick="caGoToPage(${current+1})" ${state.loading||current>=last?'disabled':''}>Növbəti →</button><span id="caPageLabel" class="ca-page-summary" aria-live="polite">${current} / ${last}</span>`;
+ const control=(page,label,attrs,disabled)=>filteredPages()||disabled?`<button type="button" ${attrs} onclick="caGoToPage(${page})" ${disabled?'disabled':''}>${label}</button>`:`<a ${attrs} href="${pageUrl(page)}" onclick="return caFollowPageLink(event,${page})">${label}</a>`;
+ element.innerHTML=control(current-1,'← Əvvəlki','id="caPagePrev"',state.loading||current<=1)+pageNumbers(current,last).map(p=>p==='…'?'<span class="ca-page-ellipsis" aria-hidden="true">…</span>':control(p,p,`class="ca-page-number${p===current?' is-current':''}" data-page="${p}" aria-label="Səhifə ${p}" ${p===current?'aria-current="page"':''}`,state.loading||p===current)).join('')+control(current+1,'Növbəti →','id="caPageNext"',state.loading||current>=last)+`<span id="caPageLabel" class="ca-page-summary" aria-live="polite">${current} / ${last}</span>`;
 }
+function filteredPages(){return (document.getElementById('sortListings')?.value||'newest')!=='newest'||typeof currentFilter!=='undefined'&&currentFilter!=='all'||typeof currentSearch!=='undefined'&&currentSearch&&Object.values(currentSearch).some(v=>Array.isArray(v)?v.length>0:v!==''&&v!==null&&v!==undefined&&v!==false);}
+function pageUrl(page){const url=new URL('./',location.href);url.search='';url.hash='';if(page>1)url.searchParams.set('page',String(page));return url.href;}
+window.caFollowPageLink=function(event,page){if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return true;event.preventDefault();window.caGoToPage(page);return false;};
 window.caRenderPagination=drawPages;
 window.caGoToPage=function(number){
  const page=Number(number),state=caBrowseState;
  if(!Number.isSafeInteger(page)||state.loading||page<1||page>state.totalPages||page===state.page)return false;
  cancelPendingLink();
- const pending=caFetchListings(page);document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth',block:'start'});return pending;
+ const pending=caFetchListings(page);Promise.resolve(pending).then(ok=>{if(ok!==false&&!filteredPages()&&caBrowseState.page===page){history.replaceState(history.state,'',pageUrl(page));window.dispatchEvent(new Event('ca:page-route'));}});document.getElementById('elanlar')?.scrollIntoView({behavior:'smooth',block:'start'});return pending;
 };
 const previousRender=window.render;
 if(typeof previousRender==='function')window.render=function(...args){const result=previousRender.apply(this,args);drawPages();return result;};
@@ -82,7 +86,8 @@ function setLinkNotice(text,error=false,retry=false){
 // Cancel only explicit navigation functions/user input, never background renders.
 function cancelPendingLink(){
  if(!linkLoading)return false;
- linkSequence++;linkController?.abort();linkController=null;linkLoading=false;requestedId=null;setLinkNotice('');return true;
+ linkSequence++;linkController?.abort();linkController=null;linkLoading=false;requestedId=null;setLinkNotice('');
+ const url=new URL(location.href);url.searchParams.delete('ad');history.replaceState(history.state,'',url.href);window.dispatchEvent(new Event('ca:page-route'));return true;
 }
 window.caCancelListingLink=cancelPendingLink;
 for(const name of ['searchCars','clearCarSearch','setFilter','caToggleFilters','quickBrand','showBMWSeries','openVehiclePicker','openSellPage','openCabinet','showBuyerFavorites','showSellerCabinet','openAuth','openCarDetailKey','openCarDetail','caAdminOpen','caShowCompare','caShowBackup','caShowPolicy']){

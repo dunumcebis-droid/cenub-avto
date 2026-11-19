@@ -6,6 +6,9 @@ function loadPageSource(root = path.resolve(__dirname, '..')) {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [];
   for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const type = match[1].match(/\btype\s*=\s*["']([^"']+)["']/i)?.[1].trim().toLowerCase();
+    // Structured data is metadata, not a classic executable page script.
+    if (type && !['text/javascript', 'application/javascript'].includes(type)) continue;
     const src = match[1].match(/\bsrc\s*=\s*["']([^"']+)["']/i);
     if (!src) {
       scripts.push({ path: null, source: match[2], attributes: match[1] });

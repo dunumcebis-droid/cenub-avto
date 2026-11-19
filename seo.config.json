@@ -1,0 +1,63 @@
+{
+  "baseUrl": "https://dunumcebis-droid.github.io/cenub-avto/",
+  "name": "AzAvto",
+  "slogan": "Xəyal etdiyin avtomobili kəşf et",
+  "language": "az",
+  "locale": "az_AZ",
+  "description": "Azərbaycanda avtomobil elanlarına baxın. Marka, model, qiymət və satış şərtlərinə görə axtarın, nağd, kredit və barter təkliflərini müqayisə edin.",
+  "logo": {
+    "path": "assets/branding/azavto-logo.png",
+    "width": 2038,
+    "height": 772,
+    "alt": "AzAvto — Xəyal etdiyin avtomobili kəşf et"
+  },
+  "contact": {
+    "email": "azavto44@gmail.com",
+    "telephone": "+994709091997"
+  },
+  "googleSiteVerification": "",
+  "pages": [
+    {
+      "file": "index.html",
+      "path": "",
+      "title": "AzAvto — Azərbaycanda avtomobil elanları",
+      "description": "Azərbaycanda avtomobil elanlarına baxın. Marka, model, qiymət və satış şərtlərinə görə axtarın, nağd, kredit və barter təkliflərini müqayisə edin.",
+      "indexable": true
+    },
+    {
+      "file": "about.html",
+      "path": "about.html",
+      "title": "Haqqımızda — AzAvto",
+      "description": "AzAvto avtomobil elanları platformasını tanıyın: elanların yoxlanması və yayımlanması, avtomobil axtarışı, elan paketləri və dəstək haqqında məlumat.",
+      "indexable": true
+    },
+    {
+      "file": "support.html",
+      "path": "support.html",
+      "title": "Dəstək xidməti və əlaqə — AzAvto",
+      "description": "AzAvto-da hesabınız, avtomobil elanınız və paket müraciətinizlə bağlı kömək alın. Telefon: 0709091997. E-poçt: azavto44@gmail.com.",
+      "indexable": true
+    },
+    {
+      "file": "terms.html",
+      "path": "terms.html",
+      "title": "İstifadə qaydaları — AzAvto",
+      "description": "AzAvto platformasında hesabdan istifadə, avtomobil elanları və şəkillərinin yerləşdirilməsi, elan paketləri və moderasiya qaydaları ilə tanış olun.",
+      "indexable": true
+    },
+    {
+      "file": "privacy.html",
+      "path": "privacy.html",
+      "title": "Məxfilik siyasəti — AzAvto",
+      "description": "AzAvto-da hesab, elan, şəkil və əlaqə məlumatlarının necə istifadə edildiyini, açıq görünüşü və məlumatların silinməsi üçün müraciət qaydasını öyrənin.",
+      "indexable": true
+    },
+    {
+      "file": "reset-password.html",
+      "path": "reset-password.html",
+      "title": "Parolun bərpası — AzAvto",
+      "description": "AzAvto hesabınızın parolunu e-poçtunuza göndərilmiş etibarlı bərpa keçidi ilə yeniləyin.",
+      "indexable": false
+    }
+  ]
+}

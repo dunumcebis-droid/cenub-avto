@@ -928,10 +928,10 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 
 /* Listing navigation, sharing and private administrator review. */
 #caPagination{max-width:100%;gap:8px!important;min-width:0}
-#caPagination button{min-width:42px;min-height:44px;max-width:100%;padding:10px 13px;border:1px solid #45637c;border-radius:10px;background:#142d44;color:#e8f3fc;font-size:14px;font-weight:750;line-height:1.4;cursor:pointer}
-#caPagination button:hover{background:#204762;border-color:#68dbce}
-#caPagination button[aria-current="page"]{background:#b9f34b;border-color:#b9f34b;color:#071321}
-#caPagination button:focus-visible,#caShareListingBtn:focus-visible{outline:3px solid #71e7d6;outline-offset:3px}
+#caPagination button,#caPagination a{min-width:42px;min-height:44px;max-width:100%;padding:10px 13px;border:1px solid #45637c;border-radius:10px;background:#142d44;color:#e8f3fc;font-size:14px;font-weight:750;line-height:1.4;cursor:pointer}
+#caPagination button:hover,#caPagination a:hover{background:#204762;border-color:#68dbce}
+#caPagination button[aria-current="page"],#caPagination a[aria-current="page"]{background:#b9f34b;border-color:#b9f34b;color:#071321}
+#caPagination button:focus-visible,#caPagination a:focus-visible,#caShareListingBtn:focus-visible{outline:3px solid #71e7d6;outline-offset:3px}
 #caPagination button:disabled{opacity:.5;cursor:default}
 #caPagePrev,#caPageNext{white-space:nowrap}
 #caPagination .ca-page-ellipsis{padding:8px 3px;color:#9fb5c9;user-select:none}
@@ -965,7 +965,7 @@ body.ca-content-modal-open #caToolsBar{visibility:hidden;pointer-events:none}
 .ca-policy-table th,.ca-policy-table td{padding:11px 13px;text-align:left;border-bottom:1px solid #36536b;vertical-align:top}
 .ca-policy-table th{background:#183149;color:#eff7ff;font-weight:800}
 .ca-policy-table tr:last-child td{border-bottom:0}
-@media(max-width:360px){#caPagination{gap:6px!important}#caPagination button{min-width:40px;padding:9px 10px;font-size:13px}.ca-link-notice{padding:14px}#caAdminPreviewBadge{padding:10px 12px;font-size:12px}.ca-policy-copy ul,.ca-policy-copy ol{padding-left:20px;font-size:14px}.ca-policy-table th,.ca-policy-table td{padding:9px 11px}}
+@media(max-width:360px){#caPagination{gap:6px!important}#caPagination button,#caPagination a{min-width:40px;padding:9px 10px;font-size:13px}.ca-link-notice{padding:14px}#caAdminPreviewBadge{padding:10px 12px;font-size:12px}.ca-policy-copy ul,.ca-policy-copy ol{padding-left:20px;font-size:14px}.ca-policy-table th,.ca-policy-table td{padding:9px 11px}}
 
 /* Account phone verification keeps provider availability and status readable. */
 .ca-phone-verification{max-width:100%;min-width:0;margin:22px 0;padding:20px;border:1px solid #365b73;border-radius:15px;background:#10263a;color:#dfedf7;overflow-wrap:anywhere}
@@ -1090,6 +1090,10 @@ body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-marke
 }
 @media(max-width:360px){#allGrid,#vipGrid,#buyerFavoritesList{gap:8px!important}.ca-urgent-browse{padding:15px}.ca-urgent-choice{padding:10px;font-size:13px}}
 
+/* Crawlable listing titles keep the existing card appearance. */
+.ca-seo-listing-link{color:inherit;text-decoration:none}
+.ca-seo-listing-link:focus-visible{outline:2px solid #6ee7d8;outline-offset:3px;border-radius:3px}
+
 /* Compact equipment choices: four columns on every screen. */
 #caAdvanced #caEquipOptions[hidden]{display:none!important}
 .ca-seller-equip,#caAdvanced #caEquipOptions{
@@ -1112,3 +1116,5 @@ body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-marke
  .ca-seller-equip label,#caAdvanced #caEquipOptions label{flex-direction:column!important;justify-content:center!important;text-align:center;padding:4px 2px!important;gap:2px!important;font-size:11px!important;line-height:1.2!important}
  .ca-seller-equip input[type=checkbox],#caAdvanced #caEquipOptions input[type=checkbox]{width:12px!important;height:12px!important;flex-basis:12px!important}
 }
+
+#caPagination a{text-decoration:none;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}

@@ -80,7 +80,7 @@ class ListingNavigationBrowserTests(unittest.TestCase):
         self.page.wait_for_function('caBrowseState.loaded&&!caBrowseState.loading')
 
     def page_number(self,n):
-        return self.page.locator(f'#caPagination button[data-page="{n}"]')
+        return self.page.locator(f'#caPagination [data-page="{n}"]')
 
     def wait_page(self,n):
         self.page.wait_for_function('n=>!caBrowseState.loading&&caBrowseState.page===n',arg=n)

@@ -5,6 +5,12 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## SEO hazırlığı — 19 noyabr 2026
+
+Açıq səhifələr üçün ayrıca axtarış başlıqları, təsvirlər, paylaşım metadata-sı, canonical qaydaları, AzAvto `WebSite`/`Organization` məlumatı və beş səhifəlik `sitemap.xml` hazırlanıb. Parol bərpası `noindex, nofollow` saxlayır. SEO ünvanlarının əsas mənbəyi `seo.config.json`-dur; `node tools/generate-seo.cjs` nəticələri yaradır, `--check` isə dəyişiklik yazmadan uyğunluğu yoxlayır.
+
+Search Console sahiblik təsdiqi üçün istifadəçinin açıq Google tokeni gözlənilir. Hazırkı GitHub Pages layihə yolunda `robots.txt` və Google sayt adı məhdudiyyətləri, təsdiq addımları və gələcək şəxsi domenə keçid [SEO_SETUP.md](SEO_SETUP.md) sənədindədir. Bu hazırlıq indekslənmə və nəticə sırası zəmanəti vermir.
+
 ## Saytın adı — 19 noyabr 2026
 
 Saytın yeni brendi **AzAvto**-dur. Loqo, səhifə başlıqları, alt yazılar, giriş/bərpa ekranları, paylaşım mətni və yeni şəkillərin su nişanı uyğunlaşdırılıb. Şüar: **Xəyal etdiyin avtomobili kəşf et**.
