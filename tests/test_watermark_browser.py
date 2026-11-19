@@ -188,7 +188,7 @@ class WatermarkBrowserTests(unittest.TestCase):
             mark = card.locator('.ca-photo-watermark')
             self.assertEqual(mark.count(), 1)
             self.assertTrue(mark.is_visible())
-            self.assertEqual(mark.inner_text(), 'CƏNUB AVTO')
+            self.assertEqual(mark.inner_text(), 'AZAVTO')
         stamped = self.card('Stamped')
         self.assertEqual(stamped.locator('.car-cover img').get_attribute('src'), STAMPED)
         self.assertEqual(stamped.locator('.ca-photo-watermark').count(), 0)

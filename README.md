@@ -1,9 +1,15 @@
-# Cənub Avto
+# AzAvto
 
 Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və JavaScript GitHub Pages-də yerləşir; hesablar, elanlar və şəkil saxlancı Supabase ilə işləyir.
 
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
+
+## Saytın adı — 19 noyabr 2026
+
+Saytın yeni brendi **AzAvto**-dur. Loqo, səhifə başlıqları, alt yazılar, giriş/bərpa ekranları, paylaşım mətni və yeni şəkillərin su nişanı uyğunlaşdırılıb. Şüar: **Xəyal etdiyin avtomobili kəşf et**.
+
+Yoxlamalar və texniki uyğunluq: [AZAVTO_BRANDING_VERIFICATION.md](AZAVTO_BRANDING_VERIFICATION.md).
 
 ## Cari paketlər — 19 noyabr 2026
 
