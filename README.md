@@ -19,9 +19,9 @@ AvtoUnvan üçün cari yoxlama: [AVTOUNVAN_BRANDING_VERIFICATION.md](AVTOUNVAN_B
 
 ## Dəstək və admin Gmaili — 19 noyabr 2026
 
-Cari dəstək ünvanı **avtounvan@gmail.com**-dur. Admin girişinin bu ünvana keçirilməsi üçün qorunan əməliyyat hazırlanıb: hazırkı admin sayta daxil olub **Admin Gmailini dəyiş** düyməsinə basır. Əməliyyat mövcud hesabın yalnız e-poçtunu yeniləyir; UUID, parol, profil, elanlar və admin üzvlüyü saxlanılır. Yeni ünvanın real Auth-da tətbiqi ayrıca yoxlanılmalıdır. Texniki axın: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
+Cari dəstək və admin giriş ünvanı **avtounvan@gmail.com**-dur. İstifadəçi qorunan əməliyyatı tamamlayıb; yeni ünvan, Auth e-poçt identikliyi, eyni UUID/profil və admin üzvlüyü canlı bazadan təsdiqlənib. Əməliyyat yalnız e-poçtu yeniləyib; parol və elan əlaqələri saxlanılıb. Texniki axın: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
 
-Bərpa məktubunun istənilən göndərəni **AvtoUnvan <avtounvan@gmail.com>**-dur. İstifadəçi yeni Gmail üçün tətbiq parolunu yaratdığını və SMTP sahələrini paneldə saxladığını bildirib. Məktubun faktiki göndərəni HTML-dən deyil, Supabase SMTP ayarından gəlir; tətbiq parolu yalnız həmin məxfi ayara daxil edilməlidir. Yeni göndərənin real məktubda görünməsi hələ ayrıca təsdiqlənməyib. Hazır sahələr və yoxlama: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
+Bərpa məktubunun istənilən göndərəni **AvtoUnvan <avtounvan@gmail.com>**-dur. İstifadəçi yeni Gmail üçün tətbiq parolunu yaratdığını və SMTP sahələrini paneldə saxladığını bildirib. Məktubun faktiki göndərəni HTML-dən deyil, Supabase SMTP ayarından gəlir; tətbiq parolu yalnız həmin məxfi ayara daxil edilməlidir. İstifadəçi öz bərpa sınağında yeni göndərən ünvanını və məktubun çatmasını təsdiqləyib. Hazır sahələr və yoxlama: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Cari paketlər — 19 noyabr 2026
 
@@ -87,7 +87,7 @@ Elanlardan sonra ayrıca məlumat menyusu göstərilir. [Dəstək xidməti](http
 
 ## Əvvəlki dəstək və footer düzəlişi
 
-«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və əvvəlki dəstək ünvanı əlavə olunmuşdu. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Cari dəstək və təsdiqlənmiş Gmail SMTP göndərən ünvanı `azavto44@gmail.com`-dur. Cari ayarlar və çatdırılma yoxlaması: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
+«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və əvvəlki dəstək ünvanı əlavə olunmuşdu. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Cari dəstək və seçilmiş SMTP göndərən ünvanı `avtounvan@gmail.com`-dur; istifadəçi yeni SMTP ayarlarını paneldə saxladığını bildirib. Cari ayarlar və real çatdırılma yoxlamasının vəziyyəti: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Əvvəlki VIP bildirişi düzəlişi
 

@@ -56,7 +56,7 @@ test('OPTIONS, unsupported methods, untrusted origins and absent bearer perform 
  assert.equal(preflight.headers.get('access-control-allow-origin'),ORIGIN);assert.equal(preflight.headers.get('access-control-allow-methods'),'POST,OPTIONS');
 });
 test('caller-supplied IDs, addresses, attributes, malformed JSON and oversized input are rejected before Auth',async()=>{
- const cases=[{body:JSON.stringify({user_id:OTHER})},{body:JSON.stringify({email:TARGET})},{body:JSON.stringify({password:'fixture-password'})},{body:JSON.stringify({app_metadata:{admin:true}})},{body:'[]'},{body:'null'},{body:'true'},{body:'{'},{body:''},{body:' '.repeat(257)},{headers:{'Content-Length':'257'}},{headers:{'Content-Type':'text/plain'}},{query:'?user_id='+OTHER}];
+ const cases=[{body:JSON.stringify({user_id:OTHER})},{body:JSON.stringify({email:TARGET})},{body:JSON.stringify({user_metadata:{email:TARGET}})},{body:JSON.stringify({password:'fixture-password'})},{body:JSON.stringify({app_metadata:{admin:true}})},{body:'[]'},{body:'null'},{body:'true'},{body:'{'},{body:''},{body:' '.repeat(257)},{headers:{'Content-Length':'257'}},{headers:{'Content-Type':'text/plain'}},{query:'?user_id='+OTHER}];
  for(const request of cases){const f=await fixture();const result=await f.invoke(request);assert.equal(result.status,400);assert.deepEqual(f.calls,[]);assert.deepEqual(f.envReads,[]);noSecrets(result);}
 });
 test('missing server URL or anon configuration fails without any Auth or Admin call',async()=>{
@@ -102,13 +102,45 @@ test('authenticated administrator already at the address succeeds without any Ad
  const ordinary=await fixture({user:{id:USER,email:TARGET},admin:false});assert.equal((await ordinary.invoke()).status,403);assert.equal(writes(ordinary.calls).length,0);
 });
 test('an administrator using the former fixed address migrates to the current brand address without changing other attributes',async()=>{
- const f=await fixture({user:{id:USER,email:'azavto44@gmail.com',user_metadata:{role:'admin',id:OTHER},app_metadata:{provider:'email'}}});
+ const f=await fixture({user:{id:USER,email:'former-admin@example.invalid',user_metadata:{role:'admin',id:OTHER},app_metadata:{provider:'email'}}});
  const result=await f.invoke();
  assert.equal(result.status,200);assert.deepEqual(result.data,{status:'updated',user_id:USER,email:TARGET});
  assert.equal(writes(f.calls).length,1);assert.equal(writes(f.calls)[0].url,BASE+'/auth/v1/admin/users/'+USER);
  assert.deepEqual(JSON.parse(writes(f.calls)[0].body),{email:'avtounvan@gmail.com'});
- assert.equal(f.state.user.email,'azavto44@gmail.com','The injected Auth fixture is never mutated by the handler');
+ assert.equal(f.state.user.email,'former-admin@example.invalid','The injected Auth fixture is never mutated by the handler');
  noSecrets(result);
+});
+test('stale metadata email is patched alone and a repeated clean request performs no additional Admin write',async()=>{
+ const metadata={email:'former-admin@example.invalid',telefon:'+994000000000',preferences:{theme:'dark'},fixture:'preserve'};
+ const user={id:USER,email:TARGET,user_metadata:metadata,app_metadata:{provider:'email',role:'preserve'},password:'fixture-unchanged-password'};
+ const updated={...user,user_metadata:{...metadata,email:TARGET}};
+ const f=await fixture({user,updated});const original=structuredClone(user);
+ const result=await f.invoke();
+ assert.equal(result.status,200);assert.deepEqual(result.data,{status:'updated',user_id:USER,email:TARGET,metadata_email_synced:true});
+ assert.deepEqual(JSON.parse(writes(f.calls)[0].body),{user_metadata:{email:TARGET}});
+ assert.equal(writes(f.calls)[0].url,BASE+'/auth/v1/admin/users/'+USER);
+ assert.deepEqual(user,original,'No unrelated fixture metadata, app metadata or password is changed or sent');
+ f.state.user=updated;
+ const again=await f.invoke();
+ assert.equal(again.status,200);assert.deepEqual(again.data,{status:'already_current',user_id:USER,email:TARGET,metadata_email_synced:true});
+ assert.equal(writes(f.calls).length,1);assert.equal(f.envReads.filter(name=>name==='SUPABASE_SERVICE_ROLE_KEY').length,1);
+ noSecrets(result);noSecrets(again);
+});
+test('an absent or non-string metadata email is never created or rewritten',async()=>{
+ for(const metadata of [undefined,null,{},[],{fixture:'preserve'},{email:null},{email:123},{email:{fixture:'preserve'}}]){
+  const user={id:USER,email:TARGET,...(metadata===undefined?{}:{user_metadata:metadata})};
+  const original=structuredClone(user),f=await fixture({user});const result=await f.invoke();
+  assert.equal(result.status,200);assert.deepEqual(result.data,{status:'already_current',user_id:USER,email:TARGET});
+  assert.equal(writes(f.calls).length,0);assert.equal(f.envReads.includes('SUPABASE_SERVICE_ROLE_KEY'),false);assert.deepEqual(user,original);
+ }
+});
+test('an unverified metadata repair response never claims success',async()=>{
+ const user={id:USER,email:TARGET,user_metadata:{email:'former-admin@example.invalid',fixture:'preserve'}};
+ for(const metadata of [undefined,null,{},[],{email:'former-admin@example.invalid'},{email:null},{email:123}]){
+  const f=await fixture({user,updated:{id:USER,email:TARGET,...(metadata===undefined?{}:{user_metadata:metadata})}});
+  const result=await f.invoke();assert.equal(result.status,503);assert.equal(result.data.status,undefined);assert.equal(result.data.metadata_email_synced,undefined);
+  assert.deepEqual(JSON.parse(writes(f.calls)[0].body),{user_metadata:{email:TARGET}});noSecrets(result);
+ }
 });
 test('missing privileged credentials fail after authorization without issuing a write',async()=>{
  const f=await fixture({env:{SUPABASE_SERVICE_ROLE_KEY:''}});const result=await f.invoke();assert.equal(result.status,503);assert.equal(f.calls.length,2);assert.equal(writes(f.calls).length,0);noSecrets(result);

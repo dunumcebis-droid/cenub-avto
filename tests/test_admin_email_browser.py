@@ -194,6 +194,71 @@ class AdminEmailBrowserTests(unittest.TestCase):
         self.assertEqual(self.page.evaluate('currentUser.email'), EMAIL)
         self.assert_no_auth_mutation()
 
+    def test_verified_metadata_sync_updates_only_email_after_explicit_server_confirmation(self):
+        for status in ('updated', 'already_current'):
+            with self.subTest(status=status):
+                self.go()
+                session = fixture_session()
+                session['user']['email'] = EMAIL
+                session['user']['user_metadata'].update(
+                    email='former-admin@example.invalid', preferences={'theme': 'preserve'})
+                self.page.evaluate('''async session=>{
+                    await caPersistSession(session);await caAdminOpen();
+                    currentUser.user_metadata=structuredClone(session.user.user_metadata);
+                    document.getElementById('authPassword').value='Synthetic-unchanged-password';
+                }''', session)
+                original = self.saved_session()
+                self.backend.email_result = {
+                    'status': status, 'user_id': OWNER, 'email': EMAIL,
+                    'metadata_email_synced': True,
+                }
+                self.backend.delay_email = True
+                self.page.locator('#caAdminEmailButton').click()
+                self.wait_for_pending()
+                self.assertEqual(self.saved_session(), original)
+                self.assertEqual(self.page.evaluate('currentUser.user_metadata.email'),
+                                 'former-admin@example.invalid')
+                self.assertNotIn('✓', self.page.locator('#caAdminEmailButton').inner_text())
+                self.release_pending()
+                expected = copy.deepcopy(original)
+                expected['user']['user_metadata']['email'] = EMAIL
+                self.assertEqual(self.saved_session(), expected)
+                self.assertEqual(self.page.evaluate('caSession'), expected)
+                self.assertEqual(self.page.evaluate('currentUser.user_metadata'),
+                                 expected['user']['user_metadata'])
+                self.assertEqual(self.page.evaluate('currentUser.id'), OWNER)
+                self.assertEqual(self.page.evaluate('currentUser.email'), EMAIL)
+                self.assertEqual(self.page.locator('#authPassword').input_value(),
+                                 'Synthetic-unchanged-password')
+                self.assertTrue(self.page.locator('#caAdminEmailButton').is_disabled())
+                self.backend.delay_email = False
+        self.assertEqual(len(self.backend.email_calls), 2)
+        self.assert_no_auth_mutation()
+
+    def test_malformed_metadata_sync_flag_never_changes_cache_or_claims_success(self):
+        for signal in ('true', 1, False, None):
+            with self.subTest(signal=signal):
+                self.go()
+                session = fixture_session()
+                session['user']['email'] = EMAIL
+                session['user']['user_metadata']['email'] = 'former-admin@example.invalid'
+                self.page.evaluate('''async session=>{
+                    await caPersistSession(session);await caAdminOpen();
+                }''', session)
+                original = self.saved_session()
+                self.backend.email_result = {
+                    'status': 'updated', 'user_id': OWNER, 'email': EMAIL,
+                    'metadata_email_synced': signal,
+                }
+                self.page.locator('#caAdminEmailButton').click()
+                self.page.wait_for_function(
+                    'document.getElementById("caAdminEmailStatus").textContent.includes("dəyişdirilmədi")')
+                self.assertEqual(self.saved_session(), original)
+                self.assertTrue(self.page.locator('#caAdminEmailButton').is_enabled())
+                self.assertNotIn('✓', self.page.locator('#caAdminEmailButton').inner_text())
+        self.assertEqual(len(self.backend.email_calls), 4)
+        self.assert_no_auth_mutation()
+
     def test_non_admin_cannot_show_or_invoke_email_action(self):
         self.go()
         self.page.evaluate('''async session=>{

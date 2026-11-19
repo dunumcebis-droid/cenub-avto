@@ -151,8 +151,14 @@ window.caAdminChangeEmail=async()=>{
   const result=await caRequest('/functions/v1/ca-admin-email-change','POST',{},token);
   if(!active())return false;
   if(!result||!['updated','already_current'].includes(result.status)||result.user_id!==expected||result.email!==adminEmail)throw Error('Gmailin dəyişməsi təsdiqlənmədi. Yenidən yoxla.');
+  if(Object.hasOwn(result,'metadata_email_synced')&&result.metadata_email_synced!==true)throw Error('Gmail məlumatlarının uyğunluğu təsdiqlənmədi. Yenidən yoxla.');
   emailDone=true;currentUser.email=adminEmail;
-  if(caSession?.user?.id===expected){caSession.user.email=adminEmail;try{localStorage.setItem(CA_SESSION_KEY,JSON.stringify(caSession));}catch(error){}}
+  if(result.metadata_email_synced===true&&currentUser.user_metadata&&typeof currentUser.user_metadata==='object'&&!Array.isArray(currentUser.user_metadata))currentUser.user_metadata={...currentUser.user_metadata,email:adminEmail};
+  if(caSession?.user?.id===expected){
+   caSession.user.email=adminEmail;
+   if(result.metadata_email_synced===true){const metadata=caSession.user.user_metadata;caSession.user.user_metadata={...(metadata&&typeof metadata==='object'&&!Array.isArray(metadata)?metadata:{}),email:adminEmail};}
+   try{localStorage.setItem(CA_SESSION_KEY,JSON.stringify(caSession));}catch(error){}
+  }
   button.textContent='✓ Gmail yeniləndi';message.textContent='Admin girişin: '+adminEmail+'. Əvvəlki parolunla daxil ola bilərsən.';return true;
  }catch(error){if(active())message.textContent='Gmail dəyişdirilmədi: '+error.message;return false;}
  finally{if(active()){emailBusy=false;button.disabled=emailDone;}}

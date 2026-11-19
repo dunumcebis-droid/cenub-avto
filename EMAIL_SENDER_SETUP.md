@@ -1,16 +1,16 @@
 # Bərpa məktubunun göndərən ünvanı
 
-İstənilən göndərən: **AvtoUnvan <avtounvan@gmail.com>**. Saytdakı dəstək ünvanı da budur. **Cari vəziyyət:** istifadəçi bu Gmail üçün tətbiq parolunu yaratdığını və yeni SMTP sahələrini Supabase panelində saxladığını bildirib. Yeni göndərənin real bərpa məktubunda görünməsi hələ ayrıca təsdiqlənməyib. HTML-də e-poçtu dəyişmək Supabase Auth-un `From` sahəsini dəyişmir.
+Cari göndərən: **AvtoUnvan <avtounvan@gmail.com>**. Saytdakı dəstək ünvanı da budur. **Cari vəziyyət:** istifadəçi bu Gmail üçün tətbiq parolunu yaratdığını və yeni SMTP sahələrini Supabase panelində saxladığını bildirib. İstifadəçi öz bərpa sınağında məktubun gəldiyini və göndərənin **AvtoUnvan <avtounvan@gmail.com>** olduğunu təsdiqləyib. HTML-də e-poçtu dəyişmək Supabase Auth-un `From` sahəsini dəyişmir.
 
 Hazırkı işlək parol bərpası kodu saxlanılıb. İstifadəçilərin giriş ünvanları və bərpa məktubunun alıcısı dəstək/göndərən ünvanından ayrıdır. Adminin öz giriş ünvanı ayrıca qorunan əməliyyatla yenilənir; [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
 
-## Yeni Gmail üçün hazır SMTP sahələri
+## İstifadəçinin saxladığı SMTP sahələri
 
 [Supabase SMTP ayarları](https://supabase.com/dashboard/project/iqdtehqxusfiwokrzceo/auth/smtp):
 
-| Sahə | İstənilən dəyər |
+| Sahə | Dəyər |
 | --- | --- |
-| Custom SMTP | Bütün sahələr hazır olanda aktiv |
+| Custom SMTP | Aktiv |
 | Sender email | `avtounvan@gmail.com` |
 | Sender name | `AvtoUnvan` |
 | Host | `smtp.gmail.com` |
@@ -28,6 +28,6 @@ Sayt hələ **https://dunumcebis-droid.github.io/cenub-avto/** ünvanındadır. 
 
 ## Tamamlanmanı yoxlamaq
 
-Ayarlar saxlandıqdan sonra istifadəçi öz hesabı üçün bir bərpa məktubu istəyə bilər. `From` sahəsi **AvtoUnvan <avtounvan@gmail.com>** olmalı, keçid **Yeni parol yarat** ekranını açmalıdır. Məxfi keçid və parol paylaşılmır. Yeni göndərənin çatdırılması real məktubla hələ yoxlanılmayıb; avtomatik sınaqlar məktub göndərişini imitasiya edir.
+Ayarlar saxlandıqdan sonra istifadəçi öz hesabı üçün bir bərpa məktubu istəyə bilər. `From` sahəsi **AvtoUnvan <avtounvan@gmail.com>** olmalı, keçid **Yeni parol yarat** ekranını açmalıdır. Məxfi keçid və parol paylaşılmır. Yeni göndərənin çatdırılması istifadəçinin öz istədiyi real bərpa məktubu ilə təsdiqlənib. Həmin yeni keçidin açılması və parolun həqiqətən dəyişdirilməsi bu cavabla təsdiqlənmir; ayrıca bərpa səhifəsinin əvvəlki funksional sınaqları və yeni görünüş yoxlamaları saxlanılıb. Avtomatik sınaqlar məktub göndərişini imitasiya edir, real məktub göndərmir.
 
 Rəsmi mənbələr: [Supabase SMTP](https://supabase.com/docs/guides/auth/auth-smtp), [Google SMTP ilə Supabase](https://supabase.com/kb/troubleshooting/using-google-smtp-with-supabase-custom-smtp-ZZzU4Y), [Google App Password](https://support.google.com/accounts/answer/185833?hl=en).

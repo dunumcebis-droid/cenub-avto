@@ -1,4 +1,4 @@
-/** Changes only the authenticated administrator's own login to the approved address. */
+/** Syncs only the authenticated administrator's login and an existing metadata email. */
 const TARGET_EMAIL='avtounvan@gmail.com';
 const ALLOWED_ORIGIN='https://dunumcebis-droid.github.io';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -56,19 +56,27 @@ export function createHandler({env={},fetch:fetcher=globalThis.fetch}={}){
    const admin=await adminResponse.json();
    if(admin===false)return fail(403,'admin_required');
    if(admin!==true)return fail(503,'service_unavailable');
-   if(user.email.toLowerCase()===TARGET_EMAIL)return json({status:'already_current',user_id:user.id,email:TARGET_EMAIL},200,cors);
+   const metadata=user.user_metadata;
+   const hasMetadataEmail=metadata!==null&&typeof metadata==='object'&&!Array.isArray(metadata)&&Object.hasOwn(metadata,'email')&&typeof metadata.email==='string';
+   const emailNeedsSync=user.email.toLowerCase()!==TARGET_EMAIL;
+   const metadataNeedsSync=hasMetadataEmail&&metadata.email!==TARGET_EMAIL;
+   const success=(status,synced)=>json({status,user_id:user.id,email:TARGET_EMAIL,...(synced?{metadata_email_synced:true}:{})},200,cors);
+   if(!emailNeedsSync&&!metadataNeedsSync)return success('already_current',hasMetadataEmail);
    // Privileged credentials and the write are reachable only after both checks succeed.
    const service=configValue(env,'SUPABASE_SERVICE_ROLE_KEY');
    if(!service)return fail(503,'service_unavailable');
-   // Same endpoint and email-only payload used by auth.admin.updateUserById.
-   const updatedResponse=await fetcher(base+'/auth/v1/admin/users/'+user.id,{method:'PUT',headers:{'Authorization':'Bearer '+service,'apikey':service,'Content-Type':'application/json'},body:JSON.stringify({email:TARGET_EMAIL}),signal,redirect:'error'});
+   // Auth Admin merges only these metadata keys; never resend or replace the
+   // other metadata, password, roles or profile. An absent email is not added.
+   const updates={...(emailNeedsSync?{email:TARGET_EMAIL}:{}),...(metadataNeedsSync?{user_metadata:{email:TARGET_EMAIL}}:{})};
+   const updatedResponse=await fetcher(base+'/auth/v1/admin/users/'+user.id,{method:'PUT',headers:{'Authorization':'Bearer '+service,'apikey':service,'Content-Type':'application/json'},body:JSON.stringify(updates),signal,redirect:'error'});
    if(!updatedResponse.ok){
     let error;try{error=await updatedResponse.json();}catch{/* Never return upstream response text. */}
     return updatedResponse.status===409||error?.code==='email_exists'?fail(409,'email_unavailable'):fail(503,'service_unavailable');
    }
    const updated=await updatedResponse.json();
    if(updated?.id!==user.id||typeof updated.email!=='string'||updated.email.toLowerCase()!==TARGET_EMAIL)return fail(503,'service_unavailable');
-   return json({status:'updated',user_id:user.id,email:TARGET_EMAIL},200,cors);
+   if(hasMetadataEmail&&updated.user_metadata?.email!==TARGET_EMAIL)return fail(503,'service_unavailable');
+   return success('updated',hasMetadataEmail);
   }catch{return fail(503,'service_unavailable');}
  };
 }

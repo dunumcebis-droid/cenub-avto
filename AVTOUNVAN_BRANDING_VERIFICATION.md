@@ -8,18 +8,26 @@ Altı səhifənin başlığı, logo təsviri, alt yazısı, dəstək keçidləri
 
 ## Yerli yoxlama
 
-- **125 Node**, **5 statik SEO** sınağı keçir.
-- **9 SEO + 5 su nişanı + 13 admin Gmaili** imitasiya edilmiş brauzer sınağı keçir. Serverin 14 təhlükəsizlik ssenarisi ümumi Node sayına daxildir.
+- **128 Node**, **5 statik SEO** sınağı keçir.
+- **9 SEO + 5 su nişanı + 15 admin Gmaili** imitasiya edilmiş brauzer sınağı keçir. Serverin 17 təhlükəsizlik ssenarisi ümumi Node sayına daxildir.
 - Altı səhifə × 375/1440 px = **12 görünüş**: logo tamdır, fon uyğun gəlir, en daşması və başlıq düymələrinin örtüşməsi yoxdur. Paylaşım yeni brenddir; hazırlanmış JPEG yeni su nişanını daşıyır. Brauzer səhvi yoxdur.
 - Bütün avtomatik Auth/API/provayder cavabları imitasiya edilir. Real məktub, parol, elan, şəkil və ödəniş yaradılmır.
 - SEO generatorunun `--check` yoxlaması keçir. Search Console təsdiqi istifadəçinin qərarı ilə domen/hostinq qoşulandan sonraya saxlanılıb.
 
 ## Server və sahibin son addımları
 
-Qorunan `ca-admin-email-change` funksiya yeni hədəflə **v2 ACTIVE**, `verify_jwt=true` olaraq yayımlanıb. Çağıranın JWT-si, Auth istifadəçisi və admin RPC-si yoxlanmadan xidmət açarı oxunmur. Yazma yalnız mövcud adminin e-poçtunu yeniləyir; parol/rol/profil/UUID yazma atributu yoxdur. [Admin axını](ADMIN_EMAIL_CHANGE.md).
+Qorunan `ca-admin-email-change` funksiya yeni hədəflə **v3 ACTIVE**, `verify_jwt=true` olaraq yayımlanıb. Çağıranın JWT-si, Auth istifadəçisi və admin RPC-si yoxlanmadan xidmət açarı oxunmur. Yazma yalnız mövcud adminin giriş e-poçtunu və ya mövcud `user_metadata.email` sətrini eyni ünvana uyğunlaşdırır; parol/rol/profil/UUID və digər metadata üçün yazma atributu yoxdur. Təkrar təmiz əməliyyat yazma etmir. Serverin təsdiq siqnalı ilə brauzer sessiyasındakı e-poçt sahəsi də uyğunlaşdırılır. [Admin axını](ADMIN_EMAIL_CHANGE.md).
 
-Hazırkı admin `?admin-email=1` keçidində **Admin Gmailini dəyiş** düyməsini basmalıdır. Yeni ünvanla real Auth hesabı dəyişikliyi hələ tətbiq edilməyib.
+İstifadəçi qorunan düymə ilə dəyişikliyi tamamlayıb. Yeni ünvan və e-poçt identikliyi, eyni UUID/profil və admin üzvlüyü, təsdiqlənmiş e-poçt canlı bazadan yoxlanılıb. Əvvəlki giriş ünvanına aid hesab sayı sıfırdır. Parol atributu yazılmayıb.
 
-İstifadəçi yeni Gmaildə **AvtoUnvan** tətbiq parolunu yaratdığını və SMTP sahələrini Supabase-də saxladığını təsdiqləyib. Tətbiq parolu söhbətə/koda alınmayıb. Yeni göndərəndən real məktubun çatması hələ yoxlanılmayıb. [SMTP ayarları](EMAIL_SENDER_SETUP.md).
+İstifadəçi yeni Gmaildə **AvtoUnvan** tətbiq parolunu yaratdığını və SMTP sahələrini Supabase-də saxladığını təsdiqləyib. Tətbiq parolu söhbətə/koda alınmayıb. İstifadəçi öz bərpa sınağında məktubun çatmasını və yeni göndərən ünvanını təsdiqləyib. [SMTP ayarları](EMAIL_SENDER_SETUP.md).
 
-Frontend-in canlı yayımı və real Gmail/admin nəticələri ayrıca yoxlanılacaq; bu sənəd onları əvvəlcədən tamamlanmış saymır.
+## Canlı yoxlama
+
+Frontend **bd97fe8** ilə yayımlanıb; GitHub Pages **44616633345** uğurludur. Yayımlanmış fayllarla **27 brauzer sınağı** (9 SEO, 13 admin, 5 su nişanı) keçir. Əlavə müstəqil canlı görünüş yoxlamasında altı səhifənin **12 görünüşü**, **29 statik faylın bayt uyğunluğu** təsdiqlənib. Real Auth/API/provayder cavabları bu sınaqlarda imitasiya olunub; şəbəkəyə yalnız açıq statik GET sorğuları gedib.
+
+Ayrı anonim, yalnız oxuma yoxlamasında faktiki açıq elan, dinamik Car/Offer metadata-sı və pəncərə bağlananda əsas səhifənin bərpası keçir. 320/375/768/1440 px enlərdə iki sütun saxlanılır, səhifə və HTTP xətası yoxdur. İki real siyahı-oxuma RPC-si icra olunub; analitika yazması imitasiya olunub. Real məktub və məlumat yazması yoxdur.
+
+Server v2 üçün girişsiz preflight **204**, tokensiz/yanlış tokenli POST sorğuları **401** qaytarır. Adminin real e-poçt dəyişikliyini isə avtomatik sınaq yox, istifadəçinin öz qorunan klik əməliyyatı icra edib.
+
+Yeni SMTP sahələrinin saxlanması istifadəçi tərəfindən təsdiqlənib. İstifadəçi öz bərpa sınağında yeni göndərənin real məktubda görünməsini təsdiqləyib. Avtomatik sınaqlar real məktub göndərməyib; həmin məktubdakı yeni keçidin açılması/parol dəyişikliyi ayrıca təsdiqlənməyib.
