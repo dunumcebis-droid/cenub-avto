@@ -4,9 +4,11 @@
 
 ## Mövcud admin hesabının yenilənməsi
 
-Sayta hazırkı admin hesabı ilə daxil olub `?admin-email=1` keçidini açın və **Admin Gmailini dəyiş** düyməsinə basın. Keçid yalnız giriş pəncərəsini və ya yoxlanmış admin bölməsini açır; öz-özünə hesabı dəyişmir. Uğurlu nəticə yeni giriş ünvanını göstərir. Mövcud parol istifadə olunur.
+**19 noyabr 2026 vəziyyəti:** mövcud admin hesabının giriş ünvanı `azavto44@gmail.com` olaraq bazadan təsdiqlənib; istifadəçi yeni ünvanla daxil olduğunu təsdiqləyib. Hesabın UUID-si, profili və admin üzvlüyü saxlanılıb. Parol dəyişdirilməyib.
 
-Hesab dəyişikliyi istifadəçinin açıq admin sessiyasını tələb edir. Qoşulmuş MCP alətlərində Auth Admin istifadəçi-yeniləmə əməliyyatı yoxdur. İdarə olunan `auth.users` və `auth.identities` cədvəllərinə birbaşa dəyişiklik edilməyib. Faktiki e-poçt yenilənməsi yalnız istifadəçinin düyməyə basmasından sonra standart Auth Admin API-si ilə edilir; hazırlanma və sınaqlar bu addımı tamamlanmış kimi göstərmir.
+Köməkçi axın üçün sayta hazırkı admin hesabı ilə daxil olub `?admin-email=1` keçidini açın və **Admin Gmailini dəyiş** düyməsinə basın. Keçid yalnız giriş pəncərəsini və ya yoxlanmış admin bölməsini açır; öz-özünə hesabı dəyişmir. Uğurlu nəticə giriş ünvanını göstərir. Mövcud parol istifadə olunur.
+
+Hesab dəyişikliyi istifadəçinin açıq admin sessiyasını tələb edir. Qoşulmuş MCP alətlərində Auth Admin istifadəçi-yeniləmə əməliyyatı yoxdur. İdarə olunan `auth.users` və `auth.identities` cədvəllərinə birbaşa dəyişiklik edilməyib. Köməkçi funksiya e-poçtu yalnız istifadəçinin düyməyə basmasından sonra standart Auth Admin API-si ilə yeniləyir.
 
 Server: `supabase/functions/ca-admin-email-change/{index.ts,handler.mjs}`. Funksiya `verify_jwt: true` ilə yayımlanıb. POST yalnız boş JSON obyektini qəbul edir:
 
@@ -20,6 +22,7 @@ UUID, profil/elan əlaqələri və admin üzvlüyü dəyişdirilmir; parol atrib
 
 ## Yoxlama
 
+- Canlı bazadan yeni admin ünvanı, eyni hesab UUID-si, profil və admin üzvlüyü təsdiqlənib; istifadəçi yeni ünvanla girişini təsdiqləyib. Hesab identifikatoru və məxfi sessiya məlumatları sənəddə saxlanılmır.
 - 124 Node yoxlaması keçib: əvvəlki 111 və 13 yeni server təhlükəsizlik ssenarisi. Auth və admin yoxlamaları bitmədən xidmət açarının oxunmadığı və yazmanın başlamadığı ayrıca yoxlanıb.
 - 40 brauzer sınağı keçib: 13 yeni admin Gmaili və 27 mövcud giriş/admin pəncərəsi ssenarisi.
 - Altı səhifə və qaydalar pəncərəsində 5 e-poçt keçidi yeni ünvandır; 5 telefon keçidi saxlanılıb.

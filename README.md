@@ -13,7 +13,9 @@ Yoxlamalar və texniki uyğunluq: [AZAVTO_BRANDING_VERIFICATION.md](AZAVTO_BRAND
 
 ## Dəstək və admin Gmaili — 19 noyabr 2026
 
-Cari dəstək ünvanı **azavto44@gmail.com**-dur. Mövcud admin hesabı öz açıq sessiyasından [admin Gmaili bölməsini](https://dunumcebis-droid.github.io/cenub-avto/?admin-email=1) açıb eyni ünvana keçə bilər. Düymə hesabın ID-sini, parolunu, elanlarını və admin üzvlüyünü saxlayır. Texniki axın və yoxlamalar: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
+Cari dəstək və admin giriş ünvanı **azavto44@gmail.com**-dur. Admin ünvanı bazadan, yeni ünvanla giriş isə istifadəçi tərəfindən təsdiqlənib; hesabın UUID-si, profili və admin üzvlüyü saxlanılıb, parol dəyişdirilməyib. Texniki axın və yoxlamalar: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
+
+Gmail SMTP ayarları da tamamlanıb: istifadəçi real bərpa məktubunun çatmasını və göndərənin **AzAvto <azavto44@gmail.com>** görünməsini təsdiqləyib. SMTP tətbiq parolu yalnız Supabase-in məxfi ayarında saxlanılıb. Bu yoxlamada yeni məktubdakı keçidin açılması və parol dəyişikliyi təkrar sınanmayıb. Əhatə: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Cari paketlər — 19 noyabr 2026
 
@@ -79,7 +81,7 @@ Elanlardan sonra ayrıca məlumat menyusu göstərilir. [Dəstək xidməti](http
 
 ## Əvvəlki dəstək və footer düzəlişi
 
-«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və əvvəlki dəstək ünvanı əlavə olunmuşdu. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Cari dəstək ünvanı `azavto44@gmail.com`-dur. Parol bərpasının Gmail SMTP göndərənini bu ünvana keçirmək hələ gözlənilir; konfiqurasiya və çatdırılma yoxlanmadan keçid tamamlanmış sayılmır. Quraşdırma bələdçisi: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
+«Dəstək xidməti ilə əlaqə» bölməsinə `0709091997` və əvvəlki dəstək ünvanı əlavə olunmuşdu. Footer və admin/alət düymələri telefonda bir-birini örtmür. 58 Node, 35 mövcud brauzer sınağı və 21 görünüş yoxlaması keçib. Sübutlar: [SUPPORT_FOOTER_VERIFICATION.md](SUPPORT_FOOTER_VERIFICATION.md). Cari dəstək və təsdiqlənmiş Gmail SMTP göndərən ünvanı `azavto44@gmail.com`-dur. Cari ayarlar və çatdırılma yoxlaması: [EMAIL_SENDER_SETUP.md](EMAIL_SENDER_SETUP.md).
 
 ## Əvvəlki VIP bildirişi düzəlişi
 
