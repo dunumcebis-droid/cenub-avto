@@ -1,0 +1,27 @@
+# Dəstək və admin Gmaili — 19 noyabr 2026
+
+İstifadəçinin seçdiyi ünvan: **azavto44@gmail.com**. Dəstək səhifəsi, qaydalar, məxfilik səhifəsi və qaydalar pəncərəsinin bütün e-poçt keçidləri bu ünvandır. Dəstək telefonu `0709091997`-dir.
+
+## Mövcud admin hesabının yenilənməsi
+
+Sayta hazırkı admin hesabı ilə daxil olub `?admin-email=1` keçidini açın və **Admin Gmailini dəyiş** düyməsinə basın. Keçid yalnız giriş pəncərəsini və ya yoxlanmış admin bölməsini açır; öz-özünə hesabı dəyişmir. Uğurlu nəticə yeni giriş ünvanını göstərir. Mövcud parol istifadə olunur.
+
+Hesab dəyişikliyi istifadəçinin açıq admin sessiyasını tələb edir. Qoşulmuş MCP alətlərində Auth Admin istifadəçi-yeniləmə əməliyyatı yoxdur. İdarə olunan `auth.users` və `auth.identities` cədvəllərinə birbaşa dəyişiklik edilməyib. Faktiki e-poçt yenilənməsi yalnız istifadəçinin düyməyə basmasından sonra standart Auth Admin API-si ilə edilir; hazırlanma və sınaqlar bu addımı tamamlanmış kimi göstərmir.
+
+Server: `supabase/functions/ca-admin-email-change/{index.ts,handler.mjs}`. Funksiya `verify_jwt: true` ilə yayımlanıb. POST yalnız boş JSON obyektini qəbul edir:
+
+1. Bearer tokeni Auth `/user` vasitəsilə yoxlanır və istifadəçi ID-si oradan alınır.
+2. Eyni istifadəçinin tokeni ilə `cenub_admin_yoxla` nəticəsi tam `true` olmalıdır.
+3. Yalnız bundan sonra serverin məxfi xidmət açarı oxunur və standart `PUT /auth/v1/admin/users/{id}` əməliyyatına yalnız `{email:'azavto44@gmail.com'}` göndərilir.
+
+İstifadəçi başqa hesab ID-si, ünvan, parol və ya metadata ötürə bilməz. Artıq bu ünvandan istifadə edən admin üçün əməliyyat yenidən hesabı yazmadan uğur qaytarır. Xidmət açarı, tokenlər və provayderin daxili xətaları cavaba daxil edilmir. Anonim/yanlış token, qeyri-admin, başqa origin, yanlış üsul və həddən artıq və ya əlavə sahəli sorğu rədd edilir. Gözləmə müddəti məhduddur.
+
+UUID, profil/elan əlaqələri və admin üzvlüyü dəyişdirilmir; parol atributu API sorğusunda yoxdur. Brauzer yalnız gözlənilən hesab ID-si, ünvan və status qayıtdıqda uğur göstərir; gecikmiş başqa sessiya cavabları istifadə edilmir. Şəbəkə xətası təkrar sınana bilər. SMTP göndərən hesabı bu dəstək/admin giriş dəyişikliyindən ayrı konfiqurasiyadır.
+
+## Yoxlama
+
+- 124 Node yoxlaması keçib: əvvəlki 111 və 13 yeni server təhlükəsizlik ssenarisi. Auth və admin yoxlamaları bitmədən xidmət açarının oxunmadığı və yazmanın başlamadığı ayrıca yoxlanıb.
+- 40 brauzer sınağı keçib: 13 yeni admin Gmaili və 27 mövcud giriş/admin pəncərəsi ssenarisi.
+- Altı səhifə və qaydalar pəncərəsində 5 e-poçt keçidi yeni ünvandır; 5 telefon keçidi saxlanılıb.
+- Canlı Edge Function üçün girişsiz preflight `204`, tokensiz və yanlış tokenli POST sorğuları `401` qaytarıb. Bu yoxlamalarda hesab yenilənməsi yoxdur.
+- Avtomatik brauzer sınaqlarında bütün şəbəkə cavabları imitasiya edilir; real məktub, parol dəyişikliyi, elan və ödəniş yaradılmır.

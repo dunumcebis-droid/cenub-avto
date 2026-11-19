@@ -2,11 +2,14 @@
 const el=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let owner=null,authorized=false,verifySequence=0,busy=false,sessionEpoch=0;
+const adminEmail='azavto44@gmail.com';
+let emailBusy=false,emailDone=false,emailFocusPending=new URLSearchParams(location.search).get('admin-email')==='1';
 let previewSequence=0,previewActive=false,previewSource=null;
 const state=()=>({page:1,total:0,pages:0,rows:[],status:'all',query:'',sequence:0,loading:false,loaded:false,linked:null});
 let ads=state(),payments=state();
 function reset(){closePreview();sessionEpoch++;verifySequence++;owner=currentUser?.id||null;authorized=false;busy=false;ads.sequence++;payments.sequence++;ads=state();payments=state();el('caAdminLaunch').style.display='none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display='none';el('caAdminPanel').style.display='none';for(const id of ['caAdminList','caPayList','caAdminMsg','caPayMsg','caAdminPager','caPayPager'])el(id).replaceChildren();if(el('caPayLinkedNotice')){el('caPayLinkedNotice').replaceChildren();el('caPayLinkedNotice').hidden=true;}el('caAdminSearch').value='';el('caPaySearch').value='';el('caPayFilter').value='all';el('caAdminActionMsg').textContent='';}
-window.caAdminSessionChanged=()=>{if(owner!==(currentUser?.id||null))reset();};
+function resetEmail(){emailBusy=false;emailDone=false;if(el('caAdminEmailButton')){el('caAdminEmailButton').disabled=false;el('caAdminEmailButton').textContent='Admin Gmailini dəyiş';}if(el('caAdminEmailStatus'))el('caAdminEmailStatus').textContent='';}
+window.caAdminSessionChanged=()=>{if(owner!==(currentUser?.id||null)){reset();resetEmail();if(emailFocusPending&&owner)queueMicrotask(verify);}};
 async function rpc(name,body,expected=owner){
  const t=await caToken();
  if(!expected||currentUser?.id!==expected||owner!==expected||!t)throw Error('Hesab dəyişib və ya sessiya bitib. Yenidən daxil ol.');
@@ -15,7 +18,7 @@ async function rpc(name,body,expected=owner){
 async function verify(){
  window.caAdminSessionChanged();if(!owner)return false;
  const expected=owner,seq=++verifySequence;
- try{const ok=await rpc('cenub_admin_yoxla',{},expected);if(seq!==verifySequence||owner!==expected||currentUser?.id!==expected)return false;authorized=ok===true;el('caAdminLaunch').style.display=authorized?'block':'none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display=authorized?'block':'none';if(!authorized){closePreview();el('caAdminPanel').style.display='none';}return authorized;}
+ try{const ok=await rpc('cenub_admin_yoxla',{},expected);if(seq!==verifySequence||owner!==expected||currentUser?.id!==expected)return false;authorized=ok===true;el('caAdminLaunch').style.display=authorized?'block':'none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display=authorized?'block':'none';if(!authorized){closePreview();el('caAdminPanel').style.display='none';}else if(emailFocusPending){emailFocusPending=false;queueMicrotask(async()=>{await window.caAdminOpen();if(owner===expected&&currentUser?.id===expected&&authorized){el('caAdminEmailSection')?.scrollIntoView({block:'center'});el('caAdminEmailButton')?.focus({preventScroll:true});}});}return authorized;}
  catch(error){if(seq===verifySequence&&owner===expected){authorized=false;closePreview();el('caAdminLaunch').style.display='none';if(el('caBackupLaunch'))el('caBackupLaunch').style.display='none';el('caAdminPanel').style.display='none';}return false;}
 }
 // Preview records stay out of public listing collections and are discarded on close.
@@ -138,6 +141,22 @@ window.caAdminPage=delta=>ads.loading||ads.page+delta<1||ads.page+delta>ads.page
 window.caPayPage=delta=>payments.loading||payments.page+delta<1||payments.page+delta>payments.pages?false:load('payments',payments.page+delta);
 window.caAdminOpen=async()=>{if(!await verify())return alert('Admin girişi təsdiqlənmədi. Hesabına yenidən daxil ol.');el('caAdminPanel').style.display='block';await Promise.all([load('ads'),load('payments')]);};
 window.caAdminClose=()=>{closePreview();el('caAdminPanel').style.display='none';};
+window.caAdminChangeEmail=async()=>{
+ const button=el('caAdminEmailButton'),message=el('caAdminEmailStatus');
+ if(emailBusy||emailDone||!button||!message||!authorized||!owner||el('caAdminPanel').style.display==='none')return false;
+ const expected=owner,epoch=sessionEpoch;emailBusy=true;button.disabled=true;message.textContent='Gmail dəyişdirilir...';
+ const active=()=>owner===expected&&currentUser?.id===expected&&sessionEpoch===epoch;
+ try{
+  const token=await caToken();if(!active()||!token)throw Error('Sessiya bitib. Yenidən daxil ol.');
+  const result=await caRequest('/functions/v1/ca-admin-email-change','POST',{},token);
+  if(!active())return false;
+  if(!result||!['updated','already_current'].includes(result.status)||result.user_id!==expected||result.email!==adminEmail)throw Error('Gmailin dəyişməsi təsdiqlənmədi. Yenidən yoxla.');
+  emailDone=true;currentUser.email=adminEmail;
+  if(caSession?.user?.id===expected){caSession.user.email=adminEmail;try{localStorage.setItem(CA_SESSION_KEY,JSON.stringify(caSession));}catch(error){}}
+  button.textContent='✓ Gmail yeniləndi';message.textContent='Admin girişin: '+adminEmail+'. Əvvəlki parolunla daxil ola bilərsən.';return true;
+ }catch(error){if(active())message.textContent='Gmail dəyişdirilmədi: '+error.message;return false;}
+ finally{if(active()){emailBusy=false;button.disabled=emailDone;}}
+};
 async function refreshPublic(){const results=await Promise.allSettled([caFetchListings(1),...(currentUser?[caFetchMyListings(),caFetchFavoriteListings()]:[])]);return results.every(r=>r.status==='fulfilled'&&r.value!==false);}
 async function mutate(button,name,body,confirmation){
  if(busy||button.disabled||!authorized||!confirm(confirmation))return;
@@ -151,5 +170,5 @@ async function mutate(button,name,body,confirmation){
 }
 el('caAdminList').addEventListener('click',e=>{const preview=e.target.closest('button[data-preview-id]');if(preview){previewListing(preview);return;}const link=e.target.closest('button[data-package-request-id]');if(link){jumpToPackage(link);return;}const b=e.target.closest('button[data-id]');if(b)mutate(b,'ca_admin_status',{p_id:b.dataset.id,p_status:b.dataset.status},'Bu elanın vəziyyəti dəyişdirilsin?');});
 el('caPayList').addEventListener('click',e=>{const b=e.target.closest('button[data-pay-id]');if(!b)return;const approve=b.dataset.payAction==='approve';mutate(b,approve?'ca_admin_paket_tesdiq':'ca_admin_paket_reddet',{p_sorgu_id:b.dataset.payId},approve?'SINAQ TƏSDİQİ: Real kart ödənişi qoşulmayıb. Yalnız öz sınaq sorğunu təsdiqlə. Davam edilsin?':'Ödəniş sorğusu rədd edilsin?');});
-reset();setInterval(verify,12000);window.addEventListener('load',()=>setTimeout(verify,1200));document.addEventListener('visibilitychange',()=>{if(!document.hidden)verify();});
+reset();resetEmail();setInterval(verify,12000);window.addEventListener('load',()=>{if(emailFocusPending&&!currentUser){openAuth('login');if(typeof caAuthMessage==='function')caAuthMessage('Admin Gmailini dəyişmək üçün hazırkı admin hesabınla daxil ol.');}setTimeout(verify,1200);});document.addEventListener('visibilitychange',()=>{if(!document.hidden)verify();});
 })();

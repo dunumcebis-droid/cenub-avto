@@ -11,6 +11,10 @@ Saytın yeni brendi **AzAvto**-dur. Loqo, səhifə başlıqları, alt yazılar, 
 
 Yoxlamalar və texniki uyğunluq: [AZAVTO_BRANDING_VERIFICATION.md](AZAVTO_BRANDING_VERIFICATION.md).
 
+## Dəstək və admin Gmaili — 19 noyabr 2026
+
+Cari dəstək ünvanı **azavto44@gmail.com**-dur. Mövcud admin hesabı öz açıq sessiyasından [admin Gmaili bölməsini](https://dunumcebis-droid.github.io/cenub-avto/?admin-email=1) açıb eyni ünvana keçə bilər. Düymə hesabın ID-sini, parolunu, elanlarını və admin üzvlüyünü saxlayır. Texniki axın və yoxlamalar: [ADMIN_EMAIL_CHANGE.md](ADMIN_EMAIL_CHANGE.md).
+
 ## Cari paketlər — 19 noyabr 2026
 
 Pulsuz; Təcili — 1 AZN / satılanadək; Üstün — 5 AZN / 10 gün; Önə çıxarılan — 10 AZN / 15 gün. Sərfəli seçim yeni paketlərdən çıxarılıb. Paket müraciəti və elanın yayımlanması ayrıca admin təsdiqi tələb edir; avtomatik kart ödənişi hələ aktiv deyil.
