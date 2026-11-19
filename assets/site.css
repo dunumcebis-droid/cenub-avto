@@ -1089,13 +1089,13 @@ body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-marke
 }
 @media(max-width:360px){#allGrid,#vipGrid,#buyerFavoritesList{gap:8px!important}.ca-urgent-browse{padding:15px}.ca-urgent-choice{padding:10px;font-size:13px}}
 
-/* Compact equipment choices: three columns on phones, four on wider screens. */
+/* Compact equipment choices: four columns on every screen. */
 #caAdvanced #caEquipOptions[hidden]{display:none!important}
 .ca-seller-equip,#caAdvanced #caEquipOptions{
  grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;padding:8px!important;border-radius:12px!important;
 }
 .ca-seller-equip label,#caAdvanced #caEquipOptions label{
- display:flex!important;align-items:center!important;gap:5px!important;min-width:0;min-height:54px!important;
+ display:flex!important;align-items:center!important;gap:5px!important;min-width:0;min-height:48px!important;
  padding:7px!important;border-radius:9px!important;font-size:12px!important;line-height:1.3!important;letter-spacing:0;overflow-wrap:anywhere!important;
 }
 .ca-seller-equip label::after,#caAdvanced #caEquipOptions label::after,
@@ -1107,7 +1107,7 @@ body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-marke
 }
 .ca-seller-equip label:hover,#caAdvanced #caEquipOptions label:hover{transform:none!important}
 @media(max-width:600px){
- .ca-seller-equip,#caAdvanced #caEquipOptions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:6px!important}
- .ca-seller-equip label,#caAdvanced #caEquipOptions label{padding:4px!important;gap:3px!important;font-size:11.5px!important}
- .ca-seller-equip input[type=checkbox],#caAdvanced #caEquipOptions input[type=checkbox]{width:14px!important;height:14px!important;flex-basis:14px!important}
+ .ca-seller-equip,#caAdvanced #caEquipOptions{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:4px!important}
+ .ca-seller-equip label,#caAdvanced #caEquipOptions label{flex-direction:column!important;justify-content:center!important;text-align:center;padding:4px 2px!important;gap:2px!important;font-size:11px!important;line-height:1.2!important}
+ .ca-seller-equip input[type=checkbox],#caAdvanced #caEquipOptions input[type=checkbox]{width:12px!important;height:12px!important;flex-basis:12px!important}
 }
