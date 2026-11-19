@@ -110,7 +110,7 @@ function caEffectivePackage(r){
  // Historical approved listings may lack package dates. Show the recorded
  // package only while a verifiable approval timestamp is within its term.
  const approved=Date.parse(r.tesdiq_tarixi||'');
- const days=({VIP:15,Premium:5,Standart:3})[name];
+ const days=({VIP:15,Premium:10,Standart:3})[name];
  if(!Number.isFinite(approved))return 'Pulsuz';
  return approved<=Date.now()&&Date.now()<approved+days*86400000?name:'Pulsuz';
 }
@@ -1223,7 +1223,7 @@ document.getElementById('listingForm').addEventListener('submit',async e=>{
  if(Object.values(projectedPhotos).flat().length<1){alert('Elan yerləşdirmək üçün ən azı 1 avtomobil şəkli əlavə et.');return;}
  try{caValidatePhotoCounts(projectedPhotos,editingOriginalPhotos,photoInputs);}catch(error){alert(error.message);return;}
  const selectedPackage=String(d.package||'');
- const paidPackage=selectedPackage.includes('15 AZN')?'VIP':selectedPackage.includes('5 AZN')?'Premium':selectedPackage.includes('3 AZN')?'Standart':selectedPackage.includes('1 AZN')||selectedPackage==='Tecili'?'Tecili':null;
+ const paidPackage=({'Önə çıxarılan — 10 AZN / 15 gün':'VIP','Üstün — 5 AZN / 10 gün':'Premium','Təcili — 1 AZN / satılanadək':'Tecili',VIP:'VIP',Premium:'Premium',Tecili:'Tecili'})[selectedPackage]||null;
  d.requestedPackage=paidPackage?selectedPackage:'';d.pack='Pulsuz';delete d.package;
  if(wasEdit){if(original?._submission_id)d._submission_id=original._submission_id;}else{if(!caCreateSubmission||caCreateSubmission.owner!==owner)caCreateSubmission={owner,key:crypto.randomUUID()};d._submission_id=caCreateSubmission.key;}
  const submission=++caListingSubmissionSequence;

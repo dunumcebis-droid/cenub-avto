@@ -5,6 +5,12 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## Cari paketlər — 19 noyabr 2026
+
+Pulsuz; Təcili — 1 AZN / satılanadək; Üstün — 5 AZN / 10 gün; Önə çıxarılan — 10 AZN / 15 gün. Sərfəli seçim yeni paketlərdən çıxarılıb. Paket müraciəti və elanın yayımlanması ayrıca admin təsdiqi tələb edir; avtomatik kart ödənişi hələ aktiv deyil.
+
+Sınaq əhatəsi və əvvəlki paketlərin qorunması: [PACKAGE_PRICING_VERIFICATION.md](PACKAGE_PRICING_VERIFICATION.md).
+
 ## Təcili paket və iki sütun — 19 noyabr 2026
 
 - **Təcili:** 1 AZN-lik paket müraciəti əlavə olunub. Paket və elan ayrıca admin təsdiqindən sonra yaşıl **TƏCİLİ** nişanı ilə görünür və elan satılanadək qalır; gün limiti yoxdur. Kartla avtomatik ödəniş hələ qoşulmayıb.
@@ -78,7 +84,7 @@ Kartlar, admin, parol bərpası, BMW seçimi, nəsil məlumatı və müqayisə a
 - Marka, model, qiymət, il, yürüş və texniki məlumatlar baza sütunlarından və əvvəlki `ca_data` formatlarından oxunur. Boş yürüş `null`, daxil edilmiş sıfır isə `0 km` olaraq qorunur.
 - Redaktə forması təchizat seçimlərini və şəkillərin bölmələrini bərpa edir. Mövcud şəkillər yeni fayl seçiləndə də saxlanılır; yalnız ayrıca «Sil» əməliyyatı ilə çıxarılır. İstifadəçinin seçdiyi sıra, əsas şəkil və kataloqda olmayan köhnə təchizat dəyərləri qorunur.
 - Elan yaratma, redaktə və silmə serverin qaytardığı elan ID-si ilə təsdiqlənir. Heç bir sətri dəyişməyən sorğu uğur kimi göstərilmir. Silmə şəkilləri və ödəniş tarixçəsini saxlayan arxivləşdirmədir (`silindi`).
-- Redaktədə cari paket saxlanılır; yeni paket yalnız ayrıca seçildikdə istənilir. VIP, Premium və Standart müddətləri müvafiq olaraq 15, 5 və 3 gündür; Təcili satılanadək qalır. Faktiki paket bazanın təsdiqlənmiş vəziyyətindən oxunur.
+- Redaktədə cari paket saxlanılır; yeni paket yalnız ayrıca seçildikdə istənilir. Yeni VIP paketi 10 AZN / 15 gün, Premium 5 AZN / 10 gündür; Təcili 1 AZN / satılanadək qalır. Standart yeni sifarişlərdən çıxarılıb; əvvəlki paket qeydləri və yazılmış bitmə vaxtları saxlanılır. Faktiki paket bazanın təsdiqlənmiş vəziyyətindən oxunur.
 - Elan siyahısı serverdə süzülür və sıralanır, səhifədə 24 elan göstərilir. Ümumi say üçün kodda əvvəlki 500 elan məhdudiyyəti yoxdur. Satıcının elanları ayrıca 100-lük hissələrlə oxunur.
 - «Bu gün təsdiqlənən» göstəricisi server hesabından gəlir; sıfır düzgün göstərilir. Uğursuz sorğu əvvəlki uğurlu məlumatları silmir, köhnə sorğu cavabı yeni səhifəni əvəz etmir.
 

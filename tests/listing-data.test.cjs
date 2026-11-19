@@ -248,7 +248,7 @@ test('VIP eligibility remains tied to approved, unexpired database packages', ()
   assert.equal(caEffectivePackage({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }), 'Pulsuz');
   assert.equal(caRemoteToCar({ ...base, ca_data: { pack: 'Pulsuz' } }).pack, 'VIP');
   assert.equal(caRemoteToCar({ veziyyet: 'aktiv', ca_data: { pack: 'VIP' } }).pack, 'Pulsuz');
-  for (const [name, ageDays, expected] of [['Premium', 6, 'Pulsuz'], ['Standart', 4, 'Pulsuz'], ['VIP', 14, 'VIP']]) {
+  for (const [name, ageDays, expected] of [['Premium', 6, 'Premium'], ['Premium', 11, 'Pulsuz'], ['Standart', 4, 'Pulsuz'], ['VIP', 14, 'VIP']]) {
     const approved = new Date(now - ageDays * 86400000).toISOString();
     assert.equal(caEffectivePackage({ paket_adi: name, veziyyet: 'aktiv', paket_bitir: null, tesdiq_tarixi: approved }),
       expected, `${name} uses the canonical fallback term when no end date exists`);
@@ -312,4 +312,24 @@ test('approved urgent listings remain urgent until sold without a calendar expir
   assert.equal(caEffectivePackage({paket_adi:'Tecili',veziyyet:'aktiv',is_sold:true}), 'Pulsuz');
   assert.equal(caRemoteToCar({veziyyet:'aktiv',ca_data:{pack:'Tecili',requestedPackage:'Təcili — 1 AZN'}}).pack, 'Pulsuz');
   assert.deepEqual([{pack:'Pulsuz'},{pack:'Tecili'},{pack:'Standart'},{pack:'Premium'},{pack:'VIP'}].sort(helpers.caComparePackages).map(c=>c.pack),['VIP','Premium','Standart','Tecili','Pulsuz']);
+});
+
+
+test('Premium fallback has ten days while an explicit legacy five-day end remains authoritative', () => {
+  const now = Date.now();
+  const iso = daysAgo => new Date(now - daysAgo * 86400000).toISOString();
+  for (const [age, expected] of [[6, 'Premium'], [9, 'Premium'], [11, 'Pulsuz']]) {
+    assert.equal(caEffectivePackage({paket_adi:'Premium',veziyyet:'aktiv',tesdiq_tarixi:iso(age)}),expected);
+  }
+  const original = {id:'legacy-five-days',paket_adi:'Premium',veziyyet:'aktiv',
+    paket_baslayir:iso(7),paket_bitir:iso(2),tesdiq_tarixi:iso(1),
+    sekiller:['https://fixture.invalid/old-photo.jpg']};
+  const before = JSON.stringify(original);
+  const car = caRemoteToCar(original);
+  assert.equal(car.pack,'Pulsuz','An old recorded five-day package must not gain the new ten-day term');
+  assert.equal(car.packageStarts,original.paket_baslayir);
+  assert.equal(car.packageEnds,original.paket_bitir);
+  assert.deepEqual(plain(car._photoOrder),original.sekiller);
+  assert.equal(JSON.stringify(original),before,'Reading a historical package never rewrites it');
+  assert.equal(caEffectivePackage({...original,paket_bitir:iso(-2)}),'Premium');
 });

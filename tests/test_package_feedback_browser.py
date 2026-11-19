@@ -148,7 +148,7 @@ class PackageFeedbackBrowserTests(unittest.TestCase):
             const field=form.elements.namedItem(key);if(field&&'value' in field){field.disabled=false;field.value=String(value);}}
             form.elements.namedItem('package').selectedIndex=0;}''',fields)
         if paid:
-            package=self.page.locator('#listingForm [name="package"] option').filter(has_text='15 AZN').evaluate('option=>option.value')
+            package=self.page.locator('#listingForm [name="package"] option').filter(has_text='10 AZN').evaluate('option=>option.value')
             self.page.locator('#listingForm [name="package"]').select_option(package)
         self.page.locator('#photos-front').set_input_files(dict(name='synthetic.png',mimeType='image/png',buffer=PNG))
         self.assertTrue(self.page.locator('#listingForm').evaluate('form=>form.checkValidity()'))
@@ -257,7 +257,7 @@ class PackageFeedbackBrowserTests(unittest.TestCase):
         expected=self.page.evaluate('CA_URL')+self.backend.uploads[0].replace('/storage/v1/object/','/storage/v1/object/public/',1)
         self.assertEqual(self.backend.saves[0]['sekiller'],[expected])
         self.assertEqual(self.backend.saves[0]['ca_data']['photos'],{'front':[expected]})
-        self.assertIn('15 AZN',self.backend.saves[0]['ca_data']['requestedPackage'])
+        self.assertIn('10 AZN',self.backend.saves[0]['ca_data']['requestedPackage'])
         self.assertFalse(any(call['path'].endswith('/ca_paket_sorgusu_yarat') for call in self.backend.calls))
         self.assertFalse(self.page.evaluate('document.body.classList.contains("sell-open")'))
 
