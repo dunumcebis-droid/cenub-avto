@@ -26,8 +26,8 @@ ASSET_PATH = re.compile(
 
 def public_files():
     paths = json.loads((ROOT / "deployment/public-files.json").read_text())["files"]
-    if not isinstance(paths, list) or len(paths) != 76:
-        raise ValueError("The reviewed allowlist must contain exactly 76 files.")
+    if not isinstance(paths, list) or len(paths) != 77:
+        raise ValueError("The reviewed allowlist must contain exactly 77 files.")
     seen, files = set(), []
     for name in paths:
         if not isinstance(name, str):

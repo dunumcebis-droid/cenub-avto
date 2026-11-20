@@ -1118,3 +1118,30 @@ body.ca-market-open #caToolsBar,body.ca-market-open #caAdminLaunch,body.ca-marke
 }
 
 #caPagination a{text-decoration:none;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
+
+/* Keep account controls compact; notifications sit directly below publishing. */
+body:not(.ca-info-page)>header{padding:8px max(8px,calc((100% - 1240px)/2))}
+body:not(.ca-info-page)>header .top{display:grid;grid-template-columns:210px minmax(0,1fr) 260px;align-items:center;gap:18px;min-height:64px;width:100%;max-width:1240px}
+body:not(.ca-info-page)>header .ca-site-brand{width:210px;max-width:100%;flex:none;border-radius:8px}
+body:not(.ca-info-page)>header .top>nav{justify-self:center;width:auto;margin:0;padding:0}
+body:not(.ca-info-page)>header .header-actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(110px,1.1fr);grid-template-rows:36px auto;gap:4px 6px!important;align-items:center;justify-self:end;width:100%;max-width:260px;min-width:0;margin:0}
+body:not(.ca-info-page)>header .header-actions>.back-btn{grid-column:1;grid-row:1}
+body:not(.ca-info-page)>header .header-actions>.header-sell{grid-column:2;grid-row:1}
+body:not(.ca-info-page)>header .header-actions>button{box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:36px;min-height:36px;margin:0;padding:6px 9px;border-radius:9px;font-size:11px;line-height:1.1;white-space:nowrap;overflow-wrap:normal;box-shadow:none}
+body:not(.ca-info-page)>header .header-actions>.account-chip{grid-column:1;grid-row:2;justify-self:center;max-width:100%;margin:0;font-size:11px;line-height:1.2;letter-spacing:0;white-space:nowrap}
+body:not(.ca-info-page)>header .header-actions>.ca-notification-launch{grid-column:2;grid-row:2;min-height:28px;height:28px;gap:4px;padding:3px 7px;font-size:10.5px;line-height:1.1;white-space:nowrap}
+body:not(.ca-info-page)>header .ca-notification-launch>span:first-child{white-space:nowrap}
+body:not(.ca-info-page)>header .ca-notification-badge{flex:0 0 auto;min-width:16px;min-height:16px;padding:2px 4px;font-size:9px}
+@media(max-width:960px){
+ body:not(.ca-info-page)>header{padding:7px 8px}
+ body:not(.ca-info-page)>header .top{grid-template-columns:minmax(88px,1fr) minmax(194px,1.5fr);gap:8px;min-height:60px}
+ body:not(.ca-info-page)>header .top>nav{display:none}
+ body:not(.ca-info-page)>header .ca-site-brand{width:148px;max-width:100%}
+ body:not(.ca-info-page)>header .header-actions{max-width:250px;grid-template-columns:minmax(0,1fr) minmax(104px,1.1fr);grid-template-rows:34px auto}
+ body:not(.ca-info-page)>header .header-actions>button{height:34px;min-height:34px;padding:5px 6px;font-size:10.5px}
+ body:not(.ca-info-page)>header .header-actions>.ca-notification-launch{height:28px;min-height:28px;padding:3px 4px;font-size:10px}
+ body:not(.ca-info-page)>header .header-actions>.account-chip{font-size:10px}
+}
+.hero-proof .ca-site-visitors{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #b9f34b44;border-radius:8px;color:#cfe0ee;font-size:11px;line-height:1.4;white-space:nowrap}
+.hero-proof .ca-site-visitors strong{color:#c3f859;font-size:12px;font-variant-numeric:tabular-nums}
+@media(max-width:360px){body:not(.ca-info-page)>header .header-actions>.back-btn{padding-left:3px;padding-right:3px;font-size:10px}}

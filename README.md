@@ -6,6 +6,16 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Əlavə ünvan: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## Yığcam başlıq və gündəlik ziyarətçi sayı — 20 noyabr 2026
+
+Yeni başlıq hazırlanıb: hesab nömrəsinin son dörd rəqəmi görünür, Bildirişlər düyməsi Elan yerləşdir düyməsinin altındadır. 320–1440 px ölçülərdə girişsiz, daxil olmuş və admin vəziyyətləri yoxlanılıb; mobil başlıq təxminən 75–79 px tutur. Elan formasındakı tam telefon dəyəri dəyişdirilmir.
+
+Ana səhifədə hamıya açıq «Bu gün: … ziyarətçi» göstəricisi əlavə olunub. Sayğac Bakı təqvim gününə əsaslanır, hər brauzerin təsadüfi identifikatorunu həmin gün təkrar saymır. Sayma yeni skript yüklənəndən başlayır; əvvəlki trafik uydurulmur. Ayrı brauzer/cihaz/ünvan və yaddaşın təmizlənməsi ayrıca sayıla bilər; bu, dəqiq insan sayı deyil. Şəxsi UUID serverdə günə bağlı heşə çevrilir; hesab, telefon, IP və barmaq izi bu sayğacda toplanmır. Saxlama və təmizləmə qaydaları [məxfilik siyasətində](privacy.html) göstərilib.
+
+`daily_site_visitors` server miqrasiyası tətbiq olunub: iki gizli RLS cədvəli və məhdud ictimai qeyd/oxuma RPC-si. **62/62 verilənlər bazası yoxlaması** rollback daxilində keçib; testdən sonra say və hər iki cədvəl boş olub. Anonim oxuma API-si HTTP 200 qaytarır. **12 sayğac və 3 başlıq brauzer sınağı**, bildiriş/bazar üzrə **15 mövcud brauzer sınağı**, **5 statik SEO** yoxlaması keçib. Node yoxlamalarının yeni skript sayına və ardıcıllığına uyğunluğu təsdiqlənib; 46 ilkin şəkil dəyişmir. İki yeni private cədvəlin siyasətsiz RLS info qeydi qəsdən bütün birbaşa girişi qadağan edir; yeni təhlükəsizlik xəbərdarlığı yaranmayıb. Backend saymaq üçün hazırdır; yeni 77 fayllıq sayt paketinin Azhosting-ə yüklənməsi və son canlı yoxlaması gözlənilir.
+
+Yeni paket: **AvtoUnvan-yeni.zip**, GitHub buraxılışı `avtounvan-compact-20261120`. Əvvəlki 76 fayllıq brend keçidi ayrıca `avtounvan-vip-20261120` buraxılışında saxlanılır. Hər iki paket yalnız ictimai frontend fayllarından ibarətdir; SQL və testlər hostinq ZIP-inə daxil deyil.
+
 ## avtounvan.vip-də yayımlanma — 20 noyabr 2026
 
 Azhosting Starter aylıq 2,99 AZN hostinqi aktivdir. İstifadəçi hazır ZIP-i domenin `public_html` qovluğunda açıb, köhnə monolit faylı yeniləyib. **76/76 ictimai fayl** canlıdan HTTP 200 ilə alınıb və cari mənbə ilə bayt səviyyəsində tutuşdurulub. Bütün altı HTML səhifəsi yeni AvtoUnvan adını və loqosunu, e-poçt göstərilən səhifələr isə yalnız `avtounvan@gmail.com` ünvanını istifadə edir. Əsas domen və `www` HTTPS ilə işləyir; `www` ayrıca xidmət göstərir, əsas domenə yönləndirilmir.
@@ -18,7 +28,7 @@ Canlı saytda altı səhifənin **12 telefon/kompüter görünüşü** yoxlanıl
 
 İstifadəçi Supabase **Site URL** sahəsini `https://avtounvan.vip/` olaraq saxlayıb. Ekran şəklində əsas və `www` hostlarının kök və `reset-password.html` ünvanları olmaqla **4 dəqiq Redirect URL** təsdiqlənib. Bundan sonra istifadəçi yeni domenin bərpa səhifəsindən təzə məktub istəmə və keçidi açma sınağını yerinə yetirib, **parolunu uğurla dəyişdirdiyini bildirib**. Real məktub və parol dəyişməsini hesab sahibi icra edib; məxfi keçid və parol alınmayıb. Cari ayarlar [SEO_SETUP.md](SEO_SETUP.md) sənədindədir.
 
-Paketin təkrar hazırlanması: `node tools/generate-seo.cjs --check`, sonra `python3 tools/build-hosting-zip.py --output /tmp/AvtoUnvan-sayt.zip`. Yalnız `deployment/public-files.json` daxilindəki yoxlanılmış fayllar arxivə düşür. GitHub-da **Build hosting ZIP** workflow-u əl ilə işə salınanda bu ictimai ZIP `avtounvan-vip-20261120` buraxılışında yayımlanır; buraxılış yoxdursa yaradılır. Azhosting-ə avtomatik giriş və yükləmə etmir.
+Paketin təkrar hazırlanması: `node tools/generate-seo.cjs --check`, sonra `python3 tools/build-hosting-zip.py --output /tmp/AvtoUnvan-yeni.zip`. Yalnız `deployment/public-files.json` daxilindəki yoxlanılmış fayllar arxivə düşür. GitHub-da **Build hosting ZIP** workflow-u əl ilə işə salınanda cari ictimai ZIP `avtounvan-compact-20261120` buraxılışında yayımlanır; buraxılış yoxdursa yaradılır. Azhosting-ə avtomatik giriş və yükləmə etmir.
 
 ## SEO hazırlığı — 19 noyabr 2026
 

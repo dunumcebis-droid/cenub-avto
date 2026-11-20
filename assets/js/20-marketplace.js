@@ -422,7 +422,7 @@ function mount(){
  const actions=document.querySelector('.ca-search-main .search-actions')||document.querySelector('.search-actions');
  if(actions&&!$('caSaveSearchLaunch')){const b=button('Axtarışı yadda saxla',saveSearchDialog);b.id='caSaveSearchLaunch';actions.append(b);}
  const header=document.querySelector('header .header-actions');
- if(header&&!$('caNotificationsLaunch')){const b=button('',openNotifications);b.id='caNotificationsLaunch';b.className='ca-notification-launch';b.append(node('span','🔔 Bildirişlər'));const badge=node('span','0','ca-notification-badge');badge.id='caNotificationBadge';badge.hidden=true;b.append(badge);header.prepend(b);}
+ if(header&&!$('caNotificationsLaunch')){const b=button('',openNotifications);b.id='caNotificationsLaunch';b.className='ca-notification-launch';b.append(node('span','🔔 Bildirişlər'));const badge=node('span','0','ca-notification-badge');badge.id='caNotificationBadge';badge.hidden=true;b.append(badge);const sell=header.querySelector('.header-sell');if(sell)sell.after(b);else header.append(b);}
  savedSection();reportsSection();updateNotificationBadge();if($('caSavedSearches'))$('caSavedSearches').hidden=!owner;
 }
 function sessionChanged(){

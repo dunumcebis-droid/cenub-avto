@@ -89,6 +89,8 @@ class OfflineBackend:
     def __init__(self, rows=None):
         self.rows = copy.deepcopy(default_rows() if rows is None else rows)
         self.calls = []
+        self.site_visitor_calls = []
+        self.site_visitors = set()
         self.empty_update = False
         self.empty_delete = False
         self.today_approved = 1
@@ -118,6 +120,22 @@ class OfflineBackend:
             route.fulfill(content_type='image/svg+xml', body='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="#87a9b0"/></svg>')
             return
         parsed = urlsplit(req.url)
+        # Traffic receipts are separate from user/listing mutation assertions.
+        if parsed.path in ('/rest/v1/rpc/ca_record_site_visit','/rest/v1/rpc/ca_daily_site_visitors'):
+            from datetime import datetime, timedelta, timezone
+            body = req.post_data_json if req.post_data else {}
+            self.site_visitor_calls.append({'path':parsed.path,'method':req.method,'body':body})
+            counted = False
+            if parsed.path.endswith('/ca_record_site_visit'):
+                visitor = body.get('p_visitor')
+                counted = visitor not in self.site_visitors
+                self.site_visitors.add(visitor)
+            payload = {'day':datetime.now(timezone(timedelta(hours=4))).date().isoformat(),
+                       'timezone':'Asia/Baku','visitors':len(self.site_visitors)}
+            if parsed.path.endswith('/ca_record_site_visit'):
+                payload['counted'] = counted
+            route.fulfill(content_type='application/json',body=json.dumps(payload))
+            return
         if parsed.path == '/auth/v1/logout' and req.method == 'POST':
             route.fulfill(status=204,body='')
             return

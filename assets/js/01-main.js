@@ -514,7 +514,8 @@ window.addEventListener('load',()=>caFetchListings());
 let editingCarId=null,editingOriginalPhotos=null;
 let currentFilter='all',currentSearch=null;
 function normalizePhone(v){return String(v||'').replace(/[^+0-9]/g,'')}
-function updateAccountUI(){window.caPhotoManagerSessionChanged?.();window.caMarketSessionChanged?.();window.caPhotoReviewSessionChanged?.();window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el)el.textContent=currentUser?'● '+currentUser.phone:'';const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
+function caHeaderPhone(phone){const digits=String(phone||'').replace(/\D/g,'');return digits?'••• '+digits.slice(-4):'Hesab';}
+function updateAccountUI(){window.caPhotoManagerSessionChanged?.();window.caMarketSessionChanged?.();window.caPhotoReviewSessionChanged?.();window.caServerBackupSessionChanged?.();window.caPhoneVerificationSessionChanged?.();window.caAccountFavoritesSessionChanged?.();const el=document.getElementById('accountStatus');if(el){el.textContent=currentUser?'● '+caHeaderPhone(currentUser.phone):'';el.hidden=!currentUser;el.setAttribute('aria-label',currentUser?'Hesab nömrəsi '+caHeaderPhone(currentUser.phone):'');}const btn=document.querySelector('header .back-btn');if(btn)btn.textContent=currentUser?'Şəxsi kabinet':'Giriş / Qeydiyyat';window.caAdminSessionChanged?.();}
 function requireLogin(action){if(currentUser)return true;pendingAction=action;openAuth('register');return false;}
 let caListingFeedbackFocus=null,caListingFeedbackOverflow=null;
 function caShowListingFeedback(message,kind='success'){
