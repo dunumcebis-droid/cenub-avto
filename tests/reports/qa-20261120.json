@@ -138,8 +138,19 @@
       "index.html"
     ],
     "requiresExistingDeploymentFiles": 77,
-    "plannedDownload": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-qa-20261120/AvtoUnvan-QA.zip",
-    "artifactVerification": "pending",
-    "indexSha256": "f15f8efad9a02bc1155de1fc38df79a50fbe16e702f2e52b007605c9afa93c96"
+    "artifactVerification": {
+      "status": "passed",
+      "httpStatus": 200,
+      "files": [
+        "index.html"
+      ],
+      "fileBytesMatch": true,
+      "bytes": 13511,
+      "zipSha256": "0176091f9094a868b0a1bb5f8d9757ddee3762df953ce335714a534d1a776398",
+      "buildCommit": "7249b0616e54798498da4d2475d3be7b781cffbd",
+      "workflowRun": "https://github.com/dunumcebis-droid/cenub-avto/actions/runs/44806230233"
+    },
+    "indexSha256": "f15f8efad9a02bc1155de1fc38df79a50fbe16e702f2e52b007605c9afa93c96",
+    "download": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-qa-20261120/AvtoUnvan-QA.zip"
   }
 }
