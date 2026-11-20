@@ -5,6 +5,14 @@ Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və Java
 - Sayt: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
+## avtounvan.vip üçün hazırlıq — 19 noyabr 2026
+
+İstifadəçi domeni aldığını təsdiqləyib; Azhosting Starter üçün aylıq 2,99 AZN sifarişi davam edir. Hostinqin aktivləşməsi və yeni saytda HTTPS yayımı hələ təsdiqlənməyib. Cari canlı ünvan GitHub Pages olaraq qalır.
+
+Bərpa formaları açıldıqları domenin və qovluğun `reset-password.html` səhifəsinə yönləndirir, sorğu və fragmenti daşımır. `ca-admin-email-change` v4 və `ca-photo-review` v6 yeni HTTPS domenini və mövcud GitHub origin-ini qəbul edir; `verify_jwt=true` qorunub. Canlıda hər iki funksiya üzrə iki icazəli və üç icazəsiz originin OPTIONS cavabları yoxlanılıb; məktub və şəkil təhlili sorğusu göndərilməyib.
+
+Ayrıca köçürmə paketi hazırlanıb: `public_html` üçün kökündə `index.html` olan 76 ictimai fayl, təxminən 7,3 MB ZIP. Şəxsi ehtiyat nüsxə, server kodu, verilənlər bazası ixracı və gizli açarlar daxil deyil; 46 orijinal şəkil dəyişməyib. Yeni domenin SEO nəticələri yalnız ayrıca paketdə yaradılıb. **149/149 Node** və həmin paket üzərində **19/19 imitasiya edilmiş bərpa/SEO brauzer sınağı** keçib. Qalan keçid addımları [SEO_SETUP.md](SEO_SETUP.md) sənədindədir.
+
 ## SEO hazırlığı — 19 noyabr 2026
 
 Açıq səhifələr üçün ayrıca axtarış başlıqları, təsvirlər, paylaşım metadata-sı, canonical qaydaları, AvtoUnvan `WebSite`/`Organization` məlumatı və beş səhifəlik `sitemap.xml` hazırlanıb. Parol bərpası `noindex, nofollow` saxlayır. SEO ünvanlarının əsas mənbəyi `seo.config.json`-dur; `node tools/generate-seo.cjs` nəticələri yaradır, `--check` isə dəyişiklik yazmadan uyğunluğu yoxlayır.

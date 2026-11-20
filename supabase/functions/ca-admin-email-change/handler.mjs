@@ -1,6 +1,6 @@
 /** Syncs only the authenticated administrator's login and an existing metadata email. */
 const TARGET_EMAIL='avtounvan@gmail.com';
-const ALLOWED_ORIGIN='https://dunumcebis-droid.github.io';
+const ALLOWED_ORIGINS=new Set(['https://dunumcebis-droid.github.io','https://avtounvan.vip']);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_BODY_BYTES=256;
 const messages={
@@ -31,9 +31,9 @@ async function emptyInput(req,signal){
 export function createHandler({env={},fetch:fetcher=globalThis.fetch}={}){
  return async function handler(req){
   const origin=req.headers.get('Origin');
-  const cors={...(origin===ALLOWED_ORIGIN?{'Access-Control-Allow-Origin':origin}:{}),'Vary':'Origin','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Access-Control-Max-Age':'600'};
+  const cors={...(origin&&ALLOWED_ORIGINS.has(origin)?{'Access-Control-Allow-Origin':origin}:{}),'Vary':'Origin','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Access-Control-Max-Age':'600'};
   const fail=(status,code,headers={})=>json({code,message:messages[code]},status,{...cors,...headers});
-  if(origin&&origin!==ALLOWED_ORIGIN)return fail(403,'origin_denied');
+  if(origin&&!ALLOWED_ORIGINS.has(origin))return fail(403,'origin_denied');
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
   if(req.method!=='POST')return fail(405,'method_not_allowed',{'Allow':'POST,OPTIONS'});
   const authorization=req.headers.get('Authorization')||'';

@@ -70,6 +70,40 @@ test('wrong origin and unsupported methods are denied before Auth',async()=>{
  const f=await fixture();assert.equal((await f.invoke({headers:{Origin:'https://untrusted.invalid'}})).status,403);assert.equal((await f.invoke({method:'GET'})).status,405);assert.equal(f.calls.length,0);
  const preflight=await f.handler(new Request(BASE+'/functions/v1/ca-photo-review',{method:'OPTIONS',headers:{Origin:'https://dunumcebis-droid.github.io'}}));assert.equal(preflight.status,204);assert.equal(f.calls.length,0);
 });
+test('GitHub and the owned HTTPS apex reflect CORS for preflight, Auth failures and authenticated status',async()=>{
+ for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip']){
+  const preflightFixture=await fixture();
+  const preflight=await preflightFixture.invoke({method:'OPTIONS',headers:{Origin:origin}});
+  assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('vary'),'Origin');assert.equal(preflight.headers.get('access-control-allow-methods'),'GET,POST,OPTIONS');assert.deepEqual(preflightFixture.calls,[]);
+  const missingFixture=await fixture();
+  const missing=await missingFixture.invoke({method:'GET',status:true,headers:{Origin:origin,Authorization:''}});
+  assert.equal(missing.status,401);assert.equal(missing.data.code,'auth_required');assert.equal(missing.headers.get('access-control-allow-origin'),origin);assert.deepEqual(missingFixture.calls,[]);
+  const expiredFixture=await fixture({authStatus:401});
+  const expired=await expiredFixture.invoke({method:'GET',status:true,headers:{Origin:origin}});
+  assert.equal(expired.status,401);assert.equal(expired.headers.get('access-control-allow-origin'),origin);assert.equal(expiredFixture.calls.length,1);assert.equal(providerCalls(expiredFixture.calls).length,0);
+  const statusFixture=await fixture({enabled:false});
+  const status=await statusFixture.invoke({method:'GET',status:true,headers:{Origin:origin}});
+  assert.equal(status.status,200);assert.deepEqual(status.data,statusValue(false,true));assert.equal(status.headers.get('access-control-allow-origin'),origin);assert.equal(statusFixture.calls.length,2);assert.equal(providerCalls(statusFixture.calls).length,0);assert.equal(uploadCalls(statusFixture.calls).length,0);
+ }
+});
+test('photo review rejects HTTP, www, lookalikes and removed unowned origins before Auth',async()=>{
+ for(const origin of ['http://avtounvan.vip','https://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
+  for(const method of ['POST','OPTIONS']){
+   const f=await fixture();const result=await f.invoke({method,headers:{Origin:origin}});
+   assert.equal(result.status,403);assert.equal(result.data.code,'origin_denied');assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);
+  }
+ }
+});
+test('custom photo origin configuration still replaces defaults instead of silently broadening access',async()=>{
+ const custom='https://preview.example.test';
+ const f=await fixture({env:{PHOTO_REVIEW_ALLOWED_ORIGINS:custom}});
+ const preflight=await f.invoke({method:'OPTIONS',headers:{Origin:custom}});
+ assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),custom);assert.deepEqual(f.calls,[]);
+ for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip']){
+  const result=await f.invoke({method:'GET',status:true,headers:{Origin:origin}});
+  assert.equal(result.status,403);assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);
+ }
+});
 test('disabled or unconfigured mode fails closed for POST before reservation/provider',async()=>{
  for(const options of [{enabled:false},{env:{GEMINI_API_KEY:''}},{env:{PHOTO_REVIEW_MODEL:'invalid model'}},{env:{PHOTO_REVIEW_PROVIDER:'unsupported'}}]){
   const f=await fixture(options);const r=await f.invoke();assert.equal(r.status,503);assert.equal(r.data.code,'provider_unavailable');assert.equal(f.calls.length,2);assert.equal(providerCalls(f.calls).length,0);

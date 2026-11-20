@@ -15,7 +15,7 @@ from playwright.sync_api import sync_playwright
 from test_listing_management_browser import ORIGIN, ROOT, safe_local_asset
 
 RESET_URL = ORIGIN + 'reset-password.html'
-REDIRECT = 'https://dunumcebis-droid.github.io/cenub-avto/reset-password.html'
+REDIRECT = RESET_URL
 USER_A = {'id': '33333333-3333-4333-8333-333333333333', 'email': 'recover-a@example.invalid'}
 USER_B = {'id': '44444444-4444-4444-8444-444444444444', 'email': 'recover-b@example.invalid'}
 STORED_SESSION = json.dumps({'access_token': 'existing-owner-session', 'refresh_token': 'owner-refresh',

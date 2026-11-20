@@ -4,7 +4,7 @@ SEO saytın axtarış sistemləri tərəfindən tapılmasını və məzmununun d
 
 ## Cari ünvan və statik səhifələr
 
-Hazırda istifadə edilən ünvan **https://dunumcebis-droid.github.io/cenub-avto/**-dur. Təsdiqlənmiş şəxsi domen olmadığı üçün bütün SEO ünvanları bu real yayımlanma ünvanından hazırlanır.
+Hazırda istifadə edilən ünvan **https://dunumcebis-droid.github.io/cenub-avto/**-dur. İstifadəçi **avtounvan.vip** domenini aldığını təsdiqləyib; yeni hostinqin aktivləşməsi və HTTPS yayımı hələ yoxlanmayıb. Ona görə repozitoriyanın SEO ünvanları hazırda işləyən GitHub ünvanından hazırlanır. Ayrıca köçürmə paketində isə SEO nəticələri `https://avtounvan.vip/` əsasında yaradılıb və yoxlanılıb.
 
 `seo.config.json` SEO üçün əsas mənbədir: sayt ünvanı, brend, açıq dəstək əlaqələri, mövcud loqo, səhifə başlıqları, təsvirlər və Google təsdiq tokeni burada saxlanılır. Faylda parol, API açarı və şəxsi elan məlumatı saxlanılmır.
 
@@ -58,6 +58,8 @@ Google-un saytın yeni vəziyyətini tapması və işləməsi vaxt ala bilər. S
 Yalnız istifadəçinin sahibi olduğu və sayta həqiqətən qoşulmuş domen üçün `seo.config.json` içindəki `baseUrl` dəyişdirilir. Ünvan `https://` ilə başlamalı və `/` ilə bitməlidir. Sonra generatoru və yoxlama əmrini işə salıb hazır faylları yayımlayın. Canonical, Open Graph/Twitter şəkil ünvanları, JSON-LD və sitemap eyni mənbədən yenilənir; kökdə yayımlanan `robots.txt` artıq həmin host üçün uyğun yerdə olacaq.
 
 Domenin DNS/HTTPS ayarları, əvvəlki ünvandan yönləndirmə və hesab/bərpa keçidlərinin domenə uyğunlaşdırılması ayrıca hosting və giriş konfiqurasiyasıdır; SEO generatoru bunları dəyişdirmir. Yeni ünvan üçün Search Console sahiblik yoxlamasını yenidən edin, həmin xüsusiyyətin tokenini istifadə edin və yeni sitemap-ı təqdim edin.
+
+`avtounvan.vip` üçün əvvəlcə hostinq aktivləşdirilməli, ictimai ZIP `public_html` daxilində açılmalı, DNS hostinqə bağlanmalı və HTTPS yoxlanmalıdır. Bundan sonra Supabase Auth **Site URL** `https://avtounvan.vip/` seçilir; **Redirect URLs** siyahısına `https://avtounvan.vip/` və `https://avtounvan.vip/reset-password.html` əlavə olunur. Keçid dövründə mövcud GitHub ünvanları saxlanılır. `www` yalnız ayrıca işləməsi təsdiqlənəndən sonra əlavə edilə bilər. SMTP göndərəni `avtounvan@gmail.com` olaraq qalır. Əsas `baseUrl` yalnız yeni HTTPS sayt yoxlanandan sonra yenilənəcək.
 
 `.github/workflows/recover-pages.yml` əvvəlki konkret ilişmiş yayımı ləğv etmək üçündür. SEO generatoru həmin workflow-u dəyişdirmir və işə salmır; SEO üçün hosting rejimi dəyişdirilməyib.
 

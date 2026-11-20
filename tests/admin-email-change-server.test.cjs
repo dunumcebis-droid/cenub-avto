@@ -55,6 +55,30 @@ test('OPTIONS, unsupported methods, untrusted origins and absent bearer perform 
  const f=await fixture();const preflight=await f.invoke({method:'OPTIONS'});
  assert.equal(preflight.headers.get('access-control-allow-origin'),ORIGIN);assert.equal(preflight.headers.get('access-control-allow-methods'),'POST,OPTIONS');
 });
+test('GitHub and the owned HTTPS apex receive preflight and Auth response CORS without weakening Auth',async()=>{
+ for(const origin of [ORIGIN,'https://avtounvan.vip']){
+  const preflightFixture=await fixture();
+  const preflight=await preflightFixture.invoke({method:'OPTIONS',headers:{Origin:origin}});
+  assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('vary'),'Origin');assert.equal(preflight.headers.get('access-control-allow-methods'),'POST,OPTIONS');assert.deepEqual(preflightFixture.calls,[]);
+  const missingFixture=await fixture();
+  const missing=await missingFixture.invoke({headers:{Origin:origin,Authorization:''}});
+  assert.equal(missing.status,401);assert.equal(missing.data.code,'auth_required');assert.equal(missing.headers.get('access-control-allow-origin'),origin);assert.deepEqual(missingFixture.calls,[]);
+  const expiredFixture=await fixture({authStatus:401});
+  const expired=await expiredFixture.invoke({headers:{Origin:origin}});
+  assert.equal(expired.status,401);assert.equal(expired.headers.get('access-control-allow-origin'),origin);assert.equal(expiredFixture.calls.length,1);assert.equal(writes(expiredFixture.calls).length,0);assert.equal(expiredFixture.envReads.includes('SUPABASE_SERVICE_ROLE_KEY'),false);
+  const currentFixture=await fixture({user:{id:USER,email:TARGET}});
+  const current=await currentFixture.invoke({headers:{Origin:origin}});
+  assert.equal(current.status,200);assert.equal(current.data.status,'already_current');assert.equal(current.headers.get('access-control-allow-origin'),origin);assert.equal(currentFixture.calls.length,2);assert.equal(writes(currentFixture.calls).length,0);noSecrets(current);
+ }
+});
+test('HTTP, www, lookalike and unowned old domains are denied before Auth for POST and preflight',async()=>{
+ for(const origin of ['http://avtounvan.vip','https://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
+  for(const method of ['POST','OPTIONS']){
+   const f=await fixture();const result=await f.invoke({method,headers:{Origin:origin}});
+   assert.equal(result.status,403);assert.equal(result.data.code,'origin_denied');assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);assert.deepEqual(f.envReads,[]);noSecrets(result);
+  }
+ }
+});
 test('caller-supplied IDs, addresses, attributes, malformed JSON and oversized input are rejected before Auth',async()=>{
  const cases=[{body:JSON.stringify({user_id:OTHER})},{body:JSON.stringify({email:TARGET})},{body:JSON.stringify({user_metadata:{email:TARGET}})},{body:JSON.stringify({password:'fixture-password'})},{body:JSON.stringify({app_metadata:{admin:true}})},{body:'[]'},{body:'null'},{body:'true'},{body:'{'},{body:''},{body:' '.repeat(257)},{headers:{'Content-Length':'257'}},{headers:{'Content-Type':'text/plain'}},{query:'?user_id='+OTHER}];
  for(const request of cases){const f=await fixture();const result=await f.invoke(request);assert.equal(result.status,400);assert.deepEqual(f.calls,[]);assert.deepEqual(f.envReads,[]);noSecrets(result);}

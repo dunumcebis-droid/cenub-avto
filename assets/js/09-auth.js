@@ -3,7 +3,8 @@
 // replaces an existing account session or enters localStorage.
 let caAuthEpoch=0,caRecovery=null;
 let caAuthReturnFocus=null,caAuthPreviousOverflow='',caAuthOwnsScrollLock=false,caAuthPreviousModalLock=false;
-const CA_RECOVERY_REDIRECT='https://dunumcebis-droid.github.io/cenub-avto/reset-password.html';
+// Relative resolution keeps this deployment's directory and excludes query/fragment credentials.
+const CA_RECOVERY_REDIRECT=typeof window!=='undefined'&&window.location?.href?new URL('reset-password.html',window.location.href).href:'https://dunumcebis-droid.github.io/cenub-avto/reset-password.html';
 function caAuthMessage(message,error=false){const el=document.getElementById('authMessage');el.textContent=message;el.setAttribute('role',error?'alert':'status');}
 function caAuthVisibleControl(element){return Boolean(element?.isConnected&&element.matches('a[href],button,input,select,textarea,[tabindex],[contenteditable="true"]')&&element.getClientRects().length&&!element.disabled&&!element.closest('[inert]'));}
 function caAuthControls(container=document.getElementById('authOverlay')){

@@ -3,7 +3,8 @@
  'use strict';
  const API_URL='https://iqdtehqxusfiwokrzceo.supabase.co';
  const API_KEY='sb_publishable_i2YE7Nk-XcmmSQVi5-5_Tg_VAx1fSo7';
- const REDIRECT='https://dunumcebis-droid.github.io/cenub-avto/reset-password.html';
+ // Relative resolution keeps this deployment's directory and excludes query/fragment credentials.
+ const REDIRECT=typeof window!=='undefined'&&window.location?.href?new URL('reset-password.html',window.location.href).href:'https://dunumcebis-droid.github.io/cenub-avto/reset-password.html';
  const el=id=>document.getElementById(id);
  let epoch=0,recovery=null,state='request',requestBusy=false,resetBusy=false,closed=false;
 
