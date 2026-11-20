@@ -8,7 +8,7 @@ const MAX_BATCH_BODY_BYTES=MAX_BATCH_IMAGE_BYTES+64*1024;
 const CATEGORIES=new Set(['front','rear','side','interior','engine','other']);
 const RESULT_CATEGORIES=new Set([...CATEGORIES,'not_vehicle','uncertain']);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DEFAULT_ORIGINS=['https://dunumcebis-droid.github.io','https://avtounvan.vip'];
+const DEFAULT_ORIGINS=['https://dunumcebis-droid.github.io','https://avtounvan.vip','https://www.avtounvan.vip'];
 const VERDICT_KEYS=['category','confidence','contains_screen_ui','is_vehicle_photo'];
 const SCHEMA={type:'object',additionalProperties:false,properties:{
  is_vehicle_photo:{type:'boolean'},contains_screen_ui:{type:'boolean'},

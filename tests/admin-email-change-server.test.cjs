@@ -55,8 +55,8 @@ test('OPTIONS, unsupported methods, untrusted origins and absent bearer perform 
  const f=await fixture();const preflight=await f.invoke({method:'OPTIONS'});
  assert.equal(preflight.headers.get('access-control-allow-origin'),ORIGIN);assert.equal(preflight.headers.get('access-control-allow-methods'),'POST,OPTIONS');
 });
-test('GitHub and the owned HTTPS apex receive preflight and Auth response CORS without weakening Auth',async()=>{
- for(const origin of [ORIGIN,'https://avtounvan.vip']){
+test('GitHub and the owned HTTPS apex/www receive preflight and Auth response CORS without weakening Auth',async()=>{
+ for(const origin of [ORIGIN,'https://avtounvan.vip','https://www.avtounvan.vip']){
   const preflightFixture=await fixture();
   const preflight=await preflightFixture.invoke({method:'OPTIONS',headers:{Origin:origin}});
   assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('vary'),'Origin');assert.equal(preflight.headers.get('access-control-allow-methods'),'POST,OPTIONS');assert.deepEqual(preflightFixture.calls,[]);
@@ -71,8 +71,8 @@ test('GitHub and the owned HTTPS apex receive preflight and Auth response CORS w
   assert.equal(current.status,200);assert.equal(current.data.status,'already_current');assert.equal(current.headers.get('access-control-allow-origin'),origin);assert.equal(currentFixture.calls.length,2);assert.equal(writes(currentFixture.calls).length,0);noSecrets(current);
  }
 });
-test('HTTP, www, lookalike and unowned old domains are denied before Auth for POST and preflight',async()=>{
- for(const origin of ['http://avtounvan.vip','https://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
+test('HTTP, lookalike and unowned old domains are denied before Auth for POST and preflight',async()=>{
+ for(const origin of ['http://avtounvan.vip','http://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://www.avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
   for(const method of ['POST','OPTIONS']){
    const f=await fixture();const result=await f.invoke({method,headers:{Origin:origin}});
    assert.equal(result.status,403);assert.equal(result.data.code,'origin_denied');assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);assert.deepEqual(f.envReads,[]);noSecrets(result);

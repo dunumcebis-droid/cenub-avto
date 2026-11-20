@@ -1,17 +1,18 @@
 # AvtoUnvan
 
-Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və JavaScript GitHub Pages-də yerləşir; hesablar, elanlar və şəkil saxlancı Supabase ilə işləyir.
+Avtomobil elanları üçün Azərbaycan dilində statik sayt. HTML, CSS və JavaScript üçün Azhosting Starter hostinqi aktivdir; hesablar, elanlar və şəkil saxlancı Supabase ilə işləyir. GitHub Pages keçid dövründə əlavə yayımlanma ünvanıdır.
 
-- Sayt: https://dunumcebis-droid.github.io/cenub-avto/
+- Əsas domen: https://avtounvan.vip/
+- Əlavə ünvan: https://dunumcebis-droid.github.io/cenub-avto/
 - Kod: https://github.com/dunumcebis-droid/cenub-avto
 
 ## avtounvan.vip üçün hazırlıq — 19 noyabr 2026
 
-İstifadəçi domeni aldığını təsdiqləyib; Azhosting Starter üçün aylıq 2,99 AZN sifarişi davam edir. Hostinqin aktivləşməsi və yeni saytda HTTPS yayımı hələ təsdiqlənməyib. Cari canlı ünvan GitHub Pages olaraq qalır.
+Azhosting Starter aylıq 2,99 AZN hostinqi aktivdir. 20 noyabrda `https://avtounvan.vip/` və `https://www.avtounvan.vip/` etibarlı HTTPS ilə HTTP 200 qaytarıb. Yeni hostinqə köhnə monolit fayl yerləşdirilib: canlı başlıq hələ «Cənub Avto — Al. Sat. Tap.»-dır; yenilənmiş paketin hostinqə yüklənməsi gözlənilir.
 
-Bərpa formaları açıldıqları domenin və qovluğun `reset-password.html` səhifəsinə yönləndirir, sorğu və fragmenti daşımır. `ca-admin-email-change` v4 və `ca-photo-review` v6 yeni HTTPS domenini və mövcud GitHub origin-ini qəbul edir; `verify_jwt=true` qorunub. Canlıda hər iki funksiya üzrə iki icazəli və üç icazəsiz originin OPTIONS cavabları yoxlanılıb; məktub və şəkil təhlili sorğusu göndərilməyib.
+Bərpa formaları açıldıqları domenin və qovluğun `reset-password.html` səhifəsinə yönləndirir, sorğu və fragmenti daşımır. `ca-admin-email-change` v5 və `ca-photo-review` v7 əsas HTTPS domenini, işləyən `www` ünvanını və mövcud GitHub origin-ini qəbul edir; `verify_jwt=true` qorunub. Yeni allowlist üçün **63/63 Node sınağı**, canlıda isə **14/14 OPTIONS yoxlaması** keçib; məktub və şəkil təhlili sorğusu göndərilməyib.
 
-Ayrıca köçürmə paketi hazırlanıb: `public_html` üçün kökündə `index.html` olan 76 ictimai fayl, təxminən 7,3 MB ZIP. Şəxsi ehtiyat nüsxə, server kodu, verilənlər bazası ixracı və gizli açarlar daxil deyil; 46 orijinal şəkil dəyişməyib. Yeni domenin SEO nəticələri yalnız ayrıca paketdə yaradılıb. **149/149 Node** və həmin paket üzərində **19/19 imitasiya edilmiş bərpa/SEO brauzer sınağı** keçib. Qalan keçid addımları [SEO_SETUP.md](SEO_SETUP.md) sənədindədir.
+Ayrıca köçürmə paketi hazırlanıb: `public_html` üçün kökündə `index.html` olan 76 ictimai fayl, təxminən 7,3 MB ZIP. Şəxsi ehtiyat nüsxə, server kodu, verilənlər bazası ixracı və gizli açarlar daxil deyil; 46 orijinal şəkil dəyişməyib. HTTPS domeni təsdiqləndiyi üçün əsas SEO konfiqurasiyası da `https://avtounvan.vip/` ünvanına keçirilib. **149/149 Node** və əvvəlki paket üzərində **19/19 imitasiya edilmiş bərpa/SEO brauzer sınağı** keçib. Yayımlanma yalnız yeni fayllar canlıdan yoxlanandan sonra tamamlanmış sayılacaq. Qalan keçid addımları [SEO_SETUP.md](SEO_SETUP.md) sənədindədir.
 
 ## SEO hazırlığı — 19 noyabr 2026
 

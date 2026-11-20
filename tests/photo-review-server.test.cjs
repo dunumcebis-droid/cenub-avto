@@ -70,8 +70,8 @@ test('wrong origin and unsupported methods are denied before Auth',async()=>{
  const f=await fixture();assert.equal((await f.invoke({headers:{Origin:'https://untrusted.invalid'}})).status,403);assert.equal((await f.invoke({method:'GET'})).status,405);assert.equal(f.calls.length,0);
  const preflight=await f.handler(new Request(BASE+'/functions/v1/ca-photo-review',{method:'OPTIONS',headers:{Origin:'https://dunumcebis-droid.github.io'}}));assert.equal(preflight.status,204);assert.equal(f.calls.length,0);
 });
-test('GitHub and the owned HTTPS apex reflect CORS for preflight, Auth failures and authenticated status',async()=>{
- for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip']){
+test('GitHub and the owned HTTPS apex/www reflect CORS for preflight, Auth failures and authenticated status',async()=>{
+ for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip','https://www.avtounvan.vip']){
   const preflightFixture=await fixture();
   const preflight=await preflightFixture.invoke({method:'OPTIONS',headers:{Origin:origin}});
   assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('vary'),'Origin');assert.equal(preflight.headers.get('access-control-allow-methods'),'GET,POST,OPTIONS');assert.deepEqual(preflightFixture.calls,[]);
@@ -86,8 +86,8 @@ test('GitHub and the owned HTTPS apex reflect CORS for preflight, Auth failures 
   assert.equal(status.status,200);assert.deepEqual(status.data,statusValue(false,true));assert.equal(status.headers.get('access-control-allow-origin'),origin);assert.equal(statusFixture.calls.length,2);assert.equal(providerCalls(statusFixture.calls).length,0);assert.equal(uploadCalls(statusFixture.calls).length,0);
  }
 });
-test('photo review rejects HTTP, www, lookalikes and removed unowned origins before Auth',async()=>{
- for(const origin of ['http://avtounvan.vip','https://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
+test('photo review rejects HTTP, lookalikes and removed unowned origins before Auth',async()=>{
+ for(const origin of ['http://avtounvan.vip','http://www.avtounvan.vip','https://avtounvan.vip.evil.invalid','https://www.avtounvan.vip.evil.invalid','https://cenubavto.az','https://www.cenubavto.az','https://untrusted.invalid']){
   for(const method of ['POST','OPTIONS']){
    const f=await fixture();const result=await f.invoke({method,headers:{Origin:origin}});
    assert.equal(result.status,403);assert.equal(result.data.code,'origin_denied');assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);
@@ -99,7 +99,7 @@ test('custom photo origin configuration still replaces defaults instead of silen
  const f=await fixture({env:{PHOTO_REVIEW_ALLOWED_ORIGINS:custom}});
  const preflight=await f.invoke({method:'OPTIONS',headers:{Origin:custom}});
  assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),custom);assert.deepEqual(f.calls,[]);
- for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip']){
+ for(const origin of ['https://dunumcebis-droid.github.io','https://avtounvan.vip','https://www.avtounvan.vip']){
   const result=await f.invoke({method:'GET',status:true,headers:{Origin:origin}});
   assert.equal(result.status,403);assert.equal(result.headers.get('access-control-allow-origin'),null);assert.deepEqual(f.calls,[]);
  }

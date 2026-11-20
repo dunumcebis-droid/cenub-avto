@@ -1,6 +1,6 @@
 /** Syncs only the authenticated administrator's login and an existing metadata email. */
 const TARGET_EMAIL='avtounvan@gmail.com';
-const ALLOWED_ORIGINS=new Set(['https://dunumcebis-droid.github.io','https://avtounvan.vip']);
+const ALLOWED_ORIGINS=new Set(['https://dunumcebis-droid.github.io','https://avtounvan.vip','https://www.avtounvan.vip']);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_BODY_BYTES=256;
 const messages={
