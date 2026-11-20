@@ -4,7 +4,7 @@ SEO saytın axtarış sistemləri tərəfindən tapılmasını və məzmununun d
 
 ## Cari ünvan və statik səhifələr
 
-Əsas domen **https://avtounvan.vip/**-dur. İstifadəçi domen və Azhosting Starter hostinqini alıb; 20 noyabrda həm əsas domen, həm `www` etibarlı HTTPS ilə HTTP 200 qaytarıb. Canlı hostinqdə hələ köhnə fayl yerləşir; yenilənmiş AvtoUnvan paketinin yüklənməsi gözlənilir. `seo.config.json` və yaradılan SEO ünvanları təsdiqlənmiş `https://avtounvan.vip/` əsasında hazırlanır. Əlavə GitHub Pages ünvanı keçid dövründə işlək saxlanılır.
+Əsas domen **https://avtounvan.vip/**-dur. İstifadəçi yeni AvtoUnvan paketini Azhosting Starter hostinqində yayımlayıb. 20 noyabrda **76/76 ictimai faylın** canlı məzmunu cari mənbə ilə eyni olub; əsas domen və `www` etibarlı HTTPS ilə HTTP 200 qaytarıb. `seo.config.json` və yayımlanmış SEO ünvanları `https://avtounvan.vip/` əsasında hazırlanır. Əlavə GitHub Pages ünvanı keçid dövründə işlək saxlanılır.
 
 `seo.config.json` SEO üçün əsas mənbədir: sayt ünvanı, brend, açıq dəstək əlaqələri, mövcud loqo, səhifə başlıqları, təsvirlər və Google təsdiq tokeni burada saxlanılır. Faylda parol, API açarı və şəxsi elan məlumatı saxlanılmır.
 
@@ -59,7 +59,7 @@ Yalnız istifadəçinin sahibi olduğu və sayta həqiqətən qoşulmuş domen �
 
 Domenin DNS/HTTPS ayarları, əvvəlki ünvandan yönləndirmə və hesab/bərpa keçidlərinin domenə uyğunlaşdırılması ayrıca hosting və giriş konfiqurasiyasıdır; SEO generatoru bunları dəyişdirmir. Yeni ünvan üçün Search Console sahiblik yoxlamasını yenidən edin, həmin xüsusiyyətin tokenini istifadə edin və yeni sitemap-ı təqdim edin.
 
-`avtounvan.vip` üçün hostinq, DNS və HTTPS işləyir; növbəti addım yeni ictimai ZIP-i domenin `public_html` qovluğunda açmaqdır. Supabase Auth **Site URL** `https://avtounvan.vip/` seçilməli, **Redirect URLs** siyahısına `https://avtounvan.vip/` və `https://avtounvan.vip/reset-password.html` əlavə olunmalıdır. `www` ayrıca xidmət göstərdiyi üçün onun `https://www.avtounvan.vip/` və `https://www.avtounvan.vip/reset-password.html` ünvanları da əlavə edilməlidir. Keçid dövründə mövcud GitHub ünvanları saxlanılır. SMTP göndərəni `avtounvan@gmail.com` olaraq qalır. Bu ayarların sahib tərəfindən saxlanması ayrıca təsdiq tələb edir; SEO generatoru Auth ayarlarını dəyişmir.
+`avtounvan.vip` üçün hostinq, DNS, HTTPS və yeni ictimai faylların yayımı yoxlanılıb. Supabase Auth **Site URL** `https://avtounvan.vip/` seçilməli, **Redirect URLs** siyahısına `https://avtounvan.vip/` və `https://avtounvan.vip/reset-password.html` əlavə olunmalıdır. `www` ayrıca xidmət göstərdiyi üçün onun `https://www.avtounvan.vip/` və `https://www.avtounvan.vip/reset-password.html` ünvanları da əlavə edilməlidir. Keçid dövründə mövcud GitHub ünvanları saxlanılır. SMTP göndərəni `avtounvan@gmail.com` olaraq qalır. İstifadəçi yeni Auth URL ayarlarının saxlanmasına əmin olmadığını bildirib; həmin ayarlar və real məktubdan yeni domenə keçid hələ təsdiqlənməyib. SEO generatoru Auth ayarlarını dəyişmir.
 
 `.github/workflows/recover-pages.yml` əvvəlki konkret ilişmiş yayımı ləğv etmək üçündür. SEO generatoru həmin workflow-u dəyişdirmir və işə salmır; SEO üçün hosting rejimi dəyişdirilməyib.
 
