@@ -1,7 +1,7 @@
 {
   "checkedOn": "2026-11-20",
   "site": "https://avtounvan.vip/",
-  "result": "Passed within the documented scope; index-only QA patch awaits Azhosting deployment.",
+  "result": "Passed within the documented scope; index-only QA patch deployed and verified on apex and www.",
   "node": {
     "passed": 149,
     "failed": 0,
@@ -133,7 +133,7 @@
     "Local scratch evidence paths refer to retained workspace logs, not public release assets."
   ],
   "deployment": {
-    "status": "QA patch ready; not yet deployed to Azhosting",
+    "status": "Deployed to Azhosting by owner; live index bytes verified",
     "patchFiles": [
       "index.html"
     ],
@@ -151,6 +151,56 @@
       "workflowRun": "https://github.com/dunumcebis-droid/cenub-avto/actions/runs/44806230233"
     },
     "indexSha256": "f15f8efad9a02bc1155de1fc38df79a50fbe16e702f2e52b007605c9afa93c96",
-    "download": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-qa-20261120/AvtoUnvan-QA.zip"
+    "download": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-qa-20261120/AvtoUnvan-QA.zip",
+    "verifiedAtUtc": "2026-11-20T20:03:26Z",
+    "liveVerification": {
+      "success": true,
+      "index": [
+        {
+          "url": "https://avtounvan.vip/",
+          "status": 200,
+          "byteMatch": true,
+          "sha256": "f15f8efad9a02bc1155de1fc38df79a50fbe16e702f2e52b007605c9afa93c96",
+          "svgArrow": true,
+          "oldCabinetNoteAbsent": true
+        },
+        {
+          "url": "https://www.avtounvan.vip/",
+          "status": 200,
+          "byteMatch": true,
+          "sha256": "f15f8efad9a02bc1155de1fc38df79a50fbe16e702f2e52b007605c9afa93c96",
+          "svgArrow": true,
+          "oldCabinetNoteAbsent": true
+        }
+      ],
+      "realWrites": 0,
+      "criticalDependencies": [
+        {
+          "path": "assets/site.css",
+          "status": 200,
+          "byteMatch": true
+        },
+        {
+          "path": "assets/js/22-site-visitors.js",
+          "status": 200,
+          "byteMatch": true
+        },
+        {
+          "path": "assets/js/09-auth.js",
+          "status": 200,
+          "byteMatch": true
+        },
+        {
+          "path": "reset-password.html",
+          "status": 200,
+          "byteMatch": true
+        },
+        {
+          "path": "assets/branding/avtounvan-logo.png",
+          "status": 200,
+          "byteMatch": true
+        }
+      ]
+    }
   }
 }
