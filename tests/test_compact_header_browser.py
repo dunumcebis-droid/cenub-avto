@@ -18,8 +18,10 @@ class CompactHeaderBackend(MarketplaceBackend):
                 request.headers.get('authorization') == 'Bearer admin-token'))
             return
         if path in ('/rest/v1/rpc/ca_record_site_visit', '/rest/v1/rpc/ca_daily_site_visitors'):
-            route.fulfill(content_type='application/json', body=json.dumps(
-                {'day': '2026-11-20', 'timeZone': 'Asia/Baku', 'visitors': 47}))
+            payload = {'day':'2026-11-20','timezone':'Asia/Baku','visitors':47}
+            if path.endswith('/ca_record_site_visit'):
+                payload['counted'] = False
+            route.fulfill(content_type='application/json', body=json.dumps(payload))
             return
         super().route(route)
 
@@ -103,14 +105,14 @@ class CompactHeaderBrowserTests(unittest.TestCase):
                 self.page.evaluate('closeAuth()')
 
     def test_masked_phone_notifications_and_publishing_work_in_compact_header(self):
-        phone = '+994504468844'
+        phone = '+994500001234'
         self.sign_in(phone)
         self.page.wait_for_function("document.getElementById('caNotificationBadge').textContent==='1'")
         for width in (320, 390, 430, 1440):
             with self.subTest(width=width):
                 self.assert_geometry(width, True)
                 status = self.page.locator('#accountStatus')
-                self.assertEqual(status.inner_text(), '● ••• 8844')
+                self.assertEqual(status.inner_text(), '● ••• 1234')
                 self.assertNotIn(phone, status.get_attribute('aria-label'))
                 self.page.locator('#caNotificationsLaunch').click()
                 self.assertTrue(self.page.locator('#caMarketOverlay').is_visible())
@@ -125,7 +127,7 @@ class CompactHeaderBrowserTests(unittest.TestCase):
         notice = self.backend.notifications[OWNER][0]
         self.backend.notifications[OWNER] = [dict(notice,
             id=f'66666666-6666-4666-8666-{n:012d}') for n in range(123)]
-        phone = '+99412345678901234567890128844'
+        phone = '+99412345678901234567890121234'
         self.sign_in(phone, admin=True)
         self.page.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
         self.page.wait_for_function("document.getElementById('caNotificationBadge').textContent==='99+'")
@@ -133,7 +135,7 @@ class CompactHeaderBrowserTests(unittest.TestCase):
         for width in (320, 390, 430, 1440):
             with self.subTest(width=width):
                 self.assert_geometry(width, True)
-                self.assertEqual(self.page.locator('#accountStatus').inner_text(), '● ••• 8844')
+                self.assertEqual(self.page.locator('#accountStatus').inner_text(), '● ••• 1234')
                 self.assertEqual(self.page.evaluate('currentUser.phone'), phone)
         self.sign_in('+49 1234567890', owner=OTHER_OWNER)
         self.page.wait_for_function("document.getElementById('caNotificationBadge').textContent==='1'")
