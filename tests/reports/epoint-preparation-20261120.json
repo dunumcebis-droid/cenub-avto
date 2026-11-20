@@ -1,0 +1,134 @@
+{
+  "checkedOn": "2026-11-20",
+  "scope": "Offline server protocol preparation, not active Epoint payment integration",
+  "merchantStatus": "Registration and KYC/activity-code confirmation pending",
+  "nodeSuite": {
+    "passed": 166,
+    "failed": 0,
+    "skipped": 0,
+    "newProtocolCases": 17,
+    "existingCases": 149,
+    "evidence": "/workspace/scratch/epoint-preparation-node.log"
+  },
+  "independentOfflineReview": {
+    "passed": 17,
+    "total": 17,
+    "cases": [
+      {
+        "name": "independent SHA1 binary digest vector",
+        "pass": true
+      },
+      {
+        "name": "callback exact original encoded bytes",
+        "pass": true
+      },
+      {
+        "name": "reject signature mutation in first and last decoded bytes",
+        "pass": true
+      },
+      {
+        "name": "reject cross order transaction amount currency operation",
+        "pass": true
+      },
+      {
+        "name": "escaped duplicate JSON key rejected",
+        "pass": true
+      },
+      {
+        "name": "missing signature cannot authorize a browser return",
+        "pass": true
+      },
+      {
+        "name": "only normalized minimum fields survive callback",
+        "pass": true
+      },
+      {
+        "name": "exact decimal amount 0.29 works",
+        "pass": true
+      },
+      {
+        "name": "create uses fixed endpoint once and encodes signature safely",
+        "pass": true
+      },
+      {
+        "name": "documented exact decimal amount wire type",
+        "pass": true
+      },
+      {
+        "name": "ambiguous HTTP5xx create never retries",
+        "pass": true
+      },
+      {
+        "name": "ambiguous noncompliant timeout remains one call",
+        "pass": true
+      },
+      {
+        "name": "host userinfo lookalike and private IP rejected",
+        "pass": true
+      },
+      {
+        "name": "empty fragment also rejected under no fragment policy",
+        "pass": true
+      },
+      {
+        "name": "status uses exact queried transaction and no card PII",
+        "pass": true
+      },
+      {
+        "name": "authenticated pre-bind decode has no settlement authority",
+        "pass": true
+      },
+      {
+        "name": "numeric amount cents roundtrip rejects unrepresentable before I/O",
+        "pass": true
+      }
+    ]
+  },
+  "files": {
+    "supabase/functions/_shared/epoint-protocol.mjs": {
+      "sha256": "b73d11ee37a76927b2e41494fe67ea5839acd7a7f29cd59547a68160286c2d6f"
+    },
+    "tests/epoint-protocol.test.cjs": {
+      "sha256": "b6dcc80b5eb7f118940df6d39a9b3f31d02e2dafb23dd7aa4dc8347413d1b4ef"
+    }
+  },
+  "verifiedCapabilities": [
+    "Original encoded-byte SHA1 signature verification against independent vectors",
+    "Bounded UTF-8/base64/JSON with duplicate-key rejection",
+    "MAC-authenticated callback decoding separately from immutable-attempt binding",
+    "Saved order, transaction, amount, AZN and customer-payment operation matching",
+    "Nonpaid pending, failed, refunded and lookup-unknown observations",
+    "Exact qepik-to-numeric-amount roundtrip",
+    "Fixed official request/status endpoints, no auto retry, ambiguous creation errors",
+    "Configured HTTPS bank redirect origins, bounded streamed responses and timeouts",
+    "Normalized observations and errors omit cardholder/masked-card and upstream diagnostic payloads"
+  ],
+  "noActivation": {
+    "providerRequests": 0,
+    "productionDatabaseWrites": 0,
+    "deployedEdgeFunctions": [],
+    "publicHostingFilesChanged": [],
+    "unchangedPublicFileCount": 77,
+    "ledgerOrEntitlementApplicationImplemented": false,
+    "browserCheckoutImplemented": false
+  },
+  "remainingBeforeLive": [
+    "Merchant approval and Epoint-confirmed URLs, bank redirect origins and callback acknowledgement/retry behavior",
+    "Owner-authorized immutable payment attempts with atomic idempotent settlement, reconciled manual approval/rejection races",
+    "Secure server endpoint with secrets, owned client checkout/status and fixed return pages",
+    "Payment ledger backup/reconciliation and refund/replay safeguards",
+    "Real approved merchant test-environment end-to-end verification; real-money tests separately agreed"
+  ],
+  "documentationNotes": [
+    "Current request table declares numeric amount while some examples use a decimal string. Numeric wire amount follows the declared type and rejects an inexact roundtrip; merchant conformance is not yet tested.",
+    "Callback/status currency may be omitted in the documented schema; AZN is held in the saved attempt and contrary reported currency is rejected.",
+    "The stateless helper authenticates and validates observations, not durable deduplication or package authorization."
+  ],
+  "officialSources": [
+    "https://epointbucket.s3.eu-central-1.amazonaws.com/files/instructions/API%20Epoint%20en.pdf",
+    "https://developer.epoint.az/az/checkout/request",
+    "https://developer.epoint.az/en/callbacks",
+    "https://developer.epoint.az/az/status/get-status",
+    "https://epoint.az/az/contact"
+  ]
+}

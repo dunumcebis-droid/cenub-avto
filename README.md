@@ -172,7 +172,7 @@ Node testləri daxili test kitabxanasından istifadə edir. Python testləri ü�
 
 ## Ödənişin vəziyyəti
 
-Mövcud əl ilə paket sorğusu və admin təsdiqi axını saxlanılıb. İstifadəçinin hazırda merchant hesabı yoxdur; VÖEN və ABB ilə internet ekvayrinq/merchant girişi alındıqdan sonra bank inteqrasiyası ayrıca tamamlanmalıdır. Bu məlumatlar olmadan kartdan avtomatik ödəniş və bankın təsdiqlədiyi ödəniş nəticəsi aktiv deyil.
+Mövcud əl ilə paket sorğusu və admin təsdiqi axını saxlanılıb. İstifadəçi Epoint seçib; VÖEN və biznes bank hesabı hazırdır, tacir qeydiyyatı və anketin dəqiqləşdirilməsi davam edir. Server protokolunun hazırlığı qeydiyyatdan ayrı aparılır; kartdan avtomatik ödəniş hələ aktiv deyil. [Hazırlanan hissə və canlı qoşulmanın qalan addımları](PAYMENT_SETUP.md) ayrıca qeyd olunub.
 
 Əvvəlki açıq elan oxuma icazəsinin tətbiq tarixçəsi [PUBLIC_LISTING_ACCESS.md](PUBLIC_LISTING_ACCESS.md) sənədində saxlanılır; həmin sənəd cari yeniləmənin yayım sübutu deyil.
 
