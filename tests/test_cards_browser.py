@@ -12,6 +12,7 @@ import unittest
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from playwright.sync_api import sync_playwright
+from site_visitors_fixture import handle_site_visitors, SITE_VISITOR_PATHS
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'http://127.0.0.1:8765/'
@@ -116,7 +117,7 @@ def browse_fixture_response(rows, payload, today_approved=3):
     project = lambda row: {key:value for key,value in row.items() if key in PUBLIC_COLUMNS}
     return {'items':[project(row) for row in selected[(page-1)*size:page*size]],
             'total':len(selected),'page':page,'page_size':size,
-            'total_pages':max(1,(len(selected)+size-1)//size),
+            'total_pages':(len(selected)+size-1)//size,
             'vip_items':[project(row) for row in active if row.get('paket_adi')=='VIP'][:6],
             'today_approved':today_approved}
 
@@ -140,11 +141,14 @@ class CardBrowserTests(unittest.TestCase):
         self.page = self.context.new_page()
         self.errors = []
         self.requests = []
+        self.site_visitors = set()
         self.page.on('pageerror', lambda error: self.errors.append(str(error)))
 
         def route(request):
             req = request.request
             self.requests.append((req.method, req.url))
+            if handle_site_visitors(request, self.site_visitors):
+                return
             if req.url == ORIGIN:
                 request.fulfill(content_type='text/html', body=self.html)
             elif req.url.startswith(ORIGIN):
@@ -202,9 +206,10 @@ class CardBrowserTests(unittest.TestCase):
         self.assertFalse(self.errors, 'Uncaught browser errors')
         permitted_posts = {'/rest/v1/rpc/'+name for name in MARKET_READ_RPC_NAMES}
         permitted_posts.update(('/rest/v1/rpc/ca_browse_listings', '/rest/v1/rpc/ca_record_listing_event'))
+        permitted_posts.update(SITE_VISITOR_PATHS)
         self.assertFalse([item for item in self.requests if item[0] not in ('GET','HEAD') and
                           not (item[0]=='POST' and urlsplit(item[1]).path in permitted_posts)],
-                         'Only exact mocked browse/read and listing-event contracts may use POST; listing mutations stay forbidden')
+                         'Only exact mocked browse/read, traffic and listing-event contracts may use POST; listing mutations stay forbidden')
         self.assertTrue(any(method=='POST' and urlsplit(url).path=='/rest/v1/rpc/ca_browse_listings' for method,url in self.requests))
         reads = [(method, url) for method, url in self.requests if '/rest/v1/elanlar?' in url]
         for method, url in reads:
@@ -225,6 +230,34 @@ class CardBrowserTests(unittest.TestCase):
 
     def text(self, selector):
         return self.page.locator(selector).inner_text()
+
+    def test_empty_search_is_a_valid_result_instead_of_a_network_error(self):
+        self.page.locator('#caFilterLaunch').click()
+        self.page.locator('#searchPrice').fill('1')
+        self.page.evaluate('searchCars()')
+        self.page.wait_for_function('caBrowseState.loaded&&!caBrowseState.loading&&caBrowseState.total===0')
+        self.assertFalse(self.page.evaluate('caBrowseState.error||caListingsError'))
+        self.assertEqual(self.page.locator('#allGrid .car-card').count(), 0)
+        self.assertIn('Axtarışa uyğun elan tapılmadı', self.text('#allGrid'))
+
+    def test_untrusted_listing_text_is_rendered_as_text_in_cards_and_details(self):
+        payload = '\"><img src=x onerror="window.__qaInjected=true">'
+        key = self.page.evaluate('''payload=>{
+          window.__qaInjected=false;
+          const car={...allCars()[0],marka:payload,make:payload,brand:payload,
+            model:'QA-model',name:payload,city:payload,seher:payload,
+            desc:payload,description:payload,tesvir:payload};
+          window.__qaCar=car;
+          document.getElementById('allGrid').innerHTML=card(car);return listingKey(car);
+        }''', payload)
+        self.assertIn(payload, self.text('#allGrid'))
+        self.assertFalse(self.page.evaluate('window.__qaInjected'))
+        self.assertEqual(self.page.locator('#allGrid img[src="x"]').count(), 0)
+        self.page.evaluate('()=>caOpenCarRecord(window.__qaCar)')
+        self.page.locator('#detailOverlay').wait_for(state='visible')
+        self.assertIn(payload, self.text('#detailOverlay'))
+        self.assertEqual(self.page.locator('#detailOverlay img[src="x"]').count(), 0)
+        self.assertFalse(self.page.evaluate('window.__qaInjected'))
 
     def test_every_card_metadata_and_geometry_desktop_and_mobile(self):
         expected = [

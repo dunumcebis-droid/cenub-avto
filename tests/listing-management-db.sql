@@ -3,6 +3,12 @@
 -- No auth users are created, no existing user/listing/payment row is changed,
 -- and no IDs or credentials are returned. NEVER replace ROLLBACK with COMMIT.
 begin;
+-- Isolate legacy business-rule fixtures from the separately tested photo gate.
+-- This toggle and all fixtures are transaction-local and are always rolled back.
+create temporary table ca_qa_photo_flags as
+ select enabled,admin_preview from ca_private.photo_review_config where singleton;
+update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
+
 
 create temporary table ca_test_results (name text primary key);
 create temporary table ca_test_context (
@@ -140,7 +146,7 @@ begin
   insert into public.elanlar(satici_id,marka,model,il,qiymet,yurus,veziyyet,sekiller,ca_data)
     values(c.owner_id,c.marker||'_PAID','Paid lifecycle',2020,150,0,'gozlemede',
       array['https://fixture.invalid/paid-front.jpg','https://fixture.invalid/paid-rear.jpg'],
-      jsonb_build_object('requestedPackage','Önə çıxarılan — 15 AZN / 15 gün'))
+      jsonb_build_object('requestedPackage','Önə çıxarılan — 10 AZN / 15 gün'))
     returning id into v_id;
   v_first:=public.ca_paket_sorgusu_yarat(v_id,'VIP');
   v_second:=public.ca_paket_sorgusu_yarat(v_id,'VIP');
@@ -620,4 +626,16 @@ $test$;
 
 select count(*) as passed_count,array_agg(name order by name) as passed_tests
   from pg_temp.ca_test_results;
+
+reset role;
+update ca_private.photo_review_config c
+ set enabled=f.enabled,admin_preview=f.admin_preview
+ from pg_temp.ca_qa_photo_flags f where c.singleton;
+do $qa_restore$
+begin
+ if exists(select 1 from ca_private.photo_review_config c cross join pg_temp.ca_qa_photo_flags f
+  where c.singleton and (c.enabled,c.admin_preview) is distinct from (f.enabled,f.admin_preview)) then
+  raise exception 'QA photo configuration was not restored';
+ end if;
+end $qa_restore$;
 rollback;

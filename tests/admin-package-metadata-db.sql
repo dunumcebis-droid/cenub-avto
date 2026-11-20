@@ -2,6 +2,12 @@
 -- DDL after BEGIN for preflight. Only generated fixtures are modified. Existing
 -- users/listings/payments/photos/packages are never changed. Never COMMIT.
 begin;
+-- Isolate legacy business-rule fixtures from the separately tested photo gate.
+-- This toggle and all fixtures are transaction-local and are always rolled back.
+create temporary table ca_qa_photo_flags as
+ select enabled,admin_preview from ca_private.photo_review_config where singleton;
+update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
+
 create temporary table ca_pkg_results(name text primary key);
 create temporary table ca_pkg_context as
 select
@@ -203,4 +209,16 @@ select pg_temp.ca_pkg_check('existing_payment_records_remain_unchanged',c.paymen
  select md5(jsonb_agg(to_jsonb(p) order by p.id)::text) from public.paket_sorgulari p
  where not exists(select 1 from ca_pkg_fixture_ids f where f.id=p.elan_id))) from ca_pkg_context c;
 select count(*) passed_count,array_agg(name order by name) passed_tests from ca_pkg_results;
+
+reset role;
+update ca_private.photo_review_config c
+ set enabled=f.enabled,admin_preview=f.admin_preview
+ from pg_temp.ca_qa_photo_flags f where c.singleton;
+do $qa_restore$
+begin
+ if exists(select 1 from ca_private.photo_review_config c cross join pg_temp.ca_qa_photo_flags f
+  where c.singleton and (c.enabled,c.admin_preview) is distinct from (f.enabled,f.admin_preview)) then
+  raise exception 'QA photo configuration was not restored';
+ end if;
+end $qa_restore$;
 rollback;

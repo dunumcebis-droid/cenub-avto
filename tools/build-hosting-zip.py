@@ -54,12 +54,16 @@ def public_files():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--index-only", action="store_true",
+                        help="Build an index.html patch for an already deployed full site.")
     args = parser.parse_args()
     output = args.output.absolute()
     if (output.is_symlink() or output.resolve().is_relative_to(ROOT)
             or output.suffix.lower() != ".zip" or not output.parent.is_dir()):
         parser.error("Output must be a ZIP outside the repository in an existing temporary directory.")
     files = public_files()
+    if args.index_only:
+        files = [(name, content) for name, content in files if name == "index.html"]
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(dir=output.parent, suffix=".zip", delete=False) as handle:

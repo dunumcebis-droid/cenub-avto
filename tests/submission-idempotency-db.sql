@@ -1,5 +1,11 @@
 -- Synthetic owner writes; every fixture is rolled back. Do not change ROLLBACK.
 begin;
+-- Isolate legacy business-rule fixtures from the separately tested photo gate.
+-- This toggle and all fixtures are transaction-local and are always rolled back.
+create temporary table ca_qa_photo_flags as
+ select enabled,admin_preview from ca_private.photo_review_config where singleton;
+update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
+
 do $test$
 declare
  owner_id uuid; other_id uuid; fixture_id uuid; marker text:=gen_random_uuid()::text;
@@ -39,16 +45,28 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated')::text,true);
  perform set_config('role','authenticated',true);
  insert into public.elanlar(satici_id,marka,model,il,qiymet,veziyyet,ca_data)
- values(owner_id,'CA_SYNTHETIC_RETRY','VIP rollback',2020,100,'gozlemede',jsonb_build_object('_submission_id',second_key,'requestedPackage','VIP — 15 AZN')) returning id into fixture_id;
+ values(owner_id,'CA_SYNTHETIC_RETRY','VIP rollback',2020,100,'gozlemede',jsonb_build_object('_submission_id',second_key,'requestedPackage','Önə çıxarılan — 10 AZN / 15 gün')) returning id into fixture_id;
  blocked:=false;
  begin
   insert into public.elanlar(satici_id,marka,model,il,qiymet,veziyyet,ca_data)
-  values(owner_id,'CA_SYNTHETIC_RETRY','Duplicate VIP rollback',2020,100,'gozlemede',jsonb_build_object('_submission_id',second_key,'requestedPackage','VIP — 15 AZN'));
+  values(owner_id,'CA_SYNTHETIC_RETRY','Duplicate VIP rollback',2020,100,'gozlemede',jsonb_build_object('_submission_id',second_key,'requestedPackage','Önə çıxarılan — 10 AZN / 15 gün'));
  exception when unique_violation then blocked:=true;end;
  if not blocked then raise exception 'Duplicate VIP listing accepted';end if;
  perform set_config('role','none',true);
  if (select count(*) from public.paket_sorgulari where elan_id=fixture_id and paket_adi='VIP')<>1 or (select count(*) from public.paket_sorgulari)<>before_requests+1 then raise exception 'VIP request count mismatch';end if;
 end $test$;
+
+reset role;
+update ca_private.photo_review_config c
+ set enabled=f.enabled,admin_preview=f.admin_preview
+ from pg_temp.ca_qa_photo_flags f where c.singleton;
+do $qa_restore$
+begin
+ if exists(select 1 from ca_private.photo_review_config c cross join pg_temp.ca_qa_photo_flags f
+  where c.singleton and (c.enabled,c.admin_preview) is distinct from (f.enabled,f.admin_preview)) then
+  raise exception 'QA photo configuration was not restored';
+ end if;
+end $qa_restore$;
 rollback;
 select true as unique_index_present,true as private_helper_unexposed,true as duplicate_owner_request_blocked,
  true as omitted_key_preserved,true as changed_key_preserved,true as same_key_different_owner_allowed,

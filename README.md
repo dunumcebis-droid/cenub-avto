@@ -199,3 +199,11 @@ Elan formasında bir və ya bir neçə satış şərti seçilir; yeni formada Na
 Əsas ekrandakı ayrıca düymələr və əlavə filtr eyni `saleType` seçimini idarə edir. Seçim nəticələri birinci səhifədən açır, digər tətbiq edilmiş filtrlər/sıralama ilə birlikdə işləyir və VIP elanları da uyğun süzür. Kartlarda və tam məlumatda satış şərtləri görünür. Saxlanılan axtarışlar və yeni elan bildirişləri bu seçimi saxlayır. Kredit nişanı satıcının bəyan etdiyi imkandır; bank təsdiqi və ya ödəniş əməliyyatı deyil.
 
 `database/sale-options.sql` əvvəlki miqrasiyalardan sonra tətbiq olunur: oxuma köməkçisi, yalnız dəyişən/açıq seçimlər üçün yazma yoxlaması, siyahı/VIP filtri və saxlanılan axtarış uyğunluğu. Şəkillər, VIP tarixçəsi və əvvəlki elanlar dəyişdirilmir.
+
+## Cari QA yoxlaması — 20 noyabr 2026
+
+149 Node sınağı keçib. Brauzerdə 306 mövcud ssenarinin ilkin yoxlamasından sonra köhnəlmiş sınaq məlumatları düzəldilib və həmin 18 ssenari ayrıca uğurla təkrar yoxlanıb. Elan mətninin təhlükəsiz göstərilməsi və boş axtarış nəticəsi üçün iki yeni sınaqla birlikdə 308 fərqli brauzer ssenarisi əhatə olunub; bu rəqəm bir neçə yoxlamanın nəticəsidir. 13 SQL sınaq dəsti sintetik məlumatlarla `ROLLBACK` daxilində keçib; canlı qeydlər və şəkil yoxlamasının ayarları saxlanılıb.
+
+Əvvəlki 77 fayllıq yayım canlıda tutuşdurulub. Yeni `index.html` önizləməsi 320, 390 və 1440 piksel enlərdə yoxlanıb: «Elanlara bax» oxu şriftdən asılı olmayan SVG ilə əvəz edilib, kabinetdə artıq qüvvədə olmayan SMS/baza/giriş hazırlığı qeydi çıxarılıb. Bu kiçik QA düzəlişi hələ Azhosting-ə yüklənməyib. [Əhatə, nəticələr və yayım vəziyyəti](tests/reports/qa-20261120.json) ayrıca saxlanılır.
+
+QA zamanı real məktub, hesab dəyişikliyi və foto yoxlama provayderi çağırışı edilməyib; yeni domenlə məktub çatması və parol dəyişməsi əvvəl istifadəçi tərəfindən təsdiqlənib. Avtomatik bank ödənişi qoşulmayıb, mövcud təhlükəsizlik məsləhətçisi xəbərdarlıqları ayrıca qeydə alınıb və istehsal yük sınağı aparılmayıb.

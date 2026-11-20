@@ -13,6 +13,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from playwright.sync_api import sync_playwright
 from test_listing_management_browser import ORIGIN, ROOT, safe_local_asset
+from site_visitors_fixture import handle_site_visitors
 
 RESET_URL = ORIGIN + 'reset-password.html'
 REDIRECT = RESET_URL
@@ -26,6 +27,7 @@ class ResetPageBackend:
     def __init__(self):
         self.calls = []
         self.unexpected = []
+        self.site_visitors = set()
         self.leaks = []
         self.pending_get = []
         self.pending_put = []
@@ -55,6 +57,8 @@ class ResetPageBackend:
             return
         if parsed.netloc == '127.0.0.1:8766' and parsed.path == '/favicon.ico':
             route.fulfill(status=204, body='')
+            return
+        if handle_site_visitors(route, self.site_visitors):
             return
         if parsed.netloc != 'iqdtehqxusfiwokrzceo.supabase.co' or not parsed.path.startswith('/auth/v1/'):
             self.unexpected.append({'method': req.method, 'path': parsed.path})

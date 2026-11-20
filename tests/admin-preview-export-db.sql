@@ -1,5 +1,11 @@
 -- Read-only role, private-preview and exact keyset-export checks. Always rolled back.
 begin;
+-- Isolate legacy business-rule fixtures from the separately tested photo gate.
+-- This toggle and all fixtures are transaction-local and are always rolled back.
+create temporary table ca_qa_photo_flags as
+ select enabled,admin_preview from ca_private.photo_review_config where singleton;
+update ca_private.photo_review_config set enabled=false,admin_preview=false where singleton;
+
 do $$
 declare admin_id uuid; private_id uuid; expected jsonb; manifest jsonb; page jsonb; resource jsonb; resource_name text;
  cursor_id uuid; total integer; hashes text; seen integer; denied boolean; statement text; actual jsonb;
@@ -77,5 +83,17 @@ begin
  denied:=false;begin perform public.ca_admin_export_manifest();exception when insufficient_privilege then denied:=true;end;
  if not denied then raise exception 'Anonymous user accessed export.'; end if;
 end $$;
+
+reset role;
+update ca_private.photo_review_config c
+ set enabled=f.enabled,admin_preview=f.admin_preview
+ from pg_temp.ca_qa_photo_flags f where c.singleton;
+do $qa_restore$
+begin
+ if exists(select 1 from ca_private.photo_review_config c cross join pg_temp.ca_qa_photo_flags f
+  where c.singleton and (c.enabled,c.admin_preview) is distinct from (f.enabled,f.admin_preview)) then
+  raise exception 'QA photo configuration was not restored';
+ end if;
+end $qa_restore$;
 rollback;
 select jsonb_build_object('admin_preview','passed','exact_keyset_export_all_twelve_resources','passed','private_marketplace_tables_rls_and_grants','passed','private_helper_denials','passed','public_invoker_wrappers','passed','anonymous_and_non_admin_denials','passed','editable_metadata_not_authorization','passed','invalid_resource_and_size_denials','passed','real_records_changed',false) as result;

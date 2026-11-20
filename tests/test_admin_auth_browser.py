@@ -155,14 +155,14 @@ class AdminAuthBrowserTests(unittest.TestCase):
             self.page.wait_for_timeout(10)
         self.fail('The deliberately delayed offline request did not start')
 
-    def test_forgot_password_sends_only_email_with_canonical_redirect(self):
+    def test_forgot_password_sends_only_email_with_current_deployment_redirect(self):
         self.go();self.page.evaluate("openAuth('login')");self.page.locator('#authForgot').click()
         self.assertFalse(self.page.locator('#authPassword').is_visible())
         self.page.locator('#authEmail').fill('User@Example.invalid');self.page.locator('#authSubmit').click()
         self.page.wait_for_function('document.getElementById("authMessage").textContent.includes("mümkündürsə")')
         call=next(c for c in self.backend.auth_calls if c['path']=='/auth/v1/recover')
         self.assertEqual(call['body'],{'email':'user@example.invalid'})
-        self.assertEqual(call['query']['redirect_to'],['https://dunumcebis-droid.github.io/cenub-avto/reset-password.html'])
+        self.assertEqual(call['query']['redirect_to'],[ORIGIN+'reset-password.html'])
         self.assertIsNone(call['authorization'])
 
     def test_recovery_verifies_user_scrubs_url_and_updates_only_recovery_account(self):
