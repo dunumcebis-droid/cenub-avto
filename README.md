@@ -14,7 +14,7 @@ Bərpa formaları açıldıqları domenin və qovluğun `reset-password.html` s�
 
 Ayrıca köçürmə paketi hazırlanıb: `public_html` üçün kökündə `index.html` olan 76 ictimai fayl, təxminən 7,3 MB ZIP. Şəxsi ehtiyat nüsxə, server kodu, verilənlər bazası ixracı və gizli açarlar daxil deyil; 46 orijinal şəkil dəyişməyib. HTTPS domeni təsdiqləndiyi üçün əsas SEO konfiqurasiyası da `https://avtounvan.vip/` ünvanına keçirilib. **149/149 Node** və əvvəlki paket üzərində **19/19 imitasiya edilmiş bərpa/SEO brauzer sınağı** keçib. Yayımlanma yalnız yeni fayllar canlıdan yoxlanandan sonra tamamlanmış sayılacaq. Qalan keçid addımları [SEO_SETUP.md](SEO_SETUP.md) sənədindədir.
 
-Paketin təkrar hazırlanması: `node tools/generate-seo.cjs --check`, sonra `python3 tools/build-hosting-zip.py --output /tmp/AvtoUnvan-sayt.zip`. Yalnız `deployment/public-files.json` daxilindəki yoxlanılmış fayllar arxivə düşür. GitHub-da **Build hosting ZIP** workflow-u əl ilə işə salınanda bu ictimai ZIP mövcud `avtounvan-vip-20261120` buraxılışına əlavə olunur; Azhosting-ə avtomatik giriş və yükləmə etmir.
+Paketin təkrar hazırlanması: `node tools/generate-seo.cjs --check`, sonra `python3 tools/build-hosting-zip.py --output /tmp/AvtoUnvan-sayt.zip`. Yalnız `deployment/public-files.json` daxilindəki yoxlanılmış fayllar arxivə düşür. GitHub-da **Build hosting ZIP** workflow-u əl ilə işə salınanda bu ictimai ZIP `avtounvan-vip-20261120` buraxılışında yayımlanır; buraxılış yoxdursa yaradılır. Azhosting-ə avtomatik giriş və yükləmə etmir.
 
 ## SEO hazırlığı — 19 noyabr 2026
 

@@ -18,8 +18,15 @@ jobs:
         run: node tools/generate-seo.cjs --check
       - name: Build public hosting ZIP
         run: python3 tools/build-hosting-zip.py --output "$RUNNER_TEMP/AvtoUnvan-sayt.zip"
-      - name: Upload ZIP to the existing release
+      - name: Publish the public hosting ZIP
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release upload avtounvan-vip-20261120 "$RUNNER_TEMP/AvtoUnvan-sayt.zip" --clobber
+        run: |
+          if gh release view avtounvan-vip-20261120 >/dev/null 2>&1; then
+            gh release upload avtounvan-vip-20261120 "$RUNNER_TEMP/AvtoUnvan-sayt.zip" --clobber
+          else
+            gh release create avtounvan-vip-20261120 "$RUNNER_TEMP/AvtoUnvan-sayt.zip" \
+              --target "$GITHUB_SHA" --title "AvtoUnvan — hostinq paketi" \
+              --notes "AvtoUnvan üçün 76 ictimai fayl. ZIP-i avtounvan.vip domeninin public_html qovluğuna açın."
+          fi
