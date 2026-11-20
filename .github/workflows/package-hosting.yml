@@ -1,0 +1,25 @@
+name: Build hosting ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check generated SEO
+        run: node tools/generate-seo.cjs --check
+      - name: Build public hosting ZIP
+        run: python3 tools/build-hosting-zip.py --output "$RUNNER_TEMP/AvtoUnvan-sayt.zip"
+      - name: Upload ZIP to the existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release upload avtounvan-vip-20261120 "$RUNNER_TEMP/AvtoUnvan-sayt.zip" --clobber
