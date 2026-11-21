@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-21",
+  "change": "Allow genuine vehicle photographs in every gallery slot without an angle/category match requirement",
+  "behavior": {
+    "requested_slot": "Retained for gallery organization and HTTP result binding",
+    "observed_view": "Informational; front/rear/side/interior/engine/other/uncertain do not constrain requested slot",
+    "photo_confidence_minimum": 0.85,
+    "retained_checks": [
+      "genuine vehicle photograph",
+      "no visible screenshot interface",
+      "authentication and approved origins",
+      "file type, dimensions, byte and rate limits",
+      "server-only proof creation",
+      "same-owner approved immutable storage path",
+      "gallery, cover and quantity constraints"
+    ],
+    "legacy_unreviewed_photos": "Previous same-row/same-group exception remains"
+  },
+  "validation": {
+    "node_tests": {
+      "passed": 168,
+      "failed": 0,
+      "includes_photo_server_tests": 46,
+      "provider": "Injected HTTP fixtures"
+    },
+    "browser_tests": {
+      "photo_review": 29,
+      "adjacent_batch_manager_validation": 22,
+      "total_passed": 51,
+      "requests": "Intercepted; no real API writes"
+    },
+    "database": {
+      "dry_run_suites": [
+        "photo-review-angle-flexibility-db.sql (46 named checks)",
+        "photo-review-db.sql (all result groups true)",
+        "photo-manager-legacy-subsets-db.sql (27 named checks)"
+      ],
+      "after_deployment": [
+        "photo-review-angle-flexibility-db.sql (46 named checks)",
+        "security-boundaries-db.sql (25 named checks)"
+      ],
+      "transaction": "Every suite ends with ROLLBACK; synthetic Auth rows and Storage metadata only"
+    },
+    "syntax_and_diff": "passed",
+    "generated_seo": "current"
+  },
+  "deployment": {
+    "database_migration": {
+      "version": "20261121135936",
+      "name": "photo_review_angle_flexibility",
+      "status": "applied and verified"
+    },
+    "edge_function": {
+      "name": "ca-photo-review",
+      "version": 8,
+      "status": "ACTIVE",
+      "verify_jwt": true,
+      "deployed_files_byte_match": true,
+      "unauthenticated_status_http": 401
+    },
+    "existing_listing_photo_and_review_rows_unchanged": true,
+    "feature_flags_unchanged": true,
+    "no_new_advisor_findings": true,
+    "hosting_frontend": {
+      "status": "awaiting owner upload",
+      "files": [
+        "index.html",
+        "assets/js/18-photo-review.js"
+      ],
+      "cache_version": "photo-angle-20261121"
+    },
+    "patch": {
+      "release_url": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-photo-angles-20261121/AvtoUnvan-sekiller.zip",
+      "publication_verified": false
+    }
+  },
+  "limitations": [
+    "This change was not retested against the billed vision provider using real image bytes; existing credentials and provider configuration were unchanged.",
+    "Automated browser scenarios use fixture images and intercepted responses.",
+    "The hosting UI copy and cache version require the owner to extract the reviewed patch into public_html with overwrite. The server behavior is already deployed."
+  ]
+}

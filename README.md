@@ -82,7 +82,7 @@ Saxlanılan axtarışlar, bildirişlər, şikayətlər və daxili admin qeydlər
 
 ## Şəkil tanıma və sürət yoxlaması
 
-Şəkillərin avtomobilə və seçilən bölməyə uyğunluğunu yoxlayan server/forma inteqrasiyası hazırlanıb. **Real şəkil tanıma xidməti qoşulub.** Yoxlama 6-lıq qruplarla aparılır; təsdiqlənmiş şəkillər yenidən seçildikdə eyni bölmədə təkrar yoxlanmır. «Şəkilləri yoxla» düyməsi ilə elan yaratmadan yoxlama aparmaq mümkündür. Aktivləşdirmə və real dəqiqlik sınağı üçün [PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md), proqram/baza sınaqları üçün [PHOTO_REVIEW_VERIFICATION.md](PHOTO_REVIEW_VERIFICATION.md).
+Şəkillərin avtomobilə aid olmasını yoxlayan server/forma inteqrasiyası var. **Real şəkil tanıma xidməti qoşulub.** 21 noyabr düzəlişində foto bucağının bölmə adına uyğunluğu məcburiyyəti çıxarılıb: arxa foto ön bölmədə, ön foto yan bölmədə də qəbul olunur. Bölmələr şəkilləri qruplaşdırmaq üçündür. Yoxlama 6-lıq qruplarla aparılır; təsdiqlənmiş şəkillər yenidən seçildikdə eyni bölmədə təkrar yoxlanmır. «Şəkilləri yoxla» düyməsi ilə elan yaratmadan yoxlama aparmaq mümkündür. Cari qaydalar üçün [PHOTO_REVIEW_SETUP.md](PHOTO_REVIEW_SETUP.md), proqram/baza sınaqları üçün [PHOTO_REVIEW_VERIFICATION.md](PHOTO_REVIEW_VERIFICATION.md).
 
 ## Əvvəlki domenə hazırlıq düzəlişləri
 
@@ -184,7 +184,7 @@ Mövcud əl ilə paket sorğusu və admin təsdiqi axını saxlanılıb. İstifa
 
 Admin ZIP-i şəxsi axtarışları, şikayət mətnini və daxili qeydləri də daşıya bilər. Faylı məxfi saxlayın; serverdə gündəlik izlərin təmizlənməsi artıq yüklənmiş ZIP-i dəyişmir. İxrac zamanı yeni baxış/klik və ya başqa məlumat dəyişikliyi baş verərsə, son manifest yoxlaması nüsxəni natamam sayıb dayandıra bilər. Sakit vaxtda yenidən cəhd edin. İxrac tətbiqin məntiqi nüsxəsidir, atomik PostgreSQL snapshot-u və ya avtomatik bərpa xidməti deyil.
 
-Qəzalı avtomobillər də qəbul edilir: formada «Vəziyyəti → Qəzalı» və uyğun qəza tarixçəsi seçilə bilər. Şəkil yoxlaması zədəyə görə rədd etməmək üçün konfiqurasiya edilib; aydın avtomobil fotosu və düzgün görünüş yenə tələb olunur.
+Qəzalı avtomobillər də qəbul edilir: formada «Vəziyyəti → Qəzalı» və uyğun qəza tarixçəsi seçilə bilər. Şəkil yoxlaması zədəni və seçilən bölmədən fərqli foto bucağını rədd səbəbi saymır; aydın avtomobil fotosu yenə tələb olunur.
 
 ## Son hazırlıq yoxlamaları
 

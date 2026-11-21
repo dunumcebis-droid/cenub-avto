@@ -2,6 +2,16 @@
 
 **Real tanıma normal, hesaba girişlə qorunan yolda yoxlanıb.** Düzgün ön, arxa, yan, salon, mühərrik və digər avtomobil detalı təsdiqləri mövcuddur; rədd cavabları da müşahidə edilib. Bu, real provayderin işlədiyini göstərir, dəqiqliyə dair universal zəmanət deyil. Son yayım üçün admin təsdiqi qalır.
 
+## 21 noyabr 2026 — foto bucağının sərbəst seçilməsi
+
+Bu tarixli düzəliş ön/arxa/yan və digər görünüşlərin seçilən bölmə ilə eyni olmasını tələb etmir. Bölmə adı qalereyanı qruplaşdırır; aydın avtomobil fotosu başqa adlı bölmədə də qəbul edilir. Modelin bucaq təsnifatı qeyri-müəyyən olsa belə, avtomobil fotosuna əminlik yüksəkdirsə şəkil qəbul olunur. Ekran interfeysi, əlaqəsiz məzmun, aşağı foto etibarlılığı, giriş, fayl hədləri və sahiblik yoxlamaları qalır.
+
+Server, baza və forma dəyişiklikləri birlikdə hazırlanıb. Təsdiqlənmiş öz fotosunun URL-i başqa bölmədə istifadə oluna bilər; başqa sahibin şəkli və yeni yoxlanmamış URL qəbul edilmir. Köhnə yoxlanmamış şəkillərə əvvəlki elan/bölmə istisnası saxlanır. Yeni baza qaydaları `database/photo-review-angle-flexibility.sql`, yoxlama və yayım vəziyyəti `tests/reports/photo-angle-flexibility-20261121.json` fayllarındadır.
+
+**168 Node və 51 brauzer sınağı keçib.** Yeni baza ssenariləri əvvəlcə funksiyalarla birlikdə tranzaksiyada yoxlanıb, sonra tətbiq edilmiş bazada 46 yeni qayda və 25 təhlükəsizlik sərhədi yoxlaması keçib; bütün sınaqlar `ROLLBACK` ilə bitib. Köhnə şəkil ssenarilərinin iki ayrıca dəsti də keçib. Canlı miqrasiya `20261121135936_photo_review_angle_flexibility`, Edge Function versiyası 8 (`verify_jwt=true`) tətbiq edilib; yayımlanmış üç server faylı mənbə ilə eynidir. Elan, şəkil obyektləri və təsdiq qeydlərinin izləri dəyişməyib. İki ictimai fayllıq ZIP yalnız forma izahı və brauzer mətnlərini yeniləyir; Azhosting-ə istifadəçi tərəfindən açılması gözlənilir. Real provayderə yeni foto göndərilməyib; tanıma dəqiqliyi bu sınaq nəticələrindən çıxarılmır.
+
+Aşağıdakı 13 noyabr və əvvəlki sınaq qeydləri həmin tarixlərin əvvəlki davranışını təsvir edir.
+
 ## 13 noyabr 2026 — şəkil idarəetməsi
 
 `19-photo-manager.js` önbaxışda ayrıca «Sil», eyni bölmə daxilində əvvəlki/növbəti sıra və ★ əsas şəkil seçimi əlavə edir. Yeni fayl seçmək saxlanılan şəkilləri avtomatik əvəz etmir. Yeni şəkil əlavə ediləndə bölmə üçün 6 və elan üçün 36 həddi köhnə+yeni cəminə aiddir. Əvvəldən limitdən böyük köhnə bölmənin şəkillərini azaltmaq və sıralamaq mümkündür; yeni şəkil əlavə etmək üçün bölmə əvvəl limitə endirilməlidir. Mövcud təsdiqlənmiş şəkil öz əvvəlki hesab/bölməsində saxlanır; başqa bölməyə yeni fayl kimi qoyulursa uyğunluq yoxlaması yenidən tələb olunur. Köhnə şəklin silinməsi və ya sırasının dəyişməsi onu yeni model sorğusuna çevirmir.

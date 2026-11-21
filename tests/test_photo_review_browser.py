@@ -35,6 +35,7 @@ class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
         self.batch_reverse = False
         self.batch_bad_kind = None
         self.bad_batch_cap = False
+        self.observed_views = {}
 
     def approved(self, req, category):
         owner = OTHER_OWNER if req.headers.get('authorization') == 'Bearer second-token' else OWNER
@@ -80,7 +81,7 @@ class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
                 return
             results = []
             for i, category in enumerate(categories):
-                self.reviews.append(dict(category=category, batch=True))
+                self.reviews.append(dict(category=category, observed_view=self.observed_views.get(category, category), batch=True))
                 if i in self.batch_errors:
                     results.append(dict(index=i, ok=False, category=category, code=self.batch_errors[i]))
                 else:
@@ -116,7 +117,7 @@ class PhotoReviewBackend(fixtures.PackageFeedbackBackend):
             assert parts['file'].get_content_type() == 'image/jpeg'
             assert parts['file'].get_payload(decode=True).startswith(b'\xff\xd8')
             category = parts['category'].get_content().strip()
-            self.reviews.append(dict(category=category, bytes=len(parts['file'].get_payload(decode=True))))
+            self.reviews.append(dict(category=category, observed_view=self.observed_views.get(category, category), bytes=len(parts['file'].get_payload(decode=True))))
             if self.hold_review:
                 self.pending_reviews.append((route, self.approved(req, category)))
                 return
@@ -187,8 +188,8 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertIn('admin tərəfindən yoxlanacaq', self.page.locator('#caPhotoReviewNote').inner_text())
         self.assertNotIn('avtomatik yoxlanacaq', self.page.locator('#caPhotoReviewNote').inner_text())
         self.assertEqual(self.page.locator('.ca-photo-review-guide').count(), 6)
-        self.assertIn('faralar', self.page.locator('#caPhotoGuide-front').inner_text())
-        self.assertIn('arxa işıqlar', self.page.locator('#caPhotoGuide-rear').inner_text())
+        self.assertIn('İstəyə görə', self.page.locator('#caPhotoGuide-front').inner_text())
+        self.assertIn('arxa tərəfinin fotosu', self.page.locator('#caPhotoGuide-rear').inner_text())
         self.submit()
         self.assertEqual(len(self.backend.uploads), 1)
         self.assertEqual(len(self.backend.saves), 1)
@@ -208,12 +209,11 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertEqual(self.backend.reviews[0]['category'], 'front')
         self.assertEqual(len(self.backend.status_calls), 1)
 
-    def test_wrong_view_screenshot_nonvehicle_and_uncertain_are_blocked_with_form_retained(self):
+    def test_screenshot_nonvehicle_and_uncertain_photos_are_blocked_with_form_retained(self):
         self.new_listing()
-        for code, text in (('category_mismatch', 'bu bölməyə uyğun deyil'),
-                           ('screenshot', 'Ekran görüntüsü'),
+        for code, text in (('screenshot', 'Ekran görüntüsü'),
                            ('not_vehicle', 'avtomobil və ya ona aid hissə görünmür'),
-                           ('uncertain', 'uyğunluğu aydın deyil')):
+                           ('uncertain', 'aydın seçilmir')):
             with self.subTest(code=code):
                 self.backend.error_code = code
                 self.submit()
@@ -322,18 +322,47 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertFalse(self.backend.saves)
         self.assertFalse(self.backend.uploads)
 
-    def test_rear_group_reports_its_own_mismatched_view_and_preserves_selected_file(self):
+    def test_other_vehicle_views_are_saved_in_the_requested_front_and_side_groups(self):
+        # The fixture represents a server that approved vehicle photos after
+        # observing rear/front views; response groups remain those the seller chose.
+        self.backend.observed_views = {'front': 'rear', 'side': 'front'}
+        self.backend.batch_supported = True
+        self.new_listing()
+        self.page.locator('#photos-front').set_input_files(dict(name='rear-view.png', mimeType='image/png', buffer=fixtures.PNG))
+        self.page.locator('#photos-side').set_input_files(dict(name='front-view.png', mimeType='image/png', buffer=fixtures.PNG))
+        self.submit()
+        self.assertEqual([(r['category'], r['observed_view']) for r in self.backend.reviews],
+                         [('front', 'rear'), ('side', 'front')])
+        self.assertEqual(len(self.backend.saves), 1)
+        saved = self.backend.saves[0]
+        self.assertEqual(set(saved['ca_data']['photos']), {'front', 'side'})
+        self.assertEqual(len(saved['ca_data']['photos']['front']), 1)
+        self.assertEqual(len(saved['ca_data']['photos']['side']), 1)
+        self.assertEqual(saved['sekiller'], [*saved['ca_data']['photos']['front'], *saved['ca_data']['photos']['side']])
+        self.assertFalse(self.backend.uploads)
+
+    def test_form_explains_that_view_groups_are_optional_suggestions(self):
+        self.new_listing()
+        self.page.wait_for_function('document.getElementById("caPhotoReviewNote").dataset.reviewMode==="automatic"')
+        self.assertIn('istənilən bucaqdan', self.page.locator('#caPhotoReviewNote').inner_text())
+        self.assertIn('istədiyin bölməyə', self.page.locator('.photo-help').inner_text())
+        self.assertIn('tövsiyədir', self.page.locator('.photo-help').inner_text())
+        self.assertNotIn('uyğun olmalıdır', self.page.locator('.photo-upload').inner_text())
+        for guide in self.page.locator('.ca-photo-review-guide').all_inner_texts():
+            self.assertIn('İstəyə görə', guide)
+
+    def test_rear_group_reports_its_own_screenshot_error_and_preserves_selected_file(self):
         self.new_listing()
         self.page.locator('#photos-front').set_input_files([])
-        self.page.locator('#photos-rear').set_input_files(dict(name='wrong-front.png', mimeType='image/png', buffer=fixtures.PNG))
-        self.backend.error_code = 'category_mismatch'
+        self.page.locator('#photos-rear').set_input_files(dict(name='screen.png', mimeType='image/png', buffer=fixtures.PNG))
+        self.backend.error_code = 'screenshot'
         self.submit()
         self.assertEqual(self.backend.reviews[-1]['category'], 'rear')
         self.assertIn('Arxa görünüş', self.page.locator('#listingFeedbackText').inner_text())
-        self.assertIn('arxa işıqlar', self.page.locator('#caPhotoReview-rear').inner_text())
+        self.assertIn('Ekran görüntüsü', self.page.locator('#caPhotoReview-rear').inner_text())
         self.assertEqual(self.page.locator('#photos-rear').get_attribute('aria-invalid'), 'true')
         self.assertIsNone(self.page.locator('#photos-front').get_attribute('aria-invalid'))
-        self.assertEqual(self.page.locator('#photos-rear').evaluate('input=>input.files[0].name'), 'wrong-front.png')
+        self.assertEqual(self.page.locator('#photos-rear').evaluate('input=>input.files[0].name'), 'screen.png')
         self.assertFalse(self.backend.uploads)
         self.assertFalse(self.backend.saves)
 
@@ -395,7 +424,7 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         self.assertEqual(len(self.backend.uploads), 1)
         self.assertIn(f'/{OWNER}/checked/', self.backend.saves[-1]['sekiller'][0])
 
-    def test_same_file_moved_from_front_to_rear_requires_a_new_category_review(self):
+    def test_same_file_moved_from_front_to_rear_is_accepted_with_its_new_group_binding(self):
         self.backend.fail_save = True
         self.new_listing()
         self.submit()
@@ -410,12 +439,12 @@ class PhotoReviewBrowserTests(unittest.TestCase):
         }''')
         self.assertTrue(same_file, 'Fixture must move the exact cached File object')
         self.backend.fail_save = False
-        self.backend.error_code = 'category_mismatch'
         self.submit()
         self.assertEqual([row['category'] for row in self.backend.reviews], ['front', 'rear'])
-        self.assertIn('Arxa görünüş', self.page.locator('#listingFeedbackText').inner_text())
-        self.assertIn('bu bölməyə uyğun deyil', self.page.locator('#caPhotoReview-rear').inner_text())
-        self.assertEqual(len(self.backend.saves), 1, 'The rejected category must not send a second listing write')
+        self.assertIn('qəbul edildi', self.page.locator('#listingFeedbackText').inner_text())
+        self.assertEqual(len(self.backend.saves), 2, 'The retry must submit the photo under its newly selected group')
+        self.assertNotIn('front', self.backend.saves[-1]['ca_data']['photos'])
+        self.assertEqual(self.backend.saves[-1]['sekiller'], self.backend.saves[-1]['ca_data']['photos']['rear'])
         self.assertFalse(self.backend.uploads)
 
 
@@ -463,7 +492,7 @@ class PhotoReviewBrowserTests(unittest.TestCase):
     def test_failed_precheck_preserves_blank_form_file_and_translates_quota_errors(self):
         self.blank_photo_form()
         self.wait_for_precheck()
-        for code, text in (('category_mismatch', 'bu bölməyə uyğun deyil'),
+        for code, text in (('screenshot', 'Ekran görüntüsü'),
                            ('provider_quota', 'xidmətinin limiti dolub'),
                            ('provider_denied', 'xidmətinə giriş təsdiqlənmədi')):
             with self.subTest(code=code):

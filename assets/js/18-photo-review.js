@@ -4,12 +4,12 @@
 'use strict';
 if(window.caReviewPreparedPhoto)return;
 const categories={
- front:{label:'Ön görünüş',guide:'Ön tərəf, faralar və radiator barmaqlığı aydın görünsün.'},
- rear:{label:'Arxa görünüş',guide:'Arxa tərəf, arxa işıqlar və baqaj hissəsi aydın görünsün.'},
- side:{label:'Yan görünüş',guide:'Avtomobilin sağ və ya sol yan tərəfi görünsün.'},
- interior:{label:'Salon',guide:'Salon, oturacaqlar və ya idarəetmə paneli görünsün.'},
- engine:{label:'Mühərrik',guide:'Açıq kapot altında mühərrik hissəsi görünsün.'},
- other:{label:'Digər şəkillər',guide:'Avtomobilə aid təkər, detal və digər yaxın görünüşlər əlavə et.'}
+ front:{label:'Ön görünüş',guide:'İstəyə görə: avtomobilin ön tərəfinin fotosu.'},
+ rear:{label:'Arxa görünüş',guide:'İstəyə görə: avtomobilin arxa tərəfinin fotosu.'},
+ side:{label:'Yan görünüş',guide:'İstəyə görə: avtomobilin sağ və ya sol yan tərəfinin fotosu.'},
+ interior:{label:'Salon',guide:'İstəyə görə: salon, oturacaqlar və ya idarəetmə panelinin fotosu.'},
+ engine:{label:'Mühərrik',guide:'İstəyə görə: mühərrik hissəsinin fotosu.'},
+ other:{label:'Digər şəkillər',guide:'İstəyə görə: avtomobilə aid təkər, detal və digər yaxın görünüşlər.'}
 };
 const endpoint=CA_URL.replace(/\/$/,'')+'/functions/v1/ca-photo-review';
 let cached=null,pending=null,epoch=0,sessionOwner=currentUser?.id||null,mode=null,precheck=null,available=false;
@@ -39,7 +39,7 @@ function setMode(status){
  mode=next;
  if(!status.enabled)note('Şəkillər admin tərəfindən yoxlanacaq. Ekran görüntüsü, reklam və avtomobilə aid olmayan şəkillər qəbul edilmir.','manual');
  else if(!status.configured)note('Şəkil yoxlaması hazırda mümkün deyil. Bir qədər sonra yenidən yoxla.','unavailable');
- else note('Şəkillər göndəriş zamanı avtomatik yoxlanacaq. Hər şəkil seçilən bölməyə uyğun olmalıdır; ekran görüntüsü və avtomobilə aid olmayan şəkil əlavə etmə.','automatic');
+ else note('Avtomobilin istənilən bucaqdan çəkilmiş fotosunu istədiyin bölməyə əlavə edə bilərsən. Şəkillər göndəriş zamanı yoxlanacaq; ekran görüntüsü və avtomobilə aid olmayan şəkil əlavə etmə.','automatic');
 }
 async function jsonRequest(url,options,timeout){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
@@ -74,8 +74,7 @@ function humanError(error,category,fileName){
  const messages={
   screenshot:'Ekran görüntüsü və ya üzərində tətbiq/sayt interfeysi olan şəkil qəbul edilmir. Avtomobilin öz fotosunu seç.',
   not_vehicle:'Şəkildə avtomobil və ya ona aid hissə görünmür. Avtomobilin uyğun fotosunu seç.',
-  category_mismatch:'Şəkil bu bölməyə uyğun deyil. '+(item?.guide||'Uyğun bölməni seç.'),
-  uncertain:'Şəklin uyğunluğu aydın deyil. Avtomobili daha aydın göstərən foto seç.',
+  uncertain:'Şəkildə avtomobil və ya ona aid hissə aydın seçilmir. Daha aydın foto seç.',
   rate_limited:'Çox şəkil yoxlaması göndərilib. Bir qədər gözləyib yenidən yoxla.',
   provider_quota:'Şəkil tanıma xidmətinin limiti dolub. Şəkillərin formadadır; bir qədər sonra yenidən yoxla.',
   provider_denied:'Şəkil tanıma xidmətinə giriş təsdiqlənmədi. Şəkillərin formadadır; dəstək xidməti ilə əlaqə saxla.',
@@ -139,7 +138,7 @@ window.caReviewPreparedPhotoBatch=async function(items,{owner,submission,token,r
    if(!Number.isInteger(index)||index<0||index>=items.length||seen.has(index)||result.category!==items[index].category)throw invalidBatchResponse();seen.add(index);
    if(result.ok===true){normalized[index]={index,url:checkedPhotoUrl(result,items[index].category,owner)};}
    else if(result.ok===false&&typeof result.code==='string'&&result.code.length>0&&result.code.length<=80&&!Object.hasOwn(result,'url')&&!Object.hasOwn(result,'review_id')){
-    const code=Object.hasOwn({screenshot:1,not_vehicle:1,category_mismatch:1,uncertain:1,rate_limited:1,provider_quota:1,provider_denied:1,auth_required:1,invalid_image:1,provider_unavailable:1},result.code)?result.code:'provider_unavailable';
+    const code=Object.hasOwn({screenshot:1,not_vehicle:1,uncertain:1,rate_limited:1,provider_quota:1,provider_denied:1,auth_required:1,invalid_image:1,provider_unavailable:1},result.code)?result.code:'provider_unavailable';
     const error=Error(humanError({code},items[index].category,items[index].fileName));error.code=code;normalized[index]={index,error};
    }else throw invalidBatchResponse();
   }
@@ -180,7 +179,7 @@ window.caPrecheckPhotos=precheckPhotos;
 window.caPhotoReviewSessionChanged=function(){
  const owner=currentUser?.id||null;if(owner===sessionOwner)return;
  sessionOwner=owner;epoch++;cached=null;pending=null;mode=null;precheck=null;available=false;precheckMessage('');syncPrecheck();for(const category of Object.keys(categories))clearGroup(category);
- note('Şəkli uyğun bölməyə əlavə et. Qəzalı avtomobilin aydın fotosu da qəbul edilir. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.','pending');
+ note('Avtomobilin istənilən bucaqdan çəkilmiş fotosunu istədiyin bölməyə əlavə edə bilərsən. Qəzalı avtomobilin aydın fotosu da qəbul edilir.','pending');
 };
 async function refreshNote(){
  const owner=currentUser?.id;if(!owner)return;const submission=caListingSubmissionSequence;
@@ -189,7 +188,7 @@ async function refreshNote(){
 }
 const inputs=[...document.querySelectorAll('.photo-input')];
 if(inputs.length){
- const notice=document.createElement('p');notice.id='caPhotoReviewNote';notice.className='ca-photo-review-note';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.textContent='Şəkli uyğun bölməyə əlavə et. Qəzalı avtomobilin aydın fotosu da qəbul edilir. Yoxlama vəziyyəti göndəriş zamanı göstəriləcək.';
+ const notice=document.createElement('p');notice.id='caPhotoReviewNote';notice.className='ca-photo-review-note';notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.textContent='Avtomobilin istənilən bucaqdan çəkilmiş fotosunu istədiyin bölməyə əlavə edə bilərsən. Qəzalı avtomobilin aydın fotosu da qəbul edilir.';
  const groups=document.querySelector('.photo-groups');groups?.before(notice);
  const button=document.createElement('button');button.type='button';button.id='caPhotoPrecheck';button.className='back-btn';button.textContent='Şəkilləri yoxla';button.hidden=true;button.disabled=true;button.addEventListener('click',precheckPhotos);
  const result=document.createElement('p');result.id='caPhotoPrecheckResult';result.className='ca-photo-review-status';result.setAttribute('role','status');result.setAttribute('aria-live','polite');

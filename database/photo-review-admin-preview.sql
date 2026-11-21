@@ -43,7 +43,9 @@ begin
  if (select count(*) from jsonb_object_keys(p_verdict))<>4
  or p_verdict->'is_vehicle_photo' is distinct from 'true'::jsonb
  or p_verdict->'contains_screen_ui' is distinct from 'false'::jsonb
- or p_verdict->>'category' is distinct from p_category
+ -- The observed view is informational; the caller's gallery slot is independent.
+ or jsonb_typeof(p_verdict->'category') is distinct from 'string'
+ or coalesce(p_verdict->>'category','') not in ('front','rear','side','interior','engine','other','uncertain')
  or jsonb_typeof(p_verdict->'confidence') is distinct from 'number' then raise exception 'CA_PHOTO_REVIEW_INVALID';end if;
  if (p_verdict->>'confidence')::numeric<0.85 or (p_verdict->>'confidence')::numeric>1 then raise exception 'CA_PHOTO_REVIEW_INVALID';end if;
  if not exists(select 1 from storage.objects where bucket_id='elan-sekilleri' and name=p_path) then raise exception 'CA_PHOTO_REVIEW_OBJECT_MISSING';end if;
@@ -69,7 +71,7 @@ begin
  and new.ca_data->'photos' is not distinct from old.ca_data->'photos'
  and new.ca_data->'photo' is not distinct from old.ca_data->'photo' then return new;end if;
  groups:=new.ca_data->'photos';
- if jsonb_typeof(groups) is distinct from 'object' then raise exception 'Şəkilləri uyğun bölmələr üzrə yenidən seç və yoxlat.' using errcode='23514';end if;
+ if jsonb_typeof(groups) is distinct from 'object' then raise exception 'Şəkilləri yenidən seç və yoxlat.' using errcode='23514';end if;
  if exists(select 1 from jsonb_object_keys(groups) k where not(k=any(categories))) then raise exception 'Naməlum şəkil bölməsi.' using errcode='23514';end if;
  if tg_op='UPDATE' then previous_groups:=old.ca_data->'photos';end if;
  foreach group_name in array categories loop
@@ -90,8 +92,8 @@ begin
     end if;
    end if;
    if not legacy and not exists(select 1 from ca_private.photo_reviews r
-    where r.owner_id=new.satici_id and r.approved and r.category=group_name and photo_url=prefix||r.path) then
-    raise exception 'Şəkil seçilən bölmə üçün yoxlamadan keçməyib. Uyğun şəkli yenidən əlavə et.' using errcode='23514';
+    where r.owner_id=new.satici_id and r.approved and photo_url=prefix||r.path) then
+    raise exception 'Şəkil yoxlamadan keçməyib. Şəkli yenidən əlavə et.' using errcode='23514';
    end if;
   end loop;
  end loop;

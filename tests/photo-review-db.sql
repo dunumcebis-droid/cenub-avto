@@ -57,7 +57,7 @@ begin
  front_path:=test_owner::text||'/checked/'||front_review::text||'-ca-wm1.jpg';
  rear_path:=test_owner::text||'/checked/'||rear_review::text||'-ca-wm1.jpg';
  front_url:=prefix||front_path;rear_url:=prefix||rear_path;
- verdict:='{"is_vehicle_photo":true,"contains_screen_ui":false,"category":"front","confidence":0.95}'::jsonb;
+ verdict:='{"is_vehicle_photo":true,"contains_screen_ui":false,"category":"rear","confidence":0.95}'::jsonb;
  blocked:=false;
  begin perform public.ca_photo_review_complete(front_review,test_owner,'front',front_path,repeat('a',64),verdict);
  exception when raise_exception then blocked:=sqlerrm='CA_PHOTO_REVIEW_OBJECT_MISSING';end;
@@ -66,11 +66,11 @@ begin
  ('elan-sekilleri',front_path,'{"mimetype":"image/jpeg","size":100}'::jsonb),
  ('elan-sekilleri',rear_path,'{"mimetype":"image/jpeg","size":100}'::jsonb);
 
- foreach case_name in array array['screenshot','non_vehicle','wrong_category','low_confidence','extra_field','null_confidence'] loop
+ foreach case_name in array array['screenshot','non_vehicle','invalid_category','low_confidence','extra_field','null_confidence'] loop
   payload:=case case_name
    when 'screenshot' then jsonb_set(verdict,'{contains_screen_ui}','true'::jsonb)
    when 'non_vehicle' then jsonb_set(verdict,'{is_vehicle_photo}','false'::jsonb)
-   when 'wrong_category' then jsonb_set(verdict,'{category}','"rear"'::jsonb)
+   when 'invalid_category' then jsonb_set(verdict,'{category}','"not_vehicle"'::jsonb)
    when 'low_confidence' then jsonb_set(verdict,'{confidence}','0.84'::jsonb)
    when 'extra_field' then verdict||'{"approved":true}'::jsonb
    else jsonb_set(verdict,'{confidence}','null'::jsonb) end;
@@ -125,19 +125,27 @@ begin
  exception when insufficient_privilege then affected:=0;end;
  if affected<>0 then raise exception 'Client deleted checked object';end if;
 
- -- A correctly categorized server-approved photograph can create a pending ad.
+ -- A genuine server-approved photograph can create a pending ad in any slot.
  insert into public.elanlar(satici_id,marka,model,il,qiymet,veziyyet,sekiller,ca_data)
  values(test_owner,'CA_PHOTO_GATE_TEST','Approved front',2020,100,'gozlemede',array[front_url],
  jsonb_build_object('photos',jsonb_build_object('front',jsonb_build_array(front_url)),'photo',front_url)) returning id into approved_id;
 
- foreach case_name in array array['unreviewed','forged_approval','front_in_rear','rear_in_front','gallery_mismatch','cover_mismatch','unknown_group','duplicate_group_url','empty_groups','nonarray_group','nonstring_url','import_legacy_url'] loop
+ -- Review category is the upload slot, not a constraint on later grouping.
+ foreach case_name in array array['front_in_rear','rear_in_front'] loop
+  gallery:=case when case_name='front_in_rear' then array[front_url] else array[rear_url] end;
+  payload:=jsonb_build_object('photos',jsonb_build_object(case when case_name='front_in_rear' then 'rear' else 'front' end,to_jsonb(gallery)),'photo',gallery[1]);
+  insert into public.elanlar(satici_id,marka,model,il,qiymet,veziyyet,sekiller,ca_data)
+  values(test_owner,'CA_PHOTO_GATE_TEST',case_name,2020,100,'gozlemede',gallery,payload);
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Owned reviewed photograph rejected across slots: %',case_name;end if;
+ end loop;
+
+ foreach case_name in array array['unreviewed','forged_approval','gallery_mismatch','cover_mismatch','unknown_group','duplicate_group_url','empty_groups','nonarray_group','nonstring_url','import_legacy_url'] loop
   gallery:=array[front_url];
   payload:=jsonb_build_object('photos',jsonb_build_object('front',jsonb_build_array(front_url)),'photo',front_url);
   case case_name
    when 'unreviewed' then gallery:=array[unreviewed_url];payload:=jsonb_build_object('photos',jsonb_build_object('front',jsonb_build_array(unreviewed_url)),'photo',unreviewed_url);
    when 'forged_approval' then gallery:=array[unreviewed_url];payload:=jsonb_build_object('photos',jsonb_build_object('front',jsonb_build_array(unreviewed_url)),'photo',unreviewed_url,'photo_review',jsonb_build_object('approved',true,'owner',test_owner,'review_id',front_review));
-   when 'front_in_rear' then payload:=jsonb_build_object('photos',jsonb_build_object('rear',jsonb_build_array(front_url)),'photo',front_url);
-   when 'rear_in_front' then gallery:=array[rear_url];payload:=jsonb_build_object('photos',jsonb_build_object('front',jsonb_build_array(rear_url)),'photo',rear_url);
    when 'gallery_mismatch' then gallery:=array[unreviewed_url];
    when 'cover_mismatch' then payload:=jsonb_set(payload,'{photo}',to_jsonb(unreviewed_url));
    when 'unknown_group' then payload:=jsonb_set(payload,'{photos}',jsonb_build_object('unchecked',jsonb_build_array(front_url)));
@@ -211,7 +219,8 @@ select true as disabled_mode_preserves_existing_flow,
  true as service_proofs_and_configuration_private,
  true as strict_approved_verdict_and_object_required,
  true as reviewed_namespace_immutable_to_clients,
- true as owner_category_gallery_and_cover_bound,
+ true as owner_gallery_and_cover_bound,
+ true as approved_photos_allow_any_gallery_slot,
  true as legacy_exception_row_and_category_scoped,
  true as reservation_rate_limit_enforced,
  true as packages_unchanged,

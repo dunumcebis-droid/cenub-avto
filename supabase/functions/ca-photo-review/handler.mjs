@@ -18,7 +18,8 @@ const PROMPT=`You inspect one image for a road-vehicle classified advertisement.
 Return exactly the requested JSON object. is_vehicle_photo means a genuine photograph of a road vehicle (car, van, truck, bus, motorcycle) or its interior, engine bay, wheel or body detail. Set it false for unrelated objects, people-only pictures, games, illustrations, product ads, text documents, collages and posters. Normal photographic backgrounds and our small CƏNUB AVTO watermark are allowed.
 Accident-damaged, crashed, burned, incomplete or unrepaired vehicles are allowed genuine vehicle photographs. Damage alone must never cause rejection. Determine front/rear/side from the remaining body shape and viewing direction; intact headlights, grille, bumper or body panels are not required. A close-up of vehicle damage belongs to other. Keep rejecting nonvehicle content and visible screenshot interfaces.
 contains_screen_ui means visible phone/computer/browser/app/screenshot interface, menus, status bars, chat, a photographed screen, or a captured classified-ad layout. A small watermark on an otherwise normal photo is not screen UI. Do not claim you can determine provenance of an image with no visible screenshot evidence.
-Choose category from the view actually visible: front = the vehicle front is dominant, with grille/headlights/windshield; rear = rear is dominant, with taillights/trunk/tailgate; side = primarily the side/profile; interior = cabin/dashboard/seats; engine = actual engine bay/engine; other = a photographic close-up of another vehicle part or body detail. A clear front/rear three-quarter view can use front/rear. If the view is mixed, obscured, too small or uncertain, use uncertain and low confidence. Use not_vehicle for unrelated/nonphotographic content. Confidence expresses confidence in the photo and category classification, between 0 and 1.`;
+Photographs from any angle are allowed in every gallery category. The requested category is only an organizational label and must never be an acceptance criterion. A rear photo in a front slot, a front photo in a side slot, and mixed-angle views are all allowed genuine vehicle photographs.
+Choose category from the view actually visible: front = the vehicle front is dominant, with grille/headlights/windshield; rear = rear is dominant, with taillights/trunk/tailgate; side = primarily the side/profile; interior = cabin/dashboard/seats; engine = actual engine bay/engine; other = a photographic close-up of another vehicle part or body detail. A clear front/rear three-quarter view can use front/rear. If the angle cannot be classified, use uncertain; angle uncertainty alone must not lower confidence or make is_vehicle_photo false. Use not_vehicle for unrelated/nonphotographic content. Confidence expresses confidence that this is a genuine vehicle photograph with no visible screenshot interface, between 0 and 1, independently of angle or category. Lower confidence only when the photograph itself cannot be assessed clearly.`;
 class ReviewError extends Error{constructor(status,code,message,headers={}){super(message);this.status=status;this.code=code;this.headers=headers;}}
 const unavailable=()=>new ReviewError(503,'provider_unavailable','Şəkil yoxlaması hazırda mümkün deyil. Bir qədər sonra yenidən yoxla.');
 const invalidImage=()=>new ReviewError(400,'invalid_image','Düzgün JPEG şəkli seç.');
@@ -34,11 +35,10 @@ function verdictFrom(value){
  if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).sort().join('|')!==VERDICT_KEYS.join('|')||typeof value.is_vehicle_photo!=='boolean'||typeof value.contains_screen_ui!=='boolean'||!RESULT_CATEGORIES.has(value.category)||typeof value.confidence!=='number'||!Number.isFinite(value.confidence)||value.confidence<0||value.confidence>1)throw unavailable();
  return value;
 }
-function decide(verdict,category){
+function decide(verdict){
  if(verdict.contains_screen_ui)throw new ReviewError(422,'screenshot','Ekran şəkli və ya ekran görüntüsü qəbul edilmir. Avtomobilin öz fotosunu seç.');
  if(!verdict.is_vehicle_photo||verdict.category==='not_vehicle')throw new ReviewError(422,'not_vehicle','Bu şəkil avtomobilə aid foto kimi tanınmadı. Avtomobilin fotosunu seç.');
- if(verdict.category==='uncertain'||verdict.confidence<0.85)throw new ReviewError(422,'uncertain','Şəkildə görünüş aydın tanınmadı. Daha aydın avtomobil fotosu seç.');
- if(verdict.category!==category)throw new ReviewError(422,'category_mismatch','Şəkil seçdiyin bölməyə uyğun deyil. Uyğun bölməyə əlavə et.');
+ if(verdict.confidence<0.85)throw new ReviewError(422,'uncertain','Şəkil aydın avtomobil fotosu kimi tanınmadı. Daha aydın foto seç.');
 }
 function base64(bytes){let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return btoa(binary);}
 async function boundedBody(req,signal,limit=MAX_BODY_BYTES){
@@ -200,14 +200,14 @@ export function createHandler({env={},fetch:fetcher=globalThis.fetch,crypto:cryp
     const providerSignal=AbortSignal.any([signal,AbortSignal.timeout(boundedTimeout(timeouts.batch,16000))]);
     const verdicts=await providerBatchReview(fetcher,credential,images,providerSignal);
     const results=await mapBounded(images,3,async(image,index)=>{
-     try{decide(verdicts[index],image.category);return {index,ok:true,...await store(image,reservations[index],verdicts[index])};}
+     try{decide(verdicts[index]);return {index,ok:true,...await store(image,reservations[index],verdicts[index])};}
      catch(error){const known=error instanceof ReviewError?error:unavailable();return {index,ok:false,category:image.category,code:known.code};}
     });
     return json({results},200,cors);
    }
    const image=await input(req,signal),reservation=await reserve();
    const providerSignal=AbortSignal.any([signal,AbortSignal.timeout(boundedTimeout(timeouts.single,12000))]);
-   const verdict=await providerReview(fetcher,credential,image.bytes,providerSignal);decide(verdict,image.category);
+   const verdict=await providerReview(fetcher,credential,image.bytes,providerSignal);decide(verdict);
    return json(await store(image,reservation,verdict),200,cors);
   }catch(error){const known=error instanceof ReviewError?error:unavailable();return json({code:known.code,message:known.message},known.status,{...cors,...known.headers});}
  };

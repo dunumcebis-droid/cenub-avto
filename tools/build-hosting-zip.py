@@ -54,8 +54,11 @@ def public_files():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--index-only", action="store_true",
+    patch_mode = parser.add_mutually_exclusive_group()
+    patch_mode.add_argument("--index-only", action="store_true",
                         help="Build an index.html patch for an already deployed full site.")
+    patch_mode.add_argument("--photo-angle-only", action="store_true",
+                        help="Build the photo-angle UI patch for an already deployed full site.")
     args = parser.parse_args()
     output = args.output.absolute()
     if (output.is_symlink() or output.resolve().is_relative_to(ROOT)
@@ -64,6 +67,9 @@ def main():
     files = public_files()
     if args.index_only:
         files = [(name, content) for name, content in files if name == "index.html"]
+    elif args.photo_angle_only:
+        patch_paths = {"index.html", "assets/js/18-photo-review.js"}
+        files = [(name, content) for name, content in files if name in patch_paths]
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(dir=output.parent, suffix=".zip", delete=False) as handle:

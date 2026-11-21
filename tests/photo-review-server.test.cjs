@@ -128,14 +128,24 @@ test('chunked oversized requests are bounded without trusting Content-Length',as
 test('rate limit reservation is atomic gate before provider and returns Retry-After',async()=>{
  const f=await fixture({reserveError:{code:'P0001',message:'CA_PHOTO_REVIEW_RATE_LIMIT'}});const r=await f.invoke();assert.equal(r.status,429);assert.equal(r.headers.get('retry-after'),'60');assert.equal(providerCalls(f.calls).length,0);assert.equal(uploadCalls(f.calls).length,0);
 });
-test('screenshots, nonvehicle, wrong view and uncertainty return distinct warnings with no stored approval',async()=>{
- const cases=[{verdict:{...VERDICT,contains_screen_ui:true},code:'screenshot'},{verdict:{...VERDICT,is_vehicle_photo:false,category:'not_vehicle'},code:'not_vehicle'},{verdict:{...VERDICT,category:'rear'},code:'category_mismatch'},{verdict:{...VERDICT,category:'uncertain'},code:'uncertain'},{verdict:{...VERDICT,confidence:.849},code:'uncertain'}];
+test('screenshots, nonvehicle and low photo confidence remain rejected without stored approval',async()=>{
+ const cases=[{verdict:{...VERDICT,contains_screen_ui:true},code:'screenshot'},{verdict:{...VERDICT,is_vehicle_photo:false,category:'not_vehicle'},code:'not_vehicle'},{verdict:{...VERDICT,is_vehicle_photo:false},code:'not_vehicle'},{verdict:{...VERDICT,category:'not_vehicle'},code:'not_vehicle'},{verdict:{...VERDICT,confidence:.849},code:'uncertain'},{verdict:{...VERDICT,category:'uncertain',confidence:.849},code:'uncertain'}];
  for(const item of cases){const f=await fixture(item);const r=await f.invoke();assert.equal(r.status,422);assert.equal(r.data.code,item.code);assert.equal(uploadCalls(f.calls).length,0);assert.equal(proofCalls(f.calls).length,0);assert.equal(providerCalls(f.calls).length,1);}
 });
-test('all six categories require matching high confidence visual classification',async()=>{
+test('any observed vehicle angle can be uploaded into any of the six gallery slots',async()=>{
  for(const category of ['front','rear','side','interior','engine','other']){
-  const f=await fixture({verdict:{...VERDICT,category}});const r=await f.invoke({category});assert.equal(r.status,200);assert.equal(r.data.category,category);assert.equal(proofCalls(f.calls).length,1);
+  for(const observed of ['front','rear','side','interior','engine','other']){
+   const verdict={...VERDICT,category:observed},f=await fixture({verdict});
+   const r=await f.invoke({category});assert.equal(r.status,200,observed+' photo in '+category+' slot');assert.equal(r.data.category,category);
+   const proof=JSON.parse(proofCalls(f.calls)[0].body);assert.equal(proof.p_category,category);assert.deepEqual(proof.p_verdict,verdict);
+  }
  }
+});
+test('a genuine vehicle photograph with an uncertain angle is accepted independently of requested slot',async()=>{
+ const verdict={...VERDICT,category:'uncertain',confidence:.85},f=await fixture({verdict});
+ const r=await f.invoke({category:'side'});assert.equal(r.status,200);assert.equal(r.data.category,'side');
+ assert.equal(uploadCalls(f.calls).length,1);const proof=JSON.parse(proofCalls(f.calls)[0].body);
+ assert.equal(proof.p_category,'side');assert.deepEqual(proof.p_verdict,verdict);
 });
 test('strict schema rejects extra keys, wrong types, NaN-like strings and unknown categories',async()=>{
  const invalid=[{...VERDICT,extra:'ignored?'},{...VERDICT,confidence:'0.99'},{...VERDICT,confidence:1.01},{...VERDICT,category:'back'},{...VERDICT,is_vehicle_photo:'true'},null];
@@ -249,12 +259,24 @@ test('six separate photos use one provider call and preserve their own index, ca
 });
 test('mixed batch independently rejects unsafe photos while keeping correctly approved siblings',async()=>{
  const batchVerdicts=BATCH_CATEGORIES.map((category,input_index)=>({...VERDICT,category,input_index}));
- batchVerdicts[1].contains_screen_ui=true;batchVerdicts[2].category='rear';batchVerdicts[3].confidence=.8;
+ batchVerdicts[1].contains_screen_ui=true;batchVerdicts[2].category='not_vehicle';batchVerdicts[3].confidence=.8;
  const f=await fixture({batch:true,batchVerdicts});const r=await f.invoke({batch:true});
  assert.equal(r.status,200);assert.deepEqual(r.data.results.map(item=>item.ok),[true,false,false,false,true,true]);
- assert.equal(r.data.results[1].code,'screenshot');assert.equal(r.data.results[2].code,'category_mismatch');assert.equal(r.data.results[3].code,'uncertain');
+ assert.equal(r.data.results[1].code,'screenshot');assert.equal(r.data.results[2].code,'not_vehicle');assert.equal(r.data.results[3].code,'uncertain');
  assert.equal(providerCalls(f.calls).length,1);assert.equal(uploadCalls(f.calls).length,3);assert.equal(proofCalls(f.calls).length,3);
  for(const item of r.data.results.filter(item=>!item.ok)){assert.equal(item.url,undefined);assert.equal(item.review_id,undefined);}
+});
+test('batch accepts swapped and mixed views while binding each photo to its requested gallery slot',async()=>{
+ const observed=['rear','front','uncertain','engine','interior','side'];
+ const batchVerdicts=observed.map((category,input_index)=>({...VERDICT,category,input_index})).reverse();
+ const f=await fixture({batch:true,batchVerdicts});const r=await f.invoke({batch:true});
+ assert.equal(r.status,200);assert.ok(r.data.results.every(item=>item.ok));
+ assert.equal(uploadCalls(f.calls).length,6);assert.equal(proofCalls(f.calls).length,6);assert.equal(providerCalls(f.calls).length,1);
+ for(let index=0;index<6;index++){
+  assert.equal(r.data.results[index].category,BATCH_CATEGORIES[index]);
+  const proof=proofCalls(f.calls).map(call=>JSON.parse(call.body)).find(item=>item.p_review_id===reservationId(index));
+  assert.equal(proof.p_category,BATCH_CATEGORIES[index]);assert.deepEqual(proof.p_verdict,{...VERDICT,category:observed[index]});
+ }
 });
 test('every batch verdict and unique index must validate before any object or proof is written',async()=>{
  const valid=BATCH_CATEGORIES.map((category,input_index)=>({...VERDICT,category,input_index}));
@@ -349,10 +371,13 @@ test('a failed reservation drains in-flight siblings without starting another ba
  assert.equal(f.calls.filter(c=>c.url.endsWith('/ca_photo_review_reserve')).length,3);assert.equal(providerCalls(f.calls).length,0);assert.equal(uploadCalls(f.calls).length,0);
 });
 
-test('single and batch review instructions allow damaged vehicles without bypassing view and screenshot checks',async()=>{
+test('single and batch instructions allow damaged or mixed-angle vehicles and retain screenshot checks',async()=>{
  for(const batch of [false,true]){
   const f=await fixture({batch,batchCategories:['front']});const r=await f.invoke({batch,categories:['front']});assert.equal(r.status,200);
   const prompt=JSON.parse(providerCalls(f.calls)[0].body).systemInstruction.parts[0].text;
   assert.match(prompt,/Damage alone must never cause rejection/);assert.match(prompt,/intact headlights, grille, bumper or body panels are not required/);assert.match(prompt,/visible screenshot interfaces/);
+  assert.match(prompt,/Photographs from any angle are allowed in every gallery category/);
+  assert.match(prompt,/angle uncertainty alone must not lower confidence/);
+  assert.match(prompt,/independently of angle or category/);
  }
 });

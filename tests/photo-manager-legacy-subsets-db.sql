@@ -122,7 +122,9 @@ begin
  payload:=jsonb_build_object('photos',jsonb_build_object('front',to_jsonb(front_urls[1:5]||array[foreign_url])),'photo',front_urls[1]);
  perform pg_temp.ca_legacy_photo_blocked('other_owner_proof_still_denied',format('update public.elanlar set sekiller=%L::text[],ca_data=%L::jsonb where id=%L',front_urls[1:5]||array[foreign_url],payload,normal_id));
  payload:=jsonb_build_object('photos',jsonb_build_object('front',to_jsonb(front_urls[1:5]),'rear',jsonb_build_array(front_new)),'photo',front_urls[1]);
- perform pg_temp.ca_legacy_photo_blocked('wrong_category_proof_still_denied',format('update public.elanlar set sekiller=%L::text[],ca_data=%L::jsonb where id=%L',front_urls[1:5]||array[front_new],payload,normal_id));
+ update public.elanlar set sekiller=front_urls[1:5]||array[front_new],ca_data=payload where id=normal_id;
+ get diagnostics affected=row_count;
+ perform pg_temp.ca_legacy_photo_check('owned_reviewed_photo_accepts_another_category',affected=1 and exists(select 1 from public.elanlar where id=normal_id and ca_data->'photos'->'rear'=jsonb_build_array(front_new)));
  payload:=jsonb_build_object('photos',jsonb_build_object('front',to_jsonb(front_urls[1:5]||array[front_urls[1]])),'photo',front_urls[1]);
  perform pg_temp.ca_legacy_photo_blocked('duplicate_url_still_denied',format('update public.elanlar set sekiller=%L::text[],ca_data=%L::jsonb where id=%L',front_urls[1:5]||array[front_urls[1]],payload,normal_id));
  payload:=jsonb_build_object('photos',jsonb_build_object('front',to_jsonb(front_urls[1:5])),'photo',front_new);

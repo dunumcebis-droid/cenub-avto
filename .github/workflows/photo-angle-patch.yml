@@ -1,0 +1,32 @@
+name: Publish photo angle patch
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check generated SEO
+        run: node tools/generate-seo.cjs --check
+      - name: Build photo angle UI patch
+        run: python3 tools/build-hosting-zip.py --photo-angle-only --output "$RUNNER_TEMP/AvtoUnvan-sekiller.zip"
+      - name: Publish the public patch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view avtounvan-photo-angles-20261121 >/dev/null 2>&1; then
+            gh release upload avtounvan-photo-angles-20261121 "$RUNNER_TEMP/AvtoUnvan-sekiller.zip" --clobber
+          else
+            gh release create avtounvan-photo-angles-20261121 "$RUNNER_TEMP/AvtoUnvan-sekiller.zip" \
+              --target "$GITHUB_SHA" --title "AvtoUnvan — şəkil bucağı məhdudiyyətinin çıxarılması" \
+              --notes "Əvvəldən yüklənmiş AvtoUnvan saytının public_html qovluğuna açın və üzərinə yazın. Yalnız index.html və assets/js/18-photo-review.js dəyişir. Server və baza qaydaları ayrıca yenilənir."
+          fi
