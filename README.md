@@ -207,3 +207,9 @@ Elan formasında bir və ya bir neçə satış şərti seçilir; yeni formada Na
 Əvvəlki 77 fayllıq yayım canlıda tutuşdurulub. Yeni `index.html` önizləməsi 320, 390 və 1440 piksel enlərdə yoxlanıb: «Elanlara bax» oxu şriftdən asılı olmayan SVG ilə əvəz edilib, kabinetdə artıq qüvvədə olmayan SMS/baza/giriş hazırlığı qeydi çıxarılıb. Bu kiçik QA düzəlişi istifadəçi tərəfindən Azhosting-ə yüklənib; əsas və www ünvanlarında canlı HTML yoxlanmış faylla bayt səviyyəsində eynidir. [Əhatə, nəticələr və yayım vəziyyəti](tests/reports/qa-20261120.json) ayrıca saxlanılır.
 
 QA zamanı real məktub, hesab dəyişikliyi və foto yoxlama provayderi çağırışı edilməyib; yeni domenlə məktub çatması və parol dəyişməsi əvvəl istifadəçi tərəfindən təsdiqlənib. Avtomatik bank ödənişi qoşulmayıb, mövcud təhlükəsizlik məsləhətçisi xəbərdarlıqları ayrıca qeydə alınıb və istehsal yük sınağı aparılmayıb.
+
+## İcazələrin ayrıca yoxlanması — 21 noyabr 2026
+
+`database/browser-role-hardening.sql` canlı bazada `20261121072356_browser_role_least_privilege_hardening` kimi tətbiq olunub. Profil cədvəlində istifadə edilməyən texniki hüquqlar və brauzer rollarının elanları fiziki silmək hüququ götürülüb. Elanların mövcud arxivləşdirməsi, sahibinə aid profil əməliyyatları və admin RPC-ləri saxlanılıb.
+
+Yeni 25 sərhəd yoxlaması, 59 elan idarəetmə yoxlaması, foto icazələri və admin ixracı üçün iki əlavə SQL dəsti keçib. SQL sınaqları sintetik məlumatları geri qaytarır; həqiqi elan, paket, profil və şəkil metadata qeydləri əvvəl/sonra eynidir. 63 server və 4 brauzer təhlükəsizlik ssenarisi də keçib. Canlı admin və foto funksiyalarının mənbələri yoxlanmış kodla eynidir. [Əhatə və məhdudiyyətlər](tests/reports/security-boundaries-20261121.json) ayrıca saxlanılır. Bu nəticə bütün mümkün boşluqların olmadığı və ya hostinq/hesab təhlükəsizliyinin tam yoxlandığı zəmanəti deyil.

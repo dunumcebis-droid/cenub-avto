@@ -283,8 +283,13 @@ begin
   update public.elanlar set tesvir='forbidden archived edit' where id=c.paid_id;
   get diagnostics v_count=row_count;
   perform pg_temp.ca_check('owner_cannot_edit_archive',v_count=0);
-  delete from public.elanlar where id=c.paid_id;
-  get diagnostics v_count=row_count;
+  begin
+    delete from public.elanlar where id=c.paid_id;
+    get diagnostics v_count=row_count;
+  exception when insufficient_privilege then
+    -- A revoked DELETE grant denies earlier than the row-level policy.
+    v_count:=0;
+  end;
   perform pg_temp.ca_check('owner_cannot_hard_delete_payment_evidence',v_count=0);
 end;
 $test$;
