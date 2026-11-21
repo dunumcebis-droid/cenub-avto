@@ -62,12 +62,58 @@
     "feature_flags_unchanged": true,
     "no_new_advisor_findings": true,
     "hosting_frontend": {
-      "status": "awaiting owner upload",
+      "status": "owner-deployed and verified",
       "files": [
         "index.html",
         "assets/js/18-photo-review.js"
       ],
-      "cache_version": "photo-angle-20261121"
+      "cache_version": "photo-angle-20261121",
+      "hosts": [
+        "https://avtounvan.vip/",
+        "https://www.avtounvan.vip/"
+      ],
+      "static_checks": [
+        {
+          "url": "https://avtounvan.vip/?qa=photo-angle-20261121",
+          "status": 200,
+          "bytes": 56151,
+          "sha256": "4308f096b17fcd805217a37b298cb25c5b7e180a36c7ae86f3466ccc6fc32097",
+          "source_bytes_match": true
+        },
+        {
+          "url": "https://avtounvan.vip/assets/js/18-photo-review.js?v=photo-angle-20261121",
+          "status": 200,
+          "bytes": 19393,
+          "sha256": "95de00b99de541bc5883fcd8e910b6c911047e3d5b42040fbd4b16ea84b46e64",
+          "source_bytes_match": true
+        },
+        {
+          "url": "https://www.avtounvan.vip/?qa=photo-angle-20261121",
+          "status": 200,
+          "bytes": 56151,
+          "sha256": "4308f096b17fcd805217a37b298cb25c5b7e180a36c7ae86f3466ccc6fc32097",
+          "source_bytes_match": true
+        },
+        {
+          "url": "https://www.avtounvan.vip/assets/js/18-photo-review.js?v=photo-angle-20261121",
+          "status": 200,
+          "bytes": 19393,
+          "sha256": "95de00b99de541bc5883fcd8e910b6c911047e3d5b42040fbd4b16ea84b46e64",
+          "source_bytes_match": true
+        }
+      ],
+      "live_asset_browser_verification": {
+        "passed": 2,
+        "static_js_css_assets": 21,
+        "html_source": "Fresh live HTML",
+        "origin": "https://avtounvan.vip/",
+        "backend": "Mocked approvals, saves and visitor endpoints",
+        "real_api_provider_storage_or_visitor_writes": 0,
+        "cases": [
+          "test_form_explains_that_view_groups_are_optional_suggestions",
+          "test_other_vehicle_views_are_saved_in_the_requested_front_and_side_groups"
+        ]
+      }
     },
     "patch": {
       "release_url": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-photo-angles-20261121/AvtoUnvan-sekiller.zip",
@@ -81,7 +127,6 @@
   },
   "limitations": [
     "This change was not retested against the billed vision provider using real image bytes; existing credentials and provider configuration were unchanged.",
-    "Automated browser scenarios use fixture images and intercepted responses.",
-    "The hosting UI copy and cache version require the owner to extract the reviewed patch into public_html with overwrite. The server behavior is already deployed."
+    "Automated browser scenarios use fixture images and intercepted responses."
   ]
 }
