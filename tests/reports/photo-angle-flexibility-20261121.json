@@ -71,7 +71,12 @@
     },
     "patch": {
       "release_url": "https://github.com/dunumcebis-droid/cenub-avto/releases/download/avtounvan-photo-angles-20261121/AvtoUnvan-sekiller.zip",
-      "publication_verified": false
+      "publication_verified": true,
+      "source_commit": "582d08e6287327c9b36ddf53df8d824bc8d86440",
+      "zip_size_bytes": 19152,
+      "zip_sha256": "d18b4cb2838ac8630589ff12b8903996d767372ccdfdd07223923d31b0d5a064",
+      "contents_byte_match_source": true,
+      "workflow_run_url": "https://github.com/dunumcebis-droid/cenub-avto/actions/runs/44911877265"
     }
   },
   "limitations": [
