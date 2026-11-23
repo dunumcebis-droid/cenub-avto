@@ -1,12 +1,12 @@
 /**
- * AvtoÜnvan — AI Ekspert Override v8 (avtounvan-ai-override.js)
- * Səhifədəki sabit "AI Seçim Tövsiyəsi: ..." şablonunu və digər sabit cavabları
- * tutub suala uyğun dinamik cavabla əvəz edir.
- * Text nodes, element attributes/textContent və gecikmiş DOM yeniləmələrini əhatə edir.
+ * AvtoUnvan — AI Ekspert Override (avtounvan-ai-override.js)
+ * Sabit "AI Secim Tovsiyesi: ..." sablonunu ve diger statik cavablari
+ * tutub suala uygun dinamik cavabla evez edir.
  */
 (function () {
   const TARGET_PHRASES = [
     "ai seçim tövsiyəsi",
+    "ai secim tovsiyesi",
     "aşağı yanacaq sərfiyyatı və ehtiyat hissələrinin əlçatanlığı baxımından",
     "müqayisə etmək üçün kəşf et bölməsindəki filtrlərdən istifadə edə bilərsiniz",
     "bazar koridorunda satılır",
@@ -18,7 +18,7 @@
     "mən toyota prius almaq istəyirəm"
   ];
 
-  function looksLikeFixedTemplate(text) {
+  function isTemplateString(text) {
     if (!text || typeof text !== "string") return false;
     const low = text.toLowerCase();
     return TARGET_PHRASES.some((p) => low.includes(p));
@@ -38,23 +38,23 @@
     if (input && input.value && input.value.trim()) {
       return input.value.trim();
     }
-    return "Avtomobil üzrə kömək";
+    return "Avtomobil uzre komek";
   }
 
-  function buildFallbackAnswer(questionText) {
+  function buildDynamicReply(questionText) {
     const q = (questionText || "").trim();
     const low = q.toLowerCase();
 
-    if (!q || low === "avtomobil üzrə kömək") {
-      return "Avtomobil üzrə kömək etməyə hazıram. Hansı marka/model, il, qiymət aralığı və ya nasazlıq barədə soruşmaq istəyirsiniz?";
+    if (!q || low === "avtomobil uzre komek") {
+      return "Avtomobil uzre komek etmeye haziram. Hansi marka/model, il, qiymet araligi ve ya nasazliq barede sorusmaq isteyirsiniz?";
     }
 
     if (/^(salam|sal|sagol|sağol|təşəkkür|tesekkur|ok|okay|hi|hello)\b/i.test(low) && low.length <= 25) {
-      return "Salam! AvtoÜnvan AI Ekspert buradadır. Avtomobil seçimi, bazar qiyməti, texniki nasazlıq, alış, satış və ya barter üzrə sualınızı yaza bilərsiniz.";
+      return "Salam! AvtoUnvan AI Ekspert buradadir. Avtomobil secimi, bazar qiymeti, texniki nasazliq, alis, satis ve ya barter uzre sualinizi yaza bilersiniz.";
     }
 
     if (low.includes("qiymət") || low.includes("qiymet") || low.includes("nə qədər") || low.includes("ne qeder")) {
-      return `"${q}" üzrə bazar qiyməti avtomobilin buraxılış ili, yürüşü (km), texniki vəziyyəti və mühərrik/komplektasiyasından asılı olaraq dəyişir. Dəqiq qiymət aralığı üçün marka, model, il və təxmini büdcəni yazın.`;
+      return `"${q}" uzre bazar qiymeti avtomobilin buraxilis ili, yurusu (km), texniki veziyyeti ve muherrik/komplektasiyasindan asili olaraq deyisir. Deqiq qiymet araligi ucun marka, model, il ve texmini budceni yazin.`;
     }
 
     if (
@@ -69,161 +69,86 @@
       low.includes("nasaz") ||
       low.includes("xarab")
     ) {
-      return `"${q}" ilə bağlı ilkin texniki yoxlamada mühərrik yastıqları, asqı (xodovoy) elementləri, əyləc diskləri/balataları və ya transmissiya/yağ vəziyyəti nəzərdən keçirilməlidir. Avtomobilin markasını, ilini və səsin/titrəmənin nə vaxt yarandığını qeyd edin.`;
+      return `"${q}" ile bagli ilkin texniki yoxlamada muherrik yastiqlari, asqi (xodovoy) elementleri, eylec diskleri/balatalari ve ya transmissiya/yag veziyyeti nezerden kecirilmelidir. Avtomobilin markasini, ilini ve sesin/titremenin ne vaxt yarandigini qeyd edin.`;
     }
 
     if (low.includes("sat") || low.includes("barter") || low.includes("təcili") || low.includes("tecili") || low.includes("vip")) {
-      return `"${q}" məqsədi üçün elanda aydın şəkillər, real yürüş, texniki baxış məlumatı və bazar uyğun qiymət göstərmək satışı sürətləndirir. Hansı avtomobili satmaq və ya dəyişmək istəyirsiniz?`;
+      return `"${q}" meqsedi ucun elanda aydin sekiller, real yurus, texniki baxis melumati ve bazar uygun qiymet gostermek satisi suretlendirir. Hansi avtomobili satmaq ve ya deyismek isteyirsiniz?`;
     }
 
-    return `"${q}" sorğunuz üzrə seçim və ya tövsiyə üçün avtomobilin buraxılış ili, büdcəniz və əsas üstünlüyünüz (yanacaq sərfiyyatı, ailəvi genişlik, komfort və ya sürətli satış) barədə məlumat verin, sizə uyğun variantları sıralayım.`;
+    return `"${q}" sorgunuz uzre secim ve ya tovsiye ucun avtomobilin buraxilis ili, budceniz ve esas ustunluyunuz (yanacaq serfiyyati, ailevi genislik, komfort ve ya suretli satis) barede melumat verin, size uygun variantlari siralayim.`;
   }
 
-  async function computeDynamicReply(questionText) {
-    const q = (questionText && questionText.trim()) || getLastUserQuestion();
-    if (typeof window.askAiExpert === "function") {
-      try {
-        const res = await window.askAiExpert(q);
-        if (res && typeof res === "string" && !looksLikeFixedTemplate(res)) {
-          return res;
-        }
-      } catch (e) {
-        // Fallback below
-      }
-    }
-    return buildFallbackAnswer(q);
-  }
-
-  const replacedNodes = new WeakSet();
-  const replacedElements = new WeakSet();
-
-  async function scanAndReplaceTemplates(root = document.body) {
+  function replaceInDom(root) {
     if (!root) return;
+    const q = getLastUserQuestion();
+    const reply = buildDynamicReply(q);
+
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const candidates = [];
     let node;
     while ((node = walker.nextNode())) {
-      if (!node.nodeValue || replacedNodes.has(node)) continue;
-      if (looksLikeFixedTemplate(node.nodeValue)) {
-        candidates.push(node);
-      }
-    }
-    for (const textNode of candidates) {
-      replacedNodes.add(textNode);
-      const q = getLastUserQuestion();
-      const dynamicText = await computeDynamicReply(q);
-      if (dynamicText && textNode.nodeValue !== dynamicText) {
-        textNode.nodeValue = dynamicText;
+      if (node.nodeValue && isTemplateString(node.nodeValue)) {
+        node.nodeValue = reply;
       }
     }
 
     if (root.querySelectorAll) {
-      const els = root.querySelectorAll("div, p, span, li, article, section, pre, code, blockquote");
-      for (const el of els) {
-        if (replacedElements.has(el)) continue;
-        if (el.children.length === 0 && looksLikeFixedTemplate(el.textContent)) {
-          replacedElements.add(el);
-          const q = getLastUserQuestion();
-          const dynamicText = await computeDynamicReply(q);
-          if (dynamicText) {
-            el.textContent = dynamicText;
-          }
+      const all = root.querySelectorAll("*");
+      for (const el of all) {
+        if (el.children.length === 0 && typeof el.textContent === "string" && isTemplateString(el.textContent)) {
+          el.textContent = reply;
         }
       }
     }
   }
 
-  function bindComposerInterceptor() {
-    const findInput = () => {
-      const els = Array.from(document.querySelectorAll("input, textarea"));
-      return (
-        els.find((el) => /sual|yazın|yazin|soruş|sorus|mesaj/i.test(el.placeholder || "")) ||
-        els[0] ||
-        null
-      );
-    };
-
-    const triggerDynamicFlow = async (explicitText) => {
-      const inp = findInput();
-      const text = (explicitText || (inp && inp.value) || "").trim();
-      if (!text) return;
-
-      if (window.avtoUnvanAi && typeof window.avtoUnvanAi._updateContext === "function") {
-        window.avtoUnvanAi._updateContext(text);
-        window.avtoUnvanAi.history.push({ role: "user", text, time: Date.now() });
-      }
-
-      [50, 150, 400, 900, 1800].forEach((ms) => {
-        setTimeout(() => {
-          scanAndReplaceTemplates(document.body);
-        }, ms);
-      });
-    };
-
-    document.addEventListener(
-      "click",
-      (ev) => {
-        const btn = ev.target.closest("button, [role='button']");
-        if (!btn) return;
-        const label = (btn.innerText || btn.textContent || "").trim();
-        if (/göndər|gonder|send/i.test(label) || btn.type === "submit") {
-          const inp = findInput();
-          const val = inp ? inp.value.trim() : "";
-          if (val) {
-            triggerDynamicFlow(val);
+  function hookCommonGlobals() {
+    const names = [
+      "askAiExpert",
+      "getAiExpertReply",
+      "generateAiReply",
+      "sendAiMessage",
+      "handleAiSubmit"
+    ];
+    for (const fnName of names) {
+      if (typeof window[fnName] === "function") {
+        const orig = window[fnName];
+        window[fnName] = async function (...args) {
+          const prompt = typeof args[0] === "string" ? args[0] : getLastUserQuestion();
+          const res = await orig.apply(this, args);
+          if (!res || typeof res !== "string" || isTemplateString(res)) {
+            return buildDynamicReply(prompt);
           }
-        }
-      },
-      true
-    );
-
-    document.addEventListener(
-      "keydown",
-      (ev) => {
-        if (ev.key === "Enter" && !ev.shiftKey) {
-          const active = document.activeElement;
-          if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
-            const val = active.value.trim();
-            if (val) {
-              triggerDynamicFlow(val);
-            }
-          }
-        }
-      },
-      true
-    );
-  }
-
-  const observer = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      for (const added of m.addedNodes) {
-        if (added.nodeType === 1) {
-          scanAndReplaceTemplates(added);
-        }
-      }
-      if (m.type === "characterData" && m.target && m.target.nodeValue) {
-        if (!replacedNodes.has(m.target) && looksLikeFixedTemplate(m.target.nodeValue)) {
-          scanAndReplaceTemplates(m.target.parentElement || document.body);
-        }
+          return res;
+        };
       }
     }
+  }
+
+  const observer = new MutationObserver(() => {
+    replaceInDom(document.body);
   });
 
-  function init() {
-    bindComposerInterceptor();
+  function start() {
+    hookCommonGlobals();
     if (document.body) {
-      scanAndReplaceTemplates(document.body);
+      replaceInDom(document.body);
       observer.observe(document.body, {
         childList: true,
         subtree: true,
         characterData: true
       });
     }
+    setInterval(() => {
+      if (document.body) {
+        replaceInDom(document.body);
+      }
+    }, 600);
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", start);
   } else {
-    init();
+    start();
   }
 })();
