@@ -1,8 +1,8 @@
 /**
- * AvtoÜnvan — AI Ekspert Override v7 (avtounvan-ai-override.js)
+ * AvtoÜnvan — AI Ekspert Override v8 (avtounvan-ai-override.js)
  * Səhifədəki sabit "AI Seçim Tövsiyəsi: ..." şablonunu və digər sabit cavabları
  * tutub suala uyğun dinamik cavabla əvəz edir.
- * Həmçinin mövcud window.askAiExpert və ya səhifədəki köhnə cavab funksiyalarını əhatə edir.
+ * Text nodes, element attributes/textContent və gecikmiş DOM yeniləmələrini əhatə edir.
  */
 (function () {
   const TARGET_PHRASES = [
@@ -57,7 +57,18 @@
       return `"${q}" üzrə bazar qiyməti avtomobilin buraxılış ili, yürüşü (km), texniki vəziyyəti və mühərrik/komplektasiyasından asılı olaraq dəyişir. Dəqiq qiymət aralığı üçün marka, model, il və təxmini büdcəni yazın.`;
     }
 
-    if (low.includes("səs") || low.includes("ses") || low.includes("titrəmə") || low.includes("titre") || low.includes("mühərrik") || low.includes("muherrik") || low.includes("əyləc") || low.includes("eylec") || low.includes("nasaz") || low.includes("xarab")) {
+    if (
+      low.includes("səs") ||
+      low.includes("ses") ||
+      low.includes("titrəmə") ||
+      low.includes("titre") ||
+      low.includes("mühərrik") ||
+      low.includes("muherrik") ||
+      low.includes("əyləc") ||
+      low.includes("eylec") ||
+      low.includes("nasaz") ||
+      low.includes("xarab")
+    ) {
       return `"${q}" ilə bağlı ilkin texniki yoxlamada mühərrik yastıqları, asqı (xodovoy) elementləri, əyləc diskləri/balataları və ya transmissiya/yağ vəziyyəti nəzərdən keçirilməlidir. Avtomobilin markasını, ilini və səsin/titrəmənin nə vaxt yarandığını qeyd edin.`;
     }
 
@@ -84,6 +95,8 @@
   }
 
   const replacedNodes = new WeakSet();
+  const replacedElements = new WeakSet();
+
   async function scanAndReplaceTemplates(root = document.body) {
     if (!root) return;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -101,6 +114,21 @@
       const dynamicText = await computeDynamicReply(q);
       if (dynamicText && textNode.nodeValue !== dynamicText) {
         textNode.nodeValue = dynamicText;
+      }
+    }
+
+    if (root.querySelectorAll) {
+      const els = root.querySelectorAll("div, p, span, li, article, section, pre, code, blockquote");
+      for (const el of els) {
+        if (replacedElements.has(el)) continue;
+        if (el.children.length === 0 && looksLikeFixedTemplate(el.textContent)) {
+          replacedElements.add(el);
+          const q = getLastUserQuestion();
+          const dynamicText = await computeDynamicReply(q);
+          if (dynamicText) {
+            el.textContent = dynamicText;
+          }
+        }
       }
     }
   }
@@ -125,7 +153,7 @@
         window.avtoUnvanAi.history.push({ role: "user", text, time: Date.now() });
       }
 
-      [80, 250, 600, 1200, 2200].forEach((ms) => {
+      [50, 150, 400, 900, 1800].forEach((ms) => {
         setTimeout(() => {
           scanAndReplaceTemplates(document.body);
         }, ms);
@@ -171,6 +199,11 @@
       for (const added of m.addedNodes) {
         if (added.nodeType === 1) {
           scanAndReplaceTemplates(added);
+        }
+      }
+      if (m.type === "characterData" && m.target && m.target.nodeValue) {
+        if (!replacedNodes.has(m.target) && looksLikeFixedTemplate(m.target.nodeValue)) {
+          scanAndReplaceTemplates(m.target.parentElement || document.body);
         }
       }
     }
