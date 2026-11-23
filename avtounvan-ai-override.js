@@ -1,7 +1,8 @@
 /**
- * AvtoÜnvan — AI Ekspert Override v4 (avtounvan-ai-override.js)
+ * AvtoÜnvan — AI Ekspert Override v6 (avtounvan-ai-override.js)
  * Səhifədəki sabit "AI Seçim Tövsiyəsi: ..." şablonunu və digər sabit cavabları
  * tutub suala uyğun dinamik cavabla əvəz edir.
+ * Həmçinin mövcud window.askAiExpert və ya səhifədəki köhnə cavab funksiyalarını əhatə edir.
  */
 (function () {
   const TARGET_PHRASES = [
@@ -11,7 +12,8 @@
     "bazar koridorunda satılır",
     "təcili satış (1 azn",
     "vip paket (10 azn",
-    "ai bazar analizi"
+    "ai bazar analizi",
+    "toyota camry hybrid, hyundai tucson və ya byd seal u dm-i"
   ];
 
   function looksLikeFixedTemplate(text) {
@@ -37,12 +39,42 @@
     return "Avtomobil üzrə kömək";
   }
 
+  function buildFallbackAnswer(questionText) {
+    const q = (questionText || "").trim();
+    const low = q.toLowerCase();
+
+    if (!q || low === "avtomobil üzrə kömək") {
+      return "Avtomobil üzrə kömək etməyə hazıram. Hansı marka/model, il, qiymət aralığı və ya nasazlıq barədə soruşmaq istəyirsiniz?";
+    }
+
+    if (low.includes("qiymət") || low.includes("qiymet") || low.includes("nə qədər") || low.includes("ne qeder")) {
+      return `"${q}" üzrə bazar qiyməti avtomobilin buraxılış ili, yürüşü (km), texniki vəziyyəti və mühərrik/komplektasiyasından asılı olaraq dəyişir. Dəqiq qiymət aralığı üçün marka, model, il və təxmini büdcəni yazın.`;
+    }
+
+    if (low.includes("səs") || low.includes("ses") || low.includes("titrəmə") || low.includes("titre") || low.includes("mühərrik") || low.includes("muherrik") || low.includes("əyləc") || low.includes("eylec") || low.includes("nasaz") || low.includes("xarab")) {
+      return `"${q}" ilə bağlı ilkin texniki yoxlamada mühərrik yastıqları, asqı (xodovoy) elementləri, əyləc diskləri/balataları və ya transmissiya/yağ vəziyyəti nəzərdən keçirilməlidir. Avtomobilin markasını, ilini və səsin/titrəmənin nə vaxt yarandığını qeyd edin.`;
+    }
+
+    if (low.includes("sat") || low.includes("barter") || low.includes("təcili") || low.includes("tecili") || low.includes("vip")) {
+      return `"${q}" məqsədi üçün elanda aydın şəkillər, real yürüş, texniki baxış məlumatı və bazar uyğun qiymət göstərmək satışı sürətləndirir. Hansı avtomobili satmaq və ya dəyişmək istəyirsiniz?`;
+    }
+
+    return `"${q}" sorğunuz üzrə seçim və ya tövsiyə üçün avtomobilin buraxılış ili, büdcəniz və əsas üstünlüyünüz (yanacaq sərfiyyatı, ailəvi genişlik, komfort və ya sürətli satış) barədə məlumat verin, sizə uyğun variantları sıralayım.`;
+  }
+
   async function computeDynamicReply(questionText) {
     const q = (questionText && questionText.trim()) || getLastUserQuestion();
     if (typeof window.askAiExpert === "function") {
-      return await window.askAiExpert(q);
+      try {
+        const res = await window.askAiExpert(q);
+        if (res && typeof res === "string" && !looksLikeFixedTemplate(res)) {
+          return res;
+        }
+      } catch (e) {
+        // Fallback below
+      }
     }
-    return `Sualınız ("${q}") qəbul olundu. Hansı marka/model, il və ya mövzu (qiymət, nasazlıq, alış, satış, barter) barədə dəqiqləşdirmək istəyirsiniz?`;
+    return buildFallbackAnswer(q);
   }
 
   const replacedNodes = new WeakSet();
@@ -87,7 +119,7 @@
         window.avtoUnvanAi.history.push({ role: "user", text, time: Date.now() });
       }
 
-      [100, 350, 800, 1500].forEach((ms) => {
+      [80, 250, 600, 1200, 2200].forEach((ms) => {
         setTimeout(() => {
           scanAndReplaceTemplates(document.body);
         }, ms);
@@ -100,7 +132,7 @@
         const btn = ev.target.closest("button, [role='button']");
         if (!btn) return;
         const label = (btn.innerText || btn.textContent || "").trim();
-        if (/göndər|gonder|send/i.test(label)) {
+        if (/göndər|gonder|send/i.test(label) || btn.type === "submit") {
           const inp = findInput();
           const val = inp ? inp.value.trim() : "";
           if (val) {
