@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AvtoÜnvan — Canlı AI Ekspert</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #070d14;
+      color: #eef4fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .app {
+      width: 100%;
+      max-width: 460px;
+      background: #0c1520;
+      border: 1px solid #1b2c3f;
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 82vh;
+    }
+    .header {
+      padding: 14px 16px;
+      background: #101c2b;
+      border-bottom: 1px solid #1d3045;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { font-weight: 700; font-size: 16px; }
+    .badge {
+      background: #12b98122;
+      color: #34d399;
+      border: 1px solid #12b98155;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .quick-list {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid #172738;
+    }
+    .quick-btn {
+      text-align: left;
+      background: #132132;
+      color: #dbe7f3;
+      border: 1px solid #22374f;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    .quick-btn:hover { background: #192b41; }
+    .messages {
+      flex: 1;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: #107c56;
+      color: #fff;
+      padding: 10px 13px;
+      border-radius: 14px 14px 4px 14px;
+      max-width: 84%;
+      font-size: 13.5px;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+    .msg-ai {
+      align-self: flex-start;
+      background: #142334;
+      color: #e8f0f8;
+      border: 1px solid #22384f;
+      padding: 11px 14px;
+      border-radius: 14px 14px 14px 4px;
+      max-width: 88%;
+      font-size: 13.5px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    .composer {
+      padding: 12px;
+      background: #0f1b29;
+      border-top: 1px solid #1b2c3f;
+      display: flex;
+      gap: 8px;
+    }
+    .composer input {
+      flex: 1;
+      background: #0a121b;
+      border: 1px solid #243952;
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      outline: none;
+    }
+    .composer button {
+      background: #129466;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand">AvtoÜnvan • AI Ekspert</div>
+      <div class="badge">CANLI</div>
+    </div>
+
+    <div class="quick-list">
+      <button type="button" class="quick-btn" data-q="2020 BMW X5 Bakı bazar qiyməti nə qədərdir?">2020 BMW X5 Bakı bazar qiyməti nə qədərdir?</button>
+      <button type="button" class="quick-btn" data-q="2022 Hyundai Tucson likvidliyi necədir?">2022 Hyundai Tucson likvidliyi necədir?</button>
+      <button type="button" class="quick-btn" data-q="Avtomobili tez satmaq üçün Təcili (1 AZN) ya VIP (10 AZN)?">Avtomobili tez satmaq üçün Təcili (1 AZN) ya VIP (10 AZN)?</button>
+    </div>
+
+    <div id="messages" class="messages" data-ai-messages="true"></div>
+
+    <div class="composer">
+      <input id="questionInput" type="text" placeholder="Sualınızı buraya yazın (məs: Prius, səs, barter...)" />
+      <button id="sendBtn" type="button">Göndər</button>
+    </div>
+  </div>
+
+  <script src="./avtounvan-ai-expert.js"></script>
+  <script>
+    const msgBox = document.getElementById("messages");
+    const qInput = document.getElementById("questionInput");
+    const sBtn = document.getElementById("sendBtn");
+
+    function addMsg(text, who) {
+      const div = document.createElement("div");
+      div.className = who === "user" ? "msg-user" : "msg-ai";
+      div.innerHTML = "";
+      String(text).split(/(\*\*[^*]+\*\*)/g).forEach((part) => {
+        if (/^\*\*[^*]+\*\*$/.test(part)) {
+          const b = document.createElement("strong");
+          b.textContent = part.slice(2, -2);
+          div.appendChild(b);
+        } else {
+          div.appendChild(document.createTextNode(part));
+        }
+      });
+      msgBox.appendChild(div);
+      msgBox.scrollTop = msgBox.scrollHeight;
+    }
+
+    async function sendQuestion(customText) {
+      const text = (customText ?? qInput.value).trim();
+      if (!text) return;
+      if (!customText) qInput.value = "";
+      addMsg(text, "user");
+      const reply = await window.askAiExpert(text);
+      addMsg(reply, "ai");
+    }
+
+    sBtn.addEventListener("click", () => sendQuestion());
+    qInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendQuestion();
+    });
+    document.querySelectorAll(".quick-btn").forEach((btn) => {
+      btn.addEventListener("click", () => sendQuestion(btn.getAttribute("data-q")));
+    });
+
+    addMsg("Salam! İstədiyin avtomobil, qiymət, səs/nasazlıq, barter və ya elan paketi barədə sual verə bilərsən.", "ai");
+  </script>
+</body>
+</html>
