@@ -1,10 +1,13 @@
 /**
- * AvtoÜnvan — AI Ekspert Override & Canlı Cavab Bağlayıcısı (avtounvan-ai-override.js)
- * Səhifədə köhnə/sabit cavab verən funksiyalar və ya düymələr olsa belə,
- * sualı tutub AvtoUnvanAiEngine / window.askAiExpert vasitəsilə hər suala uyğun cavab verir.
+ * AvtoÜnvan — AI Ekspert Override v4 (avtounvan-ai-override.js)
+ * Səhifədəki sabit "AI Seçim Tövsiyəsi: ..." şablonunu və digər sabit cavabları
+ * tutub suala uyğun dinamik cavabla əvəz edir.
  */
 (function () {
   const TARGET_PHRASES = [
+    "ai seçim tövsiyəsi",
+    "aşağı yanacaq sərfiyyatı və ehtiyat hissələrinin əlçatanlığı baxımından",
+    "müqayisə etmək üçün kəşf et bölməsindəki filtrlərdən istifadə edə bilərsiniz",
     "bazar koridorunda satılır",
     "təcili satış (1 azn",
     "vip paket (10 azn",
@@ -25,7 +28,9 @@
         }
       }
     }
-    const input = document.querySelector("input[placeholder*='Sual'], input[placeholder*='sual'], textarea[placeholder*='Sual'], textarea[placeholder*='sual'], input[type='text'], textarea");
+    const input = document.querySelector(
+      "input[placeholder*='Sual'], input[placeholder*='sual'], textarea[placeholder*='Sual'], textarea[placeholder*='sual'], input[type='text'], textarea"
+    );
     if (input && input.value && input.value.trim()) {
       return input.value.trim();
     }
@@ -65,7 +70,11 @@
   function bindComposerInterceptor() {
     const findInput = () => {
       const els = Array.from(document.querySelectorAll("input, textarea"));
-      return els.find((el) => /sual|yazın|yazin|soruş|sorus|mesaj/i.test(el.placeholder || "")) || els[0] || null;
+      return (
+        els.find((el) => /sual|yazın|yazin|soruş|sorus|mesaj/i.test(el.placeholder || "")) ||
+        els[0] ||
+        null
+      );
     };
 
     const triggerDynamicFlow = async (explicitText) => {
@@ -78,12 +87,11 @@
         window.avtoUnvanAi.history.push({ role: "user", text, time: Date.now() });
       }
 
-      setTimeout(() => {
-        scanAndReplaceTemplates(document.body);
-      }, 120);
-      setTimeout(() => {
-        scanAndReplaceTemplates(document.body);
-      }, 500);
+      [100, 350, 800, 1500].forEach((ms) => {
+        setTimeout(() => {
+          scanAndReplaceTemplates(document.body);
+        }, ms);
+      });
     };
 
     document.addEventListener(
@@ -134,7 +142,11 @@
     bindComposerInterceptor();
     if (document.body) {
       scanAndReplaceTemplates(document.body);
-      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
     }
   }
 
