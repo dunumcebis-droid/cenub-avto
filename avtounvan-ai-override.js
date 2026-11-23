@@ -1,5 +1,5 @@
 /**
- * AvtoÜnvan — AI Ekspert Override v6 (avtounvan-ai-override.js)
+ * AvtoÜnvan — AI Ekspert Override v7 (avtounvan-ai-override.js)
  * Səhifədəki sabit "AI Seçim Tövsiyəsi: ..." şablonunu və digər sabit cavabları
  * tutub suala uyğun dinamik cavabla əvəz edir.
  * Həmçinin mövcud window.askAiExpert və ya səhifədəki köhnə cavab funksiyalarını əhatə edir.
@@ -13,7 +13,9 @@
     "təcili satış (1 azn",
     "vip paket (10 azn",
     "ai bazar analizi",
-    "toyota camry hybrid, hyundai tucson və ya byd seal u dm-i"
+    "toyota camry hybrid, hyundai tucson və ya byd seal u dm-i",
+    "men toyota prius almaq isteyirem",
+    "mən toyota prius almaq istəyirəm"
   ];
 
   function looksLikeFixedTemplate(text) {
@@ -45,6 +47,10 @@
 
     if (!q || low === "avtomobil üzrə kömək") {
       return "Avtomobil üzrə kömək etməyə hazıram. Hansı marka/model, il, qiymət aralığı və ya nasazlıq barədə soruşmaq istəyirsiniz?";
+    }
+
+    if (/^(salam|sal|sagol|sağol|təşəkkür|tesekkur|ok|okay|hi|hello)\b/i.test(low) && low.length <= 25) {
+      return "Salam! AvtoÜnvan AI Ekspert buradadır. Avtomobil seçimi, bazar qiyməti, texniki nasazlıq, alış, satış və ya barter üzrə sualınızı yaza bilərsiniz.";
     }
 
     if (low.includes("qiymət") || low.includes("qiymet") || low.includes("nə qədər") || low.includes("ne qeder")) {
